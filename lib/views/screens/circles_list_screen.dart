@@ -1,46 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/bloc/CircleBloc/circle_bloc.dart';
-import 'package:muzn/bloc/CircleBloc/circle_event.dart';
-import 'package:muzn/bloc/CircleBloc/circle_state.dart';
-import 'package:muzn/controllers/auth_controller.dart';
-import 'package:muzn/models/user_model.dart';
+import 'package:muzn/controllers/circle_controller.dart';
+import 'package:muzn/controllers/user_controller.dart';
+import 'package:muzn/models/circle_model.dart';
+import 'package:muzn/repository/circle_repository.dart';
+import 'package:muzn/repository/user_repository.dart';
 import 'package:muzn/views/screens/circle_bottomsheet.dart';
-import 'package:muzn/views/screens/circle_screen.dart';
 import 'package:muzn/views/widgets/app_drawer.dart';
 import 'package:muzn/views/widgets/custom_app_bar.dart';
 
 class CirclesListScreen extends StatefulWidget {
-  final int school_id;
-  CirclesListScreen({required this.school_id});
+  final int schoolId;
+
+  const CirclesListScreen({Key? key, required this.schoolId}) : super(key: key);
 
   @override
   _CirclesListScreenState createState() => _CirclesListScreenState();
 }
 
 class _CirclesListScreenState extends State<CirclesListScreen> {
-  late CircleBloc _circleBloc;
+  late CircleController _circleController;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  int _teacherId = 0;
+  late UserController _userController;
+  List<Circle> _circles = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
+
   @override
   void initState() {
     super.initState();
-    _circleBloc = context.read<CircleBloc>();
-    _circleBloc
-        .add(LoadCircles(teacherId: _teacherId, schoolId: widget.school_id));
-
-    _getUserId();
+    _circleController = CircleController();
+    _userController = UserController();
+    _fetchCircles();
   }
 
-  Future<void> _getUserId() async {
-    User? user = await AuthController.getCurrentUser();
-    if (user != null && user.id != 0) {
+  Future<void> _fetchCircles() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final circles =
+          await _circleController.getCirclesBySchoolId(widget.schoolId);
       setState(() {
-        _teacherId = user.id!;
+        _circles = circles;
       });
-      _circleBloc
-          .add(LoadCircles(teacherId: _teacherId, schoolId: widget.school_id));
+    } catch (e) {
+      setState(() {
+        _errorMessage = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -52,49 +65,19 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
         title: 'circles'.tr(context),
         scaffoldKey: scaffoldKey,
       ),
-      drawer: AppDrawer(),
-      body: BlocBuilder<CircleBloc, CircleState>(
-        builder: (context, state) {
-          if (state is CircleLoading) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (state is CircleLoaded) {
-            if (state.circles.length > 0) {
-              return ListView.builder(
-                  itemCount: state.circles.length,
-                  itemBuilder: (context, index) {
-                    return _buildCircleListItem(state.circles[index]);
-                  });
-            }
-            else{
-              return Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      "assets/images/empty_box.png",
-                      width: 200,
-                      height: 200,
-                    ),
-                     SizedBox(height: 30),
-
-                    Text('empty_data'.tr(context),style: Theme.of(context).textTheme.displayMedium),
-                  ]
-                ),
-              );
-            }
-          } else if (state is CircleError) {
-            return Center(child: Text(state.message));
-          } else {
-            return Center(
-                child: Image.asset(
-              "assets/images/empty_box.png",
-              width: 200,
-              height: 200,
-            ));
-          }
-        },
-      ),
+      drawer: AppDrawer(userController: _userController),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _errorMessage.isNotEmpty
+              ? Center(child: Text(_errorMessage))
+              : _circles.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: _circles.length,
+                      itemBuilder: (context, index) {
+                        return _buildCircleListItem(_circles[index]);
+                      },
+                    )
+                  : _buildEmptyState(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           bool? isAdded = await showModalBottomSheet<bool>(
@@ -103,8 +86,8 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
             builder: (context) => AddCircleBottomSheet(),
           );
           if (isAdded == true) {
-            _circleBloc.add(LoadCircles(
-                teacherId: _teacherId, schoolId: 0)); // Ensure reloading
+            _fetchCircles();
+            Navigator.pop(context);
           }
         },
         child: const Icon(Icons.add),
@@ -112,32 +95,33 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
     );
   }
 
-  Widget _buildCircleListItem(Map<String, dynamic> circle) {
-    return Container(
-      decoration: BoxDecoration(
-          border: Border(
-        bottom: BorderSide(
-          color: Colors.black, // Border color
-          width: 0.5, // Border width
-        ),
-      )),
+  Widget _buildCircleListItem(Circle circle) {
+    return Dismissible(
+      key: Key(circle.id.toString()),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: Colors.red,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        alignment: Alignment.centerRight,
+        child: const Icon(Icons.delete, color: Colors.white, size: 30),
+      ),
+      onDismissed: (_) async {
+        await _circleController.deleteCircle(circle.id ?? 0);
+        _fetchCircles();
+      },
       child: ListTile(
         leading: const CircleAvatar(
           radius: 30,
           backgroundImage: AssetImage('assets/images/app_logo.png'),
           backgroundColor: Colors.white,
         ),
-        title: Text(circle['name'] ?? 'Unknown'),
+        title: Text(circle.name ?? 'Unknown'),
         subtitle: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(circle['category_name'] ?? 'No Address'),
-            Spacer(),
-            SizedBox(
-              width: 2,
-            ),
-            Icon(Icons.timer, color: Color.fromARGB(255, 63, 54, 54)),
-            Text(circle['circle_time'] ?? 'No Address'),
+            // Text(circle.category.name ?? circle.category.name= ''),
+            const Spacer(),
+            const Icon(Icons.timer, color: Color.fromARGB(255, 63, 54, 54)),
+            Text(circle.circleTime.name ?? 'No Time'),
           ],
         ),
         trailing: Column(
@@ -152,8 +136,10 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
               ),
               child: Center(
                 child: Text(
-                  circle['student_count'].toString() ?? '?',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  "",
+                  // circle.studentCount.toString(),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -161,15 +147,26 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
             Text('student'.tr(context)),
           ],
         ),
-        onTap: () {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => CircleScreen(circleId: circle['id']), // Pass the actual ID
-    ),
-  );
-},
+      ),
+    );
+  }
 
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            "assets/images/empty_box.png",
+            width: 200,
+            height: 200,
+          ),
+          const SizedBox(height: 30),
+          Text(
+            'empty_data'.tr(context),
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
+        ],
       ),
     );
   }

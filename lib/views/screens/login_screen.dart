@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
+import 'package:muzn/bloc/User/user_bloc.dart';
+import 'package:muzn/bloc/User/user_event.dart';
+import 'package:muzn/bloc/User/user_state.dart';
 import 'package:muzn/models/user_model.dart';
-import 'package:muzn/utils/request_status.dart';
 import 'package:muzn/views/screens/home_screen.dart';
 import 'package:muzn/views/screens/quraan_screen.dart';
 import 'package:muzn/views/screens/registration_screen.dart';
@@ -10,9 +12,7 @@ import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_text_button.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 import 'package:muzn/bloc/LocaleBloc/locale_bloc.dart';
-import 'package:muzn/controllers/auth_controller.dart';
-import 'package:muzn/views/widgets/message.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -26,47 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _isPasswordVisible = false;
-
-  final AuthController _authController = AuthController();
-
-Future<void> _login() async {
-  if (_formKey.currentState!.validate()) {
-    RequestStatus result = await _authController.loginUser(
-      emailController.text.trim(),
-      passwordController.text.trim(),
-    );
-
-    if (result.status && result.data != null) {
-      // Extract user data from the API response
-      final userData = result.data;
-
-      // Create a User object
-      final user = User(
-        id: userData['id'] ?? 0,
-        email: userData['email'] ?? '',
-        password: passwordController.text.trim(), // Storing password is optional
-        fullName: userData['full_name'] ?? '',
-        phone: userData['phone'] ?? '',
-        role: userData['role'] ?? '',
-        status: userData['status'] ?? '',
-        country: userData['country'] ?? '',
-        gender: userData['gender'] ?? '',
-      );
-
-      // Store user in SharedPreferences
-      await _authController.saveToSharedPreferences(user);
-
-      // Navigate to the home screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else {
-      ErrorSnackbar.show(context: context, errorText: result.message);
-    }
-  }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -164,9 +123,40 @@ Future<void> _login() async {
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.03),
-                CustomButton(
-                  text: 'login_button'.tr(context),
-                  onPressed: _login,
+                BlocConsumer<UserBloc, UserState>(
+                  listener: (context, state) {
+                    if (state is UserAuthenticated) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()),
+                      );
+                      
+                     
+                    } else if (state is UserError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Center(child: Text('auth_error.register_failed'.tr(context))),backgroundColor: Colors.red,),
+                      );
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is UserLoading) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    return CustomButton(
+                      text: 'login_button'.tr(context),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          // Dispatch the LoginEvent to the BLoC
+                          context.read<UserBloc>().add(
+                                LoginEvent(
+                                  emailController.text.trim(),
+                                  passwordController.text.trim(),
+                                ),
+                              );
+                        }
+                      },
+                    );
+                  },
                 ),
                 const SizedBox(height: 16.0),
                 CustomTextButton(

@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Add internet permission for streaming audio -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Add audio permission for playing audio -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
     <application
         android:label="مزن"
         android:name="${applicationName}"

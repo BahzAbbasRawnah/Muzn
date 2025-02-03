@@ -17,8 +17,9 @@ class LoadStudents extends StudentEvent {
 
 class AddStudent extends StudentEvent {
   final Student student;
-  
-  AddStudent(this.student);
+    final int circleId;
+
+  AddStudent(this.student, this.circleId);
 
   @override
   List<Object?> get props => [student];

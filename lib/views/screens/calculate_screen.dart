@@ -14,7 +14,7 @@ class CalculateScreen extends StatelessWidget {
         title: 'calculate'.tr(context),
         scaffoldKey: _scaffoldKey,
       ),
-      drawer:  AppDrawer(),
+      // drawer:  AppDrawer(),
       body: Center(child: Text('Calculate')),
       
     );

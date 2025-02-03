@@ -81,7 +81,7 @@ floatingActionButtonTheme: FloatingActionButtonThemeData(
       textStyle: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.normal,
-        color: const Color.fromARGB(176, 27, 27, 27).withAlpha(2),
+        color: const Color.fromARGB(176, 27, 27, 27),
       ),
     ),
     errorStyle: GoogleFonts.amiri(

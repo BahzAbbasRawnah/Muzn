@@ -1,18 +1,17 @@
 class User {
-  int? id;
-  String fullName;
-  String email;
-  String password;
-  String? phone;
-  String? country;
-  String gender;
-  String role;
-  String status;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  DateTime? deletedAt;
+  final int? id;
+  final String fullName;
+  final String email;
+  final String password; // Ensure this is hashed before storing
+  final String? phone;
+  final String? country;
+  final String gender;
+  final String role;
+  final String status;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
 
-  // Constructor
   User({
     this.id,
     required this.fullName,
@@ -23,43 +22,43 @@ class User {
     required this.gender,
     required this.role,
     required this.status,
-    this.createdAt,
-    this.updatedAt,
+    required this.createdAt,
+    required this.updatedAt,
     this.deletedAt,
   });
 
-  // Map to Object (fromMap)
-  factory User.fromMap(Map<String, dynamic> map) {
+  // Factory method to create a User object from a JSON map
+  factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: map['id'] as int?,
-      fullName: map['full_name'] as String,
-      email: map['email'] as String,
-      password: map['password'] as String,
-      phone: map['phone'] as String?,
-      country: map['country'] as String?,
-      gender: map['gender'] as String,
-      role: map['role'] as String,
-      status: map['status'] as String,
-      createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
-      updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null,
-      deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
+      id: json['id'],
+      fullName: json['full_name'],
+      email: json['email'],
+      password: json['password'], // Ensure this is hashed
+      phone: json['phone'],
+      country: json['country'],
+      gender: json['gender'],
+      role: json['role'],
+      status: json['status'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+      deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
     );
   }
 
-  // Object to Map (toMap)
-  Map<String, dynamic> toMap() {
+  // Method to convert a User object to a JSON map
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'full_name': fullName,
       'email': email,
-      'password': password,
+      'password': password, // Ensure this is hashed
       'phone': phone,
       'country': country,
       'gender': gender,
       'role': role,
       'status': status,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
     };
   }

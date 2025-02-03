@@ -31,14 +31,17 @@ class _SchoolBottomSheetState extends State<SchoolBottomSheet> {
       final String name = nameController.text.trim();
       final String address = addressController.text.trim();
 
-      final schoolItem = SchoolMosque(
+      // Create a new School object
+      final school = School(
         name: name,
         address: address,
         teacherId: widget.userId,
         createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
 
-      context.read<SchoolBloc>().add(AddSchoolEvent(school: schoolItem.toMap()));
+      // Dispatch the AddSchoolEvent
+      context.read<SchoolBloc>().add(AddSchoolEvent(school));
     }
   }
 
@@ -55,9 +58,14 @@ class _SchoolBottomSheetState extends State<SchoolBottomSheet> {
           child: BlocListener<SchoolBloc, SchoolState>(
             listener: (context, state) {
               if (state is SchoolAdded) {
+ ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Center(child: Text('school_added_successfully'.tr(context))),backgroundColor: Colors.green,));
                 Navigator.pop(context, true); // Close bottom sheet
-
               } else if (state is SchoolError) {
+                // Show error message
+                 ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Center(child: Text('state.message'.tr(context))),backgroundColor: Colors.red,),
+                    );
               }
             },
             child: Column(
@@ -108,7 +116,9 @@ class _SchoolBottomSheetState extends State<SchoolBottomSheet> {
                     return CustomButton(
                       text: 'save'.tr(context),
                       onPressed: () {
-                        state is SchoolLoading ? null : _saveSchool();
+                        if (state is! SchoolLoading) {
+                          _saveSchool();
+                        }
                       },
                       icon: state is SchoolLoading
                           ? Icons.hourglass_empty

@@ -3,16 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/bloc/LocaleBloc/locale_bloc.dart';
-import 'package:muzn/controllers/auth_controller.dart';
+import 'package:muzn/bloc/User/user_bloc.dart';
+import 'package:muzn/bloc/User/user_event.dart';
+import 'package:muzn/bloc/User/user_state.dart';
 import 'package:muzn/models/user_model.dart';
-import 'package:muzn/utils/request_status.dart';
-import 'package:muzn/views/screens/home_screen.dart';
-import 'package:muzn/views/screens/login_screen.dart';
 import 'package:muzn/views/screens/quraan_screen.dart';
-import 'package:muzn/views/widgets/custom_button.dart';
-import 'package:muzn/views/widgets/custom_text_button.dart';
-import 'package:muzn/views/widgets/custom_text_field.dart';
-import 'package:muzn/views/widgets/message.dart';
+
+import '../widgets/custom_text_field.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/custom_text_button.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -22,16 +22,17 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  AuthController _authController = new AuthController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController countryController = TextEditingController();
 
   String? gender = 'male'; // Default gender
-  String? countryName = '';
+  String? country = 'السعودية';
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -120,6 +121,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               SizedBox(height: deviceHeight * 0.02),
               IntlPhoneField(
+                controller: countryController,
+                decoration: InputDecoration(
+                  labelText: 'country'.tr(context),
+                  hintText: 'country'.tr(context),
+                  labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
+                  hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                showCountryFlag: false,
+                initialValue: country,
+                initialCountryCode: 'SA',
+                languageCode: 'ar',
+                textAlign: TextAlign.start,
+                disableLengthCheck: true,
+                onCountryChanged: (selectedCountry) {
+                  String translatedCountryName =
+                      selectedCountry.nameTranslations['ar'] ??
+                          selectedCountry.name;
+                  setState(() {
+                    country = translatedCountryName;
+                    countryController.text = country!;
+                  });
+                },
+              ),
+              SizedBox(height: deviceHeight * 0.02),
+              IntlPhoneField(
                 controller: phoneController,
                 searchText: 'search_country'.tr(context),
                 languageCode: 'ar',
@@ -132,10 +161,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 initialCountryCode: 'SA',
-                onCountryChanged: (country) => countryName = country.name,
-                // validator: (value) => value!.number.isEmpty
-                //     ? 'Please enter a valid phone number'.tr(context)
-                //     : null,
+                textAlign: TextAlign.start,
               ),
               SizedBox(height: deviceHeight * 0.02),
               CustomTextField(
@@ -167,62 +193,83 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               Row(
                 children: [
-                  Text('gender'.tr(context),
-                      style: Theme.of(context).textTheme.labelMedium),
+                  Text(
+                    'gender'.tr(context),
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                   Radio<String>(
                     value: 'male',
                     groupValue: gender,
                     onChanged: (value) => setState(() => gender = value),
                   ),
-                  Text('male'.tr(context),
-                      style: Theme.of(context).textTheme.labelMedium),
+                  Text(
+                    'male'.tr(context),
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                   Radio<String>(
                     value: 'female',
                     groupValue: gender,
                     onChanged: (value) => setState(() => gender = value),
                   ),
-                  Text('female'.tr(context),
-                      style: Theme.of(context).textTheme.labelMedium),
+                  Text(
+                    'female'.tr(context),
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ],
               ),
               SizedBox(height: deviceHeight * 0.03),
-              CustomButton(
-                text: 'register_button'.tr(context),
-             onPressed: () async {
-  if (_formKey.currentState!.validate()) {
-    // Create a User object with the entered data
-    final User user = User(
-      fullName: nameController.text.trim(),
-      email: emailController.text.trim(),
-      phone: phoneController.text.trim(),
-      password: passwordController.text.trim(),
-      gender: gender.toString(),
-      country: phoneController.text.trim(),
-      role: "teacher",
-      status: "active",
-    );
+              BlocConsumer<UserBloc, UserState>(
+                listener: (context, state) {
+                  if (state is UserRegistered) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Center(child: Text('auth_error.register_success'.tr(context))),backgroundColor: Colors.green,),
+                    );
+                  } else if (state is UserError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Center(child: Text('auth_error.register_failed'.tr(context)+ state.message)),backgroundColor: Colors.red,),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is UserLoading) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  return CustomButton(
+                    text: 'register_button'.tr(context),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // Create a User object with the entered data
+                        final User user = User(
+                          fullName: nameController.text.trim(),
+                          email: emailController.text.trim(),
+                          phone: phoneController.text.trim(),
+                          password: passwordController.text.trim(),
+                          gender: gender!,
+                          country: countryController.text.trim(),
+                          role: "teacher", // Default role for now
+                          status: "active",
+                          createdAt: DateTime.now(),
+                          updatedAt: DateTime.now(),
+                        );
 
-    RequestStatus result = await _authController.registerUser(user);
-
-    if (result.status) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    } else {
-      ErrorSnackbar.show(context: context, errorText: result.message);
-    }
-  }
-},
-
-                icon: Icons.touch_app,
+                        // Dispatch the RegisterEvent to the BLoC
+                        context.read<UserBloc>().add(RegisterEvent(user));
+                      }
+                    },
+                    icon: Icons.touch_app,
+                  );
+                },
               ),
               CustomTextButton(
                 text:
                     '${'have_account'.tr(context)} ${'login_button'.tr(context)}',
                 onPressed: () => Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
                 ),
               ),
             ],

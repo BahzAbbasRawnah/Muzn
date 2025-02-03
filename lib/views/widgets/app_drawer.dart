@@ -4,68 +4,65 @@ import 'package:muzn/app_localization.dart';
 import 'package:muzn/bloc/LocaleBloc/locale_bloc.dart';
 import 'package:muzn/bloc/ThemeBloc/theme_bloc.dart';
 import 'package:muzn/bloc/ThemeBloc/theme_event.dart';
-import 'package:muzn/controllers/auth_controller.dart';
+import 'package:muzn/controllers/user_controller.dart';
 import 'package:muzn/models/user_model.dart';
-import 'package:muzn/utils/shared_preferences.dart';
 import 'package:muzn/views/screens/contact_screen.dart';
+import 'package:muzn/views/screens/home_screen.dart';
 import 'package:muzn/views/screens/login_screen.dart';
 import 'package:muzn/views/screens/main_screen.dart';
 import 'package:muzn/views/screens/quraan_screen.dart';
-
+import 'package:provider/provider.dart';
 import '../../bloc/ThemeBloc/theme_state.dart';
 
 class AppDrawer extends StatelessWidget {
-  AppDrawer({Key? key}) : super(key: key);
-  final _sharedPrefs = SharedPrefsHelper();
+  final UserController _userController;
+
+  // Inject UserController via constructor
+  const AppDrawer({Key? key, required UserController userController})
+      : _userController = userController,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    AuthController _authController = AuthController();
-
     return Drawer(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
+          // Drawer Header
           DrawerHeader(
             decoration: const BoxDecoration(
               color: Color(0xffda9f35),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircleAvatar(
-                  radius: 50,
-                  backgroundImage:
-                      AssetImage('assets/images/avatar_placeholder.png'),
-                ),
-                const SizedBox(height: 5),
-
-             FutureBuilder<User?>(
-  future: AuthController.getCurrentUser(),
-  builder: (context, snapshot) {
-    if (snapshot.connectionState == ConnectionState.waiting) {
-      return const CircularProgressIndicator(); // Show loading indicator
-    }
-    if (snapshot.hasError || !snapshot.hasData) {
-      return Text(
-        "Guest",
-        style: Theme.of(context).textTheme.bodyLarge,
-      );
-    }
-
-    final String userName = snapshot.data?.fullName?.trim().isNotEmpty == true
-        ? snapshot.data!.fullName
-        : "Guest";
-
-    return Text(
-      userName,
-      style: Theme.of(context).textTheme.bodyLarge,
-    );
-  },
-),
-
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircleAvatar(
+                    radius: 50,
+                    backgroundImage: AssetImage('assets/images/avatar_placeholder.png'),
+                  ),
+                  const SizedBox(height: 5),
+                  FutureBuilder<User?>(
+                    future: _userController.getCurrentUser(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const CircularProgressIndicator(); // Show loading indicator
+                      }
+                      if (snapshot.hasData && snapshot.data?.fullName?.trim().isNotEmpty == true) {
+                        return Text(
+                          snapshot.data!.fullName!,
+                          style: Theme.of(context).textTheme.displayLarge,
+                        );
+                      }
+                      return Text(
+                        "Guest",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -82,7 +79,7 @@ class AppDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => QuranScreen(),
+                  builder: (context) =>  QuranScreen(),
                 ),
               );
             },
@@ -96,7 +93,7 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const MainScreen(),
+                  builder: (context) => const HomeScreen(),
                 ),
               );
             },
@@ -138,9 +135,7 @@ class AppDrawer extends StatelessWidget {
                   value: isEnglish,
                   onChanged: (value) {
                     final newLocale = isEnglish ? 'ar' : 'en';
-                    context
-                        .read<LocaleBloc>()
-                        .add(ChangeLocaleEvent(newLocale));
+                    context.read<LocaleBloc>().add(ChangeLocaleEvent(newLocale));
                   },
                   activeColor: const Color(0xffda9f35),
                 ),
@@ -157,7 +152,7 @@ class AppDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ContactScreen(),
+                  builder: (context) =>  ContactScreen(),
                 ),
               );
             },
@@ -168,7 +163,7 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.exit_to_app),
             title: Text('logout'.tr(context)),
             onTap: () async {
-              String result = await _authController.logout();
+              await _userController.logout();
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(

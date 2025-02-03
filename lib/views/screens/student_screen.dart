@@ -365,7 +365,42 @@ class _StudentScreenState extends State<StudentScreen> {
                          Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("reading_wrongs".tr(context),style: Theme.of(context).textTheme.labelMedium,),
+                          Text("tashkeel_wrongs".tr(context),style: Theme.of(context).textTheme.labelMedium,),
+                         const SizedBox(height: 2),
+
+                          InputQty(
+                          
+                            maxVal: 100,
+                            initVal: 0,
+                            steps: 1,
+                            minVal: 0,
+                            qtyFormProps: QtyFormProps(enableTyping: true),
+                            decoration: QtyDecorationProps(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                borderSide: BorderSide(
+                                    width: 1,
+                                    color: Theme.of(context).primaryColor),
+                              ),
+                              isBordered: true,
+                              plusBtn: Icon(
+                                Icons.plus_one,
+                                 color: Colors.green,
+                                 size: 50,),
+                              minusBtn: Icon(
+                                Icons.exposure_minus_1,
+                                color: Colors.red,
+                                size: 50,
+                              ),
+                              
+                            ),
+                          ),
+                        ],
+                      ),
+                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("tajweed_wrongs".tr(context),style: Theme.of(context).textTheme.labelMedium,),
                          const SizedBox(height: 2),
 
                           InputQty(

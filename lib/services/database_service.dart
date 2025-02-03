@@ -55,7 +55,7 @@ class DatabaseManager {
 await db.execute('PRAGMA foreign_keys = ON');
 
 await db.execute('''
-  CREATE TABLE IF NOT EXISTS SchoolMosque (
+  CREATE TABLE IF NOT EXISTS School (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     teacher_id INTEGER,
     name TEXT NOT NULL,
@@ -69,39 +69,51 @@ await db.execute('''
 ''');
 
 // Set the autoincrement counter to start from 2
-await db.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('SchoolMosque', 1)");
+await db.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('School', 1)");
 
 // Insert first row with id = 2
-await db.insert('SchoolMosque', {
+await db.insert('School', {
   'name': 'تعليم عن بعد',
   'address': 'عبر مكالمات الفيديو',
   'type': 'Virtual',
   'teacher_id': '1'
 });
 
-    // Create CirclesCategory Table
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS CirclesCategory (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        deleted_at DATETIME
-      )
-    ''');
+// Create CirclesCategory Table
+await db.execute('''
+  CREATE TABLE IF NOT EXISTS CirclesCategory (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    namevalue TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted_at DATETIME
+  )
+''');
 
-await db.insert('CirclesCategory', {'name': 'حلقة حفظ'});
-await db.insert('CirclesCategory', {'name': 'حلقة تفسير'});
-await db.insert('CirclesCategory', {'name': 'حلقة تصحيح تلاوة'});
-await db.insert('CirclesCategory', {'name': 'حلقة مراجعة'});
-await db.insert('CirclesCategory', {'name': 'حلقة إتقان'});
-await db.insert('CirclesCategory', {'name': 'حلقة التميز'});
+// Insert initial data into CirclesCategory
+await db.insert('CirclesCategory', {'name': 'حلقة حفظ', 'namevalue': 'Listening'});
+await db.insert('CirclesCategory', {'name': 'حلقة مراجعة صغرى', 'namevalue': 'MinorReview'});
+await db.insert('CirclesCategory', {'name': 'حلقة مراجعة كبرى', 'namevalue': 'MajorReview'});
+await db.insert('CirclesCategory', {'name': 'حلقة إتقان', 'namevalue': 'Mastery'});
+await db.insert('CirclesCategory', {'name': 'حلقة تجويد', 'namevalue': 'Tajweed'});
+await db.insert('CirclesCategory', {'name': 'حلقة تلاوه', 'namevalue': 'Telawah'});
+
+// Ensure `updated_at` updates automatically on updates
+await db.execute('''
+  CREATE TRIGGER IF NOT EXISTS update_CirclesCategory_updated_at
+  AFTER UPDATE ON CirclesCategory
+  FOR EACH ROW
+  BEGIN
+    UPDATE CirclesCategory SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
+  END;
+''');
 
     // Create Circle Table
     await db.execute('''
     CREATE TABLE IF NOT EXISTS Circle (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    school_mosque_id INTEGER,
+    school_id INTEGER,
     teacher_id INTEGER,
     name TEXT NOT NULL,
     description TEXT,
@@ -113,7 +125,7 @@ await db.insert('CirclesCategory', {'name': 'حلقة التميز'});
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME,
-    FOREIGN KEY (school_mosque_id) REFERENCES SchoolMosque(id),
+    FOREIGN KEY (school_id) REFERENCES School(id),
     FOREIGN KEY (teacher_id) REFERENCES User(id),
     FOREIGN KEY (circle_category_id) REFERENCES CirclesCategory(id)
 )

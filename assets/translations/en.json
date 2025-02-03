@@ -66,6 +66,8 @@
     "absent":"Absent",
     "excused":"Excused ",
     "not_heard":"Not Heard",
+    "withdrew":"Withdrew",
+
     "permission_granted":"Permission Granted",
     "late":"Late",
     "new_student":"New Student",
@@ -94,9 +96,10 @@
     "from_ayah":"From Ayah",
     "to_surah":"To Surah",
     "to_ayah":"To Ayah",
+    "surah_search":"Type surah name to search",
     "reading_wrongs":"Reading Wrongs",
     "tajweed_wrongs":"Tajweed Wrongs",
-
+    "tashkeel_wrongs":" Tashqeel Wrongs",
     "following_tab":"Following ",
     "progress_tab":"Progress",
     "new_school":"New School",
@@ -126,9 +129,17 @@
       "phone_required": "Phone number is required.",
       "phone_digits_only": "Phone number must contain only digits.",
       "phone_invalid_format": "Phone number must start with + for example +966",
-      "phone_min_length": "Phone number must be at least 10 digits long."
+      "phone_min_length": "Phone number must be at least 10 digits long.",
+      "register_success": "User registered successfully",
+      "register_failed": "Failed to register User"
+
     },
-    "empty_data" :"No data available Yet. Click the button to add new"
+    "empty_data" :"No data available Yet. Click the button to add new",
+
+
+    "increase_playback_speed":"Playback speed increased by ",
+    "decrease_playback_speed":"Playback speed decreased by",
+    "scroll_speed":"Scroll speed"
    
     
 

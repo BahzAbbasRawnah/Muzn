@@ -22,7 +22,7 @@ class OnboardingScreen extends StatelessWidget {
               body: "onBoarding1_text".tr(context),
               image: Center(
                 child: Image.asset(
-                  "assets/images/onboarding1.png",
+                  "assets/images/onboarding.png",
                   height: deviceHeight * 0.60,
                 ),
               ),
@@ -32,7 +32,7 @@ class OnboardingScreen extends StatelessWidget {
               body: "onBoarding2_text".tr(context),
               image: Center(
                 child: Image.asset(
-                  "assets/images/onboarding1.png",
+                  "assets/images/onboarding.png",
                   height: deviceHeight * 0.60,
                 ),
               ),
@@ -42,7 +42,7 @@ class OnboardingScreen extends StatelessWidget {
               body: "onBoarding3_text".tr(context),
               image: Center(
                 child: Image.asset(
-                  "assets/images/onboarding1.png",
+                  "assets/images/onboarding.png",
                   height: deviceHeight * 0.60,
                 ),
               ),

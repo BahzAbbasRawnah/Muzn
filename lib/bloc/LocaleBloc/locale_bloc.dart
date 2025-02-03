@@ -9,7 +9,7 @@ part 'locale_state.dart';
 class LocaleBloc extends Bloc<LocaleEvent, LocaleState> {
   static const String _localeKey = 'locale';
 
-  LocaleBloc() : super(const LocaleLoadedState(Locale('en'))) {
+  LocaleBloc() : super(const LocaleLoadedState(Locale('ar'))) {
     on<ChangeLocaleEvent>(_onChangeLocale);
     on<LoadLocaleEvent>(_onLoadLocale);
   }

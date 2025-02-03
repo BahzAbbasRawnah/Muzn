@@ -97,24 +97,27 @@ extension CircleTypeExtension on CircleType {
   }
 }
 
-extension StudentStatusExtension on StudentStatus {
-  String localized(BuildContext context) {
-    switch (this) {
-      case StudentStatus.none:
-        return 'all'.tr(context);
-      case StudentStatus.present:
-        return 'present'.tr(context);
-      case StudentStatus.absent:
-        return 'absent'.tr(context);
-      case StudentStatus.excused:
-        return 'excused'.tr(context);
-      case StudentStatus.late:
-        return 'late'.tr(context);
-      case StudentStatus.permissionGranted:
-        return 'permission_granted'.tr(context);
-      case StudentStatus.notHeard:
-        return 'not_heard'.tr(context);
-    }
-  }
-}
+// extension StudentStatusExtension on StudentStatus {
+//   String localized(BuildContext context) {
+//     switch (this) {
+//       case StudentStatus.none:
+//         return 'all'.tr(context);
+//       case StudentStatus.present:
+//         return 'present'.tr(context);
+//       case StudentStatus.absent:
+//         return 'absent'.tr(context);
+//       case StudentStatus.excused:
+//         return 'excused'.tr(context);
+//       case StudentStatus.late:
+//         return 'late'.tr(context);
+//       case StudentStatus.permissionGranted:
+//         return 'permission_granted'.tr(context);
+//       case StudentStatus.notHeard:
+//         return 'not_heard'.tr(context);
+//          case StudentStatus.withdrew:
+//         return 'withdrew'.tr(context);
+
+//     }
+//   }
+// }
 

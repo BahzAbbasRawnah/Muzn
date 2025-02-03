@@ -1,27 +1,65 @@
+
 import 'package:equatable/equatable.dart';
+import 'package:muzn/models/school_model.dart';
 
 abstract class SchoolEvent extends Equatable {
+  const SchoolEvent();
+
   @override
-  List<Object?> get props => [];
+  List<Object> get props => [];
 }
 
-class LoadSchools extends SchoolEvent {
-  final int teacherId;
-  LoadSchools({required this.teacherId});
-}
-
+// Event to add a new school
 class AddSchoolEvent extends SchoolEvent {
-  final Map<String, dynamic> school;
-  AddSchoolEvent({required this.school});
+  final School school;
+  const AddSchoolEvent(this.school);
+
+  @override
+  List<Object> get props => [school];
 }
 
-class EditSchoolEvent extends SchoolEvent {
-  final int schoolId;
-  final Map<String, dynamic> updatedData;
-  EditSchoolEvent({required this.schoolId, required this.updatedData});
+// Event to get all schools
+class GetAllSchoolsEvent extends SchoolEvent {}
+
+// Event to get a school by ID
+class GetSchoolByIdEvent extends SchoolEvent {
+  final int id;
+  const GetSchoolByIdEvent(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+// Event to fetch schools by teacher ID
+class GetSchoolsByTeacherIdEvent extends SchoolEvent {
+  final int teacherId;
+  const GetSchoolsByTeacherIdEvent(this.teacherId);
+
+  @override
+  List<Object> get props => [teacherId];
+}
+// Event to update a school
+class UpdateSchoolEvent extends SchoolEvent {
+  final School school;
+  const UpdateSchoolEvent(this.school);
+
+  @override
+  List<Object> get props => [school];
 }
 
+// Event to delete a school
 class DeleteSchoolEvent extends SchoolEvent {
-  final int schoolId;
-  DeleteSchoolEvent({required this.schoolId});
+  final int id;
+  const DeleteSchoolEvent(this.id);
+
+  @override
+  List<Object> get props => [id];
+}
+
+// Event to soft delete a school
+class SoftDeleteSchoolEvent extends SchoolEvent {
+  final int id;
+  const SoftDeleteSchoolEvent(this.id);
+
+  @override
+  List<Object> get props => [id];
 }

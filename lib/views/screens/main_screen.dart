@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:muzn/app_localization.dart';
+import 'package:muzn/controllers/user_controller.dart';
+import 'package:muzn/repository/user_repository.dart';
+import 'package:muzn/services/database_service.dart';
 import 'package:muzn/views/widgets/app_drawer.dart';
 import 'package:muzn/views/widgets/custom_app_bar.dart';
 
@@ -22,12 +25,24 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   final String _secondText = 'مزن القرآن ';
   int _currentIndex = 0;
   bool _isFirstTextCompleted = false;
-  int _repeatCount = 0; // Track the number of repetitions
+
+  // Initialize UserController
+  late UserController _userController; 
 
   @override
   void initState() {
     super.initState();
+  _userController = UserController(); 
 
+    _initializeDependencies();
+  }
+
+  Future<void> _initializeDependencies() async {
+
+    _startAnimation();
+  }
+
+  void _startAnimation() {
     // Initialize animation controller
     _controller = AnimationController(
       vsync: this,
@@ -50,18 +65,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
             _controller.forward(from: 0); // Restart animation for the second text
           } else {
             // Second text animation completed
-            _repeatCount++; // Increment repetition count
-            if (_repeatCount < 1) {
-              // Repeat only twice
-              Future.delayed(const Duration(seconds: 2), () {
-                _isFirstTextCompleted = false;
-                _controller.duration = const Duration(seconds: 5); // Reset duration for the first text
-                _controller.forward(from: 0); // Restart animation for the first text
-              });
-            } else {
-              // Stop the animation after 2 repetitions
-              _controller.stop();
-            }
+            _controller.stop(); // Stop the animation after the second text is displayed
           }
         }
       });
@@ -93,7 +97,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         title: 'home'.tr(context),
         scaffoldKey: _scaffoldKey,
       ),
-      drawer:  AppDrawer(),
+      drawer: AppDrawer(userController: _userController), // Pass the userController here
       body: SingleChildScrollView(
         // Make the screen scrollable
         child: SizedBox(

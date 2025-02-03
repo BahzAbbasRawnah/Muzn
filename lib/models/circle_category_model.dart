@@ -1,36 +1,40 @@
 class CirclesCategory {
-  final int id;
+  final int? id;
   final String name;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  DateTime? deletedAt;
+  final String nameValue;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final DateTime? deletedAt;
 
   CirclesCategory({
-    required this.id,
+    this.id,
     required this.name,
-    this.createdAt,
-    this.updatedAt,
+    required this.nameValue,
+    required this.createdAt,
+    required this.updatedAt,
     this.deletedAt,
   });
 
-  // Factory constructor to create an object from a Map
-  factory CirclesCategory.fromMap(Map<String, dynamic> map) {
+  // Factory method to create a CirclesCategory object from a JSON map
+  factory CirclesCategory.fromJson(Map<String, dynamic> json) {
     return CirclesCategory(
-      id: map['id'] as int,
-      name: map['name'] as String,
-      createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
-      updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null,
-      deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
+      id: json['id'],
+      name: json['name'],
+      nameValue: json['namevalue'],
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+      deletedAt: json['deleted_at'] != null ? DateTime.parse(json['deleted_at']) : null,
     );
   }
 
-  // Convert object to Map (toMap)
-  Map<String, dynamic> toMap() {
+  // Method to convert a CirclesCategory object to a JSON map
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
+      'namevalue': nameValue,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
     };
   }

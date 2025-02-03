@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // List of pages for the different bottom navigation bar items
   final List<Widget> _pages = [
      SchoolsListScreen(),
-     CirclesListScreen(school_id: 0,),
+     CirclesListScreen(schoolId: 0,),
     const MainScreen(),
      CalculateScreen(),
     const ProfileScreen(),
@@ -59,17 +59,17 @@ class _HomeScreenState extends State<HomeScreen> {
         initialActiveIndex: _selectedIndex,
         items: [
           TabItem(
-            icon: Icons.mosque,
+            icon: Icons.mosque_outlined,
             title: 'school'.tr(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
           TabItem(
-            icon: Icons.group,
+            icon: Icons.group_outlined,
             title: 'circles'.tr(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
           TabItem(
-            icon: Icons.home,
+            icon: Icons.home_outlined,
             title: 'home'.tr(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
           TabItem(
-            icon: Icons.person,
+            icon: Icons.person_outline,
             title: 'profile'.tr(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
