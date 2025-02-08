@@ -6,6 +6,7 @@ class CustomTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final int line;
+  final bool? readonly;
   final bool obscureText;
   final TextEditingController? controller;
   final TextInputType? keyboardType;
@@ -22,6 +23,7 @@ class CustomTextField extends StatelessWidget {
     this.suffixIcon,
     this.obscureText = false,
     this.line = 1,
+    this.readonly,
     this.controller,
     this.keyboardType,
     this.onChanged,
@@ -32,13 +34,14 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(  // Changed from TextField to TextFormField
+    return TextFormField(
+      // Changed from TextField to TextFormField
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
       onChanged: onChanged,
       maxLines: line,
-      validator: validator,  // Set the validator here
+      validator: validator, // Set the validator here
       decoration: InputDecoration(
         labelStyle: Theme.of(context).textTheme.labelMedium,
         hintText: hintText,
@@ -52,7 +55,8 @@ class CustomTextField extends StatelessWidget {
                 onTap: onPrefixTap,
                 child: Icon(
                   prefixIcon,
-                  color: Theme.of(context).primaryColor, // Get icon color from primary color of the theme
+                  color: Theme.of(context)
+                      .primaryColor, // Get icon color from primary color of the theme
                 ),
               )
             : null,
@@ -61,7 +65,8 @@ class CustomTextField extends StatelessWidget {
                 onTap: onSuffixTap,
                 child: Icon(
                   suffixIcon,
-                  color: Theme.of(context).primaryColor, // Get icon color from primary color of the theme
+                  color: Theme.of(context)
+                      .primaryColor, // Get icon color from primary color of the theme
                 ),
               )
             : null,

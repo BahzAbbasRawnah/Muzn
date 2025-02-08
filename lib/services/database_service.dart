@@ -38,9 +38,9 @@ class DatabaseManager {
       CREATE TABLE IF NOT EXISTS User (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         full_name TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE,
+        email TEXT UNIQUE,
         password TEXT NOT NULL,
-        phone TEXT,
+        phone TEXT NOT NULL UNIQUE,
         country TEXT,
         gender TEXT CHECK(gender IN ('male', 'female')) NOT NULL,
         role TEXT CHECK(role IN ('admin', 'student', 'teacher')) NOT NULL,
@@ -161,51 +161,63 @@ await db.execute('''
       )
     ''');
 
-    // Create StudentProgress Table
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS StudentProgress (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        circle_id INTEGER,
-        student_id INTEGER,
-        status TEXT CHECK(status IN ('none','present', 'absent', 'absent_with_excuse', 'excused', 'not_listened', 'late')) DEFAULT 'none' ,
-        start_surah_number INTEGER NOT NULL,
-        end_surah_number INTEGER NOT NULL,
-        start_ayah_number INTEGER NOT NULL,
-        end_ayah_number INTEGER NOT NULL,
-        lesson_date DATETIME NOT NULL,
-        reading_wrong INTEGER DEFAULT 0,
-        tajweed_wrong INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        deleted_at DATETIME,
-        FOREIGN KEY (circle_id) REFERENCES Circle(id),
-        FOREIGN KEY (student_id) REFERENCES Student(id)
-
-      )
-    ''');
+        // Create CircleStudent Table
+await db.execute('''
+  CREATE TABLE IF NOT EXISTS StudentAttendance (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    student_id INTEGER,
+    circle_id INTEGER,
+    attendance_date DATETIME NOT NULL,
+    status TEXT CHECK(status IN ('none', 'present', 'absent', 'absent_with_excuse', 'early_departure', 'not_listened', 'late')) DEFAULT 'none',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted_at DATETIME,
+    FOREIGN KEY (circle_id) REFERENCES Circle(id),
+    FOREIGN KEY (student_id) REFERENCES User(id)
+  )
+''');
 
 
-    // Create Assignment Table
-    await db.execute('''
-      CREATE TABLE IF NOT EXISTS HomeWork (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        circle_id INTEGER,
-        student_id INTEGER,
-        start_surah_number INTEGER NOT NULL,
-        end_surah_number INTEGER NOT NULL,
-        start_ayah_number INTEGER NOT NULL,
-        end_ayah_number INTEGER NOT NULL,
-        lesson_date DATETIME NOT NULL,
-        circle_category_id INTEGER NOT NULL,
-        notes TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        deleted_at DATETIME,
-        FOREIGN KEY (student_id) REFERENCES Student(id),
-        FOREIGN KEY (circle_category_id) REFERENCES CirclesCategory(id),
-        FOREIGN KEY (circle_id) REFERENCES Circle(id)
-      )
-    ''');
+// Create Homework Table
+await db.execute('''
+  CREATE TABLE IF NOT EXISTS Homework (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    circle_id INTEGER,
+    student_id INTEGER,
+    start_surah_number INTEGER NOT NULL,
+    end_surah_number INTEGER NOT NULL,
+    start_ayah_number INTEGER NOT NULL,
+    end_ayah_number INTEGER NOT NULL,
+    lesson_date DATETIME NOT NULL,
+    notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted_at DATETIME,
+    FOREIGN KEY (student_id) REFERENCES User(id),
+    FOREIGN KEY (circle_id) REFERENCES Circle(id)
+  )
+''');
+
+// Create StudentProgress Table
+await db.execute('''
+  CREATE TABLE IF NOT EXISTS StudentProgress (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    homework_id INTEGER,
+    student_id INTEGER,
+    reading_rating TEXT CHECK(reading_rating IN ('excellent', 'very_good', 'good', 'average', 'weak')) DEFAULT 'good',
+    review_rating TEXT CHECK(review_rating IN ('excellent', 'very_good', 'good', 'average', 'weak')) DEFAULT 'good',
+    telawah_rating TEXT CHECK(telawah_rating IN ('excellent', 'very_good', 'good', 'average', 'weak')) DEFAULT 'good',
+    reading_wrong INTEGER DEFAULT 0,
+    tajweed_wrong INTEGER DEFAULT 0,
+    tashqeel_wrong INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    deleted_at DATETIME,
+    FOREIGN KEY (homework_id) REFERENCES Homework(id),
+    FOREIGN KEY (student_id) REFERENCES User(id)
+  )
+''');
+
 
     // Create DigitalLibrary Table
     await db.execute('''

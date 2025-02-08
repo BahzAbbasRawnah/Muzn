@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/controllers/user_controller.dart';
-import 'package:muzn/repository/user_repository.dart';
+
 import 'package:muzn/services/database_service.dart';
 import 'package:muzn/views/widgets/app_drawer.dart';
 import 'package:muzn/views/widgets/custom_app_bar.dart';
@@ -21,24 +20,16 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   late AnimationController _controller;
   late Animation<int> _animation;
 
-  final String _firstText = 'ليدبروا آياته';
-  final String _secondText = 'مزن القرآن ';
+  final String _firstText = 'مزن لتعليم القرآن الكريم';
   int _currentIndex = 0;
-  bool _isFirstTextCompleted = false;
-
-  // Initialize UserController
-  late UserController _userController; 
 
   @override
   void initState() {
     super.initState();
-  _userController = UserController(); 
-
     _initializeDependencies();
   }
 
   Future<void> _initializeDependencies() async {
-
     _startAnimation();
   }
 
@@ -58,15 +49,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
       })
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-          if (!_isFirstTextCompleted) {
-            // First text animation completed
-            _isFirstTextCompleted = true;
-            _controller.duration = const Duration(seconds: 4); // Duration for the second text
             _controller.forward(from: 0); // Restart animation for the second text
-          } else {
-            // Second text animation completed
-            _controller.stop(); // Stop the animation after the second text is displayed
-          }
         }
       });
 
@@ -97,7 +80,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         title: 'home'.tr(context),
         scaffoldKey: _scaffoldKey,
       ),
-      drawer: AppDrawer(userController: _userController), // Pass the userController here
+      drawer: AppDrawer(), // Pass the userController here
       body: SingleChildScrollView(
         // Make the screen scrollable
         child: SizedBox(
@@ -108,7 +91,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
               // Animated first text
               Text(
                 _firstText.substring(
-                    0, _isFirstTextCompleted ? _firstText.length : _currentIndex.clamp(0, _firstText.length)),
+                    0, _currentIndex.clamp(0, _firstText.length)),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -117,18 +100,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                 textAlign: TextAlign.center, // Center-align the text
               ),
               SizedBox(height: deviceHeight * 0.03), // Spacing between texts
-              // Animated second text
-              Text(
-                _secondText.substring(
-                    0, _isFirstTextCompleted ? _currentIndex.clamp(0, _secondText.length) : 0),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                  fontFamily: GoogleFonts.amiriQuran().fontFamily,
-                ),
-                textAlign: TextAlign.center, // Center-align the text
-              ),
-              SizedBox(height: deviceHeight * 0.03), // Spacing between text and GIF
+          
               // Gif
               Center(
                 child: GifView.asset(

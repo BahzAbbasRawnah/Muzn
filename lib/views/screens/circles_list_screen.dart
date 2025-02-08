@@ -1,60 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/controllers/circle_controller.dart';
-import 'package:muzn/controllers/user_controller.dart';
-import 'package:muzn/models/circle_model.dart';
-import 'package:muzn/repository/circle_repository.dart';
-import 'package:muzn/repository/user_repository.dart';
-import 'package:muzn/views/screens/circle_bottomsheet.dart';
+import 'package:muzn/blocs/circle/circle_bloc.dart';
+import 'package:muzn/models/circle.dart';
+import 'package:muzn/models/enums.dart';
+import 'package:muzn/views/screens/circle_screen.dart';
+
+import 'package:muzn/views/widgets/add_circle_bottomsheet.dart';
 import 'package:muzn/views/widgets/app_drawer.dart';
 import 'package:muzn/views/widgets/custom_app_bar.dart';
 
 class CirclesListScreen extends StatefulWidget {
-  final int schoolId;
+  final int? schoolId;
 
-  const CirclesListScreen({Key? key, required this.schoolId}) : super(key: key);
+  const CirclesListScreen({Key? key, this.schoolId}) : super(key: key);
 
   @override
   _CirclesListScreenState createState() => _CirclesListScreenState();
 }
 
 class _CirclesListScreenState extends State<CirclesListScreen> {
-  late CircleController _circleController;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  late UserController _userController;
-  List<Circle> _circles = [];
-  bool _isLoading = true;
-  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-    _circleController = CircleController();
-    _userController = UserController();
-    _fetchCircles();
-  }
-
-  Future<void> _fetchCircles() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
-
-    try {
-      final circles =
-          await _circleController.getCirclesBySchoolId(widget.schoolId);
-      setState(() {
-        _circles = circles;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+    context
+        .read<CircleBloc>()
+        .add(LoadCircles(context, schoolId: widget.schoolId));
   }
 
   @override
@@ -65,30 +38,52 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
         title: 'circles'.tr(context),
         scaffoldKey: scaffoldKey,
       ),
-      drawer: AppDrawer(userController: _userController),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage))
-              : _circles.isNotEmpty
-                  ? ListView.builder(
-                      itemCount: _circles.length,
-                      itemBuilder: (context, index) {
-                        return _buildCircleListItem(_circles[index]);
-                      },
-                    )
-                  : _buildEmptyState(),
+      drawer: widget.schoolId == null ? AppDrawer() : null,
+      body: BlocBuilder<CircleBloc, CircleState>(
+        builder: (context, state) {
+          if (state is CircleLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is CircleError) {
+            return Center(child: Text(state.message.tr(context)));
+          } else if (state is CirclesLoaded) {
+            if (state.circles.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/images/empty_box.png',
+                      width: 150,
+                      height: 150,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'empty_data'.tr(context),
+                      style: Theme.of(context).textTheme.displayMedium,
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              itemCount: state.circles.length,
+              itemBuilder: (context, index) {
+                return _buildCircleListItem(state.circles[index]);
+              },
+            );
+          }
+          return const SizedBox();
+        },
+      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          bool? isAdded = await showModalBottomSheet<bool>(
+        onPressed: () {
+          showModalBottomSheet(
             context: context,
             isScrollControlled: true,
-            builder: (context) => AddCircleBottomSheet(),
+            builder: (context) => AddCircleBottomSheet(
+              schoolId: widget.schoolId ?? -1,
+            ),
           );
-          if (isAdded == true) {
-            _fetchCircles();
-            Navigator.pop(context);
-          }
         },
         child: const Icon(Icons.add),
       ),
@@ -96,77 +91,115 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
   }
 
   Widget _buildCircleListItem(Circle circle) {
-    return Dismissible(
-      key: Key(circle.id.toString()),
-      direction: DismissDirection.endToStart,
-      background: Container(
-        color: Colors.red,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        alignment: Alignment.centerRight,
-        child: const Icon(Icons.delete, color: Colors.white, size: 30),
-      ),
-      onDismissed: (_) async {
-        await _circleController.deleteCircle(circle.id ?? 0);
-        _fetchCircles();
-      },
-      child: ListTile(
-        leading: const CircleAvatar(
-          radius: 30,
-          backgroundImage: AssetImage('assets/images/app_logo.png'),
-          backgroundColor: Colors.white,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.black, // Border color
+            width: 0.5, // Border width
+          ),
         ),
-        title: Text(circle.name ?? 'Unknown'),
-        subtitle: Row(
+      ),
+      child: ListTile(
+        title: Row(
           children: [
-            // Text(circle.category.name ?? circle.category.name= ''),
-            const Spacer(),
-            const Icon(Icons.timer, color: Color.fromARGB(255, 63, 54, 54)),
-            Text(circle.circleTime.name ?? 'No Time'),
+            Text(circle.name),
+            Spacer(),
+            Icon(Icons.person_2),
+            Text('${circle.studentCount ?? 0} ${'student'.tr(context)}'),
           ],
         ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 30,
-              height: 30,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  "",
-                  // circle.studentCount.toString(),
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+            if (circle.categoryName != null)
+              Text(circle.categoryName!.tr(context)),
+        
+            SizedBox(
+              height: 5,
+            ),
+            Row(
+              children: [
+                Icon(Icons.timer),
+                const SizedBox(width: 4),
+                Text(
+                  CircleTime.values
+                      .firstWhere(
+                        (time) => time.name == circle.circleTime?.split('.').last,
+                        orElse: () => CircleTime.morning,
+                      )
+                      .toLocalizeTimedString(context),
                 ),
+                Spacer(),
+                Icon(Icons.location_on),
+                const SizedBox(width: 4),
+                Text(
+                  CircleType.values
+                      .firstWhere(
+                        (type) => type.name == circle.circleType?.split('.').last,
+                        orElse: () => CircleType.offline,
+                      )
+                      .toLocalizedTypeString(context),
+                ),
+              ],
+            )
+          ],
+        ),
+        trailing: PopupMenuButton(
+          itemBuilder: (context) => [
+            PopupMenuItem(
+              value: 'edit',
+              child: Text('edit'.tr(context)),
+            ),
+            PopupMenuItem(
+              value: 'delete',
+              child: Text(
+                'delete'.tr(context),
+                style: const TextStyle(color: Colors.red),
               ),
             ),
-            const SizedBox(height: 5),
-            Text('student'.tr(context)),
           ],
+          onSelected: (value) {
+            if (value == 'edit') {
+              // TODO: Implement edit
+            } else if (value == 'delete') {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text('delete_circle_confirm'.tr(context)),
+                  content: Text('delete_circle_confirmation'.tr(context)),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('cancel'.tr(context)),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        context
+                            .read<CircleBloc>()
+                            .add(DeleteCircle(context, circle.id));
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        'delete'.tr(context),
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
         ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(
-            "assets/images/empty_box.png",
-            width: 200,
-            height: 200,
-          ),
-          const SizedBox(height: 30),
-          Text(
-            'empty_data'.tr(context),
-            style: Theme.of(context).textTheme.displayMedium,
-          ),
-        ],
+        onTap: () {
+          // TODO: Navigate to circle details screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CircleScreen(circleId: circle.id,circleName: circle.name,)
+            ),
+          );
+        },
       ),
     );
   }

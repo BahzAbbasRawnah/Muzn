@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/bloc/LocaleBloc/locale_bloc.dart';
-import 'package:muzn/bloc/User/user_bloc.dart';
-import 'package:muzn/bloc/User/user_event.dart';
-import 'package:muzn/bloc/User/user_state.dart';
-import 'package:muzn/models/user_model.dart';
+import 'package:muzn/blocs/LocaleBloc/locale_bloc.dart';
+import 'package:muzn/blocs/auth/auth_bloc.dart';
+import 'package:muzn/services/database_service.dart';
+import 'package:muzn/views/screens/home_screen.dart';
+
 import 'package:muzn/views/screens/quraan_screen.dart';
 
 import '../widgets/custom_text_field.dart';
@@ -39,243 +39,326 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final deviceHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      appBar: AppBar(
-        leading: PopupMenuButton<String>(
-          onSelected: (String value) {
-            // Dispatch a ChangeLocaleEvent to the LocaleBloc
-            if (value == 'en') {
-              context.read<LocaleBloc>().add(ChangeLocaleEvent('en'));
-            } else if (value == 'ar') {
-              context.read<LocaleBloc>().add(ChangeLocaleEvent('ar'));
-            }
-          },
-          itemBuilder: (BuildContext context) => [
-            const PopupMenuItem(
-              value: 'en',
-              child: Text('English'),
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message.tr(context)),
+              backgroundColor: Colors.red,
             ),
-            const PopupMenuItem(
-              value: 'ar',
-              child: Text('العربية'),
+          );
+        } else if (state is AuthAuthenticated) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('registration_success'.tr(context)),
+              backgroundColor: Colors.green,
             ),
-          ],
-          child: const Icon(Icons.language),
-        ),
-        title: Text('register_title'.tr(context)),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: GestureDetector(
-              child: Image.asset(
-                'assets/images/quran.png',
-                fit: BoxFit.contain,
-                width: 40,
-                height: 40,
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QuranScreen(),
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              Center(
-                child: Image.asset(
-                  'assets/images/app_logo.png',
-                  height: deviceHeight * 0.15,
-                ),
-              ),
-              SizedBox(height: deviceHeight * 0.02),
-              CustomTextField(
-                controller: nameController,
-                hintText: 'full_name_hint'.tr(context),
-                labelText: 'full_name'.tr(context),
-                prefixIcon: Icons.person,
-                validator: (value) => value!.isEmpty
-                    ? 'auth_error.full_name_required'.tr(context)
-                    : null,
-              ),
-              SizedBox(height: deviceHeight * 0.02),
-              CustomTextField(
-                controller: emailController,
-                hintText: 'email_hint'.tr(context),
-                labelText: 'email'.tr(context),
-                prefixIcon: Icons.email,
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) => value!.isEmpty
-                    ? 'auth_error.email_required'.tr(context)
-                    : null,
-              ),
-              SizedBox(height: deviceHeight * 0.02),
-              IntlPhoneField(
-                controller: countryController,
-                decoration: InputDecoration(
-                  labelText: 'country'.tr(context),
-                  hintText: 'country'.tr(context),
-                  labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
-                  hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                showCountryFlag: false,
-                initialValue: country,
-                initialCountryCode: 'SA',
-                languageCode: 'ar',
-                textAlign: TextAlign.start,
-                disableLengthCheck: true,
-                onCountryChanged: (selectedCountry) {
-                  String translatedCountryName =
-                      selectedCountry.nameTranslations['ar'] ??
-                          selectedCountry.name;
-                  setState(() {
-                    country = translatedCountryName;
-                    countryController.text = country!;
-                  });
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+        }
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BlocBuilder<LocaleBloc, LocaleState>(
+            builder: (context, state) {
+              final currentLocale = state is LocaleLoadedState
+                  ? state.locale.languageCode
+                  : 'ar';
+
+              return PopupMenuButton<String>(
+                onSelected: (String value) {
+                  context.read<LocaleBloc>().add(ChangeLocaleEvent(value));
                 },
-              ),
-              SizedBox(height: deviceHeight * 0.02),
-              IntlPhoneField(
-                controller: phoneController,
-                searchText: 'search_country'.tr(context),
-                languageCode: 'ar',
-                decoration: InputDecoration(
-                  labelText: 'phone'.tr(context),
-                  hintText: 'phone_hint'.tr(context),
-                  prefixIcon: const Icon(Icons.phone),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem(
+                    value: 'en',
+                    child: Row(
+                      children: [
+                        Image.asset('assets/flags/us_flag.png', width: 24),
+                        const SizedBox(width: 8),
+                        const Text('English'),
+                        if (currentLocale == 'en')
+                          const Icon(Icons.check, color: Color(0xffda9f35)),
+                      ],
+                    ),
                   ),
-                ),
-                initialCountryCode: 'SA',
-                textAlign: TextAlign.start,
-              ),
-              SizedBox(height: deviceHeight * 0.02),
-              CustomTextField(
-                controller: passwordController,
-                hintText: 'password_hint'.tr(context),
-                labelText: 'password'.tr(context),
-                prefixIcon: Icons.lock,
-                obscureText: true,
-                suffixIcon: Icons.visibility,
-                validator: (value) => value!.isEmpty
-                    ? 'auth_error.password_required'.tr(context)
-                    : null,
-              ),
-              SizedBox(height: deviceHeight * 0.02),
-              CustomTextField(
-                controller: confirmPasswordController,
-                hintText: 'confirm_password_hint'.tr(context),
-                labelText: 'confirm_password_label'.tr(context),
-                prefixIcon: Icons.lock,
-                obscureText: true,
-                suffixIcon: Icons.visibility,
-                validator: (value) {
-                  if (value!.isEmpty)
-                    return 'auth_error.confirm_password_required'.tr(context);
-                  if (value != passwordController.text)
-                    return 'auth_error.passwords_do_not_match'.tr(context);
-                  return null;
-                },
-              ),
-              Row(
-                children: [
-                  Text(
-                    'gender'.tr(context),
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                  Radio<String>(
-                    value: 'male',
-                    groupValue: gender,
-                    onChanged: (value) => setState(() => gender = value),
-                  ),
-                  Text(
-                    'male'.tr(context),
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                  Radio<String>(
-                    value: 'female',
-                    groupValue: gender,
-                    onChanged: (value) => setState(() => gender = value),
-                  ),
-                  Text(
-                    'female'.tr(context),
-                    style: Theme.of(context).textTheme.labelMedium,
+                  PopupMenuItem(
+                    value: 'ar',
+                    child: Row(
+                      children: [
+                        Image.asset('assets/flags/ar_flag.png', width: 24),
+                        const SizedBox(width: 8),
+                        const Text('العربية'),
+                        if (currentLocale == 'ar')
+                          const Icon(Icons.check, color: Color(0xffda9f35)),
+                      ],
+                    ),
                   ),
                 ],
-              ),
-              SizedBox(height: deviceHeight * 0.03),
-              BlocConsumer<UserBloc, UserState>(
-                listener: (context, state) {
-                  if (state is UserRegistered) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Center(child: Text('auth_error.register_success'.tr(context))),backgroundColor: Colors.green,),
-                    );
-                  } else if (state is UserError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Center(child: Text('auth_error.register_failed'.tr(context)+ state.message)),backgroundColor: Colors.red,),
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (state is UserLoading) {
-                    return Center(child: CircularProgressIndicator());
-                  }
-                  return CustomButton(
-                    text: 'register_button'.tr(context),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        // Create a User object with the entered data
-                        final User user = User(
-                          fullName: nameController.text.trim(),
-                          email: emailController.text.trim(),
-                          phone: phoneController.text.trim(),
-                          password: passwordController.text.trim(),
-                          gender: gender!,
-                          country: countryController.text.trim(),
-                          role: "teacher", // Default role for now
-                          status: "active",
-                          createdAt: DateTime.now(),
-                          updatedAt: DateTime.now(),
-                        );
-
-                        // Dispatch the RegisterEvent to the BLoC
-                        context.read<UserBloc>().add(RegisterEvent(user));
-                      }
-                    },
-                    icon: Icons.touch_app,
+                icon: const Icon(Icons.language),
+              );
+            },
+          ),
+          title: Text('register_title'.tr(context)),
+          centerTitle: true,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: GestureDetector(
+                child: Image.asset(
+                  'assets/images/quran.png',
+                  fit: BoxFit.contain,
+                  width: 40,
+                  height: 40,
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuranScreen(),
+                    ),
                   );
                 },
               ),
-              CustomTextButton(
-                text:
-                    '${'have_account'.tr(context)} ${'login_button'.tr(context)}',
-                onPressed: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
+            ),
+          ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                Center(
+                  child: Image.asset(
+                    'assets/images/app_logo.png',
+                    height: deviceHeight * 0.15,
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: deviceHeight * 0.02),
+                CustomTextField(
+                  controller: nameController,
+                  hintText: 'full_name_hint'.tr(context),
+                  labelText: 'full_name'.tr(context),
+                  prefixIcon: Icons.person,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'required_field'.tr(context);
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: deviceHeight * 0.02),
+                CustomTextField(
+                  controller: emailController,
+                  hintText: 'email_hint'.tr(context),
+                  labelText: 'email'.tr(context),
+                  prefixIcon: Icons.email,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'required_field'.tr(context);
+                    }
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
+                      return 'invalid_email'.tr(context);
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: deviceHeight * 0.02),
+                IntlPhoneField(
+                  controller: countryController,
+                  decoration: InputDecoration(
+                    labelText: 'country'.tr(context),
+                    hintText: 'country'.tr(context),
+                    labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
+                    hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  showCountryFlag: false,
+                  initialValue: country,
+                  initialCountryCode: 'SA',
+                  languageCode: 'ar',
+                  textAlign: TextAlign.start,
+                  disableLengthCheck: true,
+                  onCountryChanged: (selectedCountry) {
+                    String translatedCountryName =
+                        selectedCountry.nameTranslations['ar'] ??
+                            selectedCountry.name;
+                    setState(() {
+                      country = translatedCountryName;
+                      countryController.text = country!;
+                    });
+                  },
+                ),
+                SizedBox(height: deviceHeight * 0.02),
+                IntlPhoneField(
+                  controller: phoneController,
+                  searchText: 'search_country'.tr(context),
+                  languageCode: 'ar',
+                  invalidNumberMessage: 'phone_min_length'.tr(context),
+                  decoration: InputDecoration(
+                    labelText: 'phone'.tr(context),
+                    hintText: 'phone_hint'.tr(context),
+                    prefixIcon: const Icon(Icons.phone),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
+                  onCountryChanged: (country) {
+                    phoneController.text = '';
+                  },
+                  initialCountryCode: 'SA',
+                  textAlign: TextAlign.start,
+                  validator: (value) {
+                    if (value == null || value.number.isEmpty) {
+                      return 'required_field'.tr(context);
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: deviceHeight * 0.02),
+                CustomTextField(
+                  controller: passwordController,
+                  hintText: 'password_hint'.tr(context),
+                  labelText: 'password'.tr(context),
+                  prefixIcon: Icons.lock,
+                  obscureText: true,
+                  suffixIcon: Icons.visibility,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'required_field'.tr(context);
+                    }
+                    if (value.length < 6) {
+                      return 'invalid_password'.tr(context);
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: deviceHeight * 0.02),
+                CustomTextField(
+                  controller: confirmPasswordController,
+                  hintText: 'confirm_password_hint'.tr(context),
+                  labelText: 'confirm_password_label'.tr(context),
+                  prefixIcon: Icons.lock,
+                  obscureText: true,
+                  suffixIcon: Icons.visibility,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'required_field'.tr(context);
+                    }
+                    if (value != passwordController.text) {
+                      return 'passwords_not_match'.tr(context);
+                    }
+                    return null;
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('gender'.tr(context)),
+                    Radio<String>(
+                      value: 'male',
+                      groupValue: gender,
+                      activeColor: Theme.of(context).primaryColor,
+                      onChanged: (value) {
+                        setState(() {
+                          gender = value;
+                        });
+                      },
+                    ),
+                    Text('male'.tr(context)),
+                    Radio<String>(
+                      value: 'female',
+                      groupValue: gender,
+                      activeColor: Theme.of(context).primaryColor,
+                      onChanged: (value) {
+                        setState(() {
+                          gender = value;
+                        });
+                      },
+                    ),
+                    Text('female'.tr(context)),
+                  ],
+                ),
+                SizedBox(height: deviceHeight * 0.03),
+                BlocConsumer<AuthBloc, AuthState>(
+                  listener: (context, state) {},
+                  builder: (context, state) {
+                    return state is AuthLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : CustomButton(
+                            text: 'register_button'.tr(context),
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                // Check if email exists before registration
+                                final dbHelper = DatabaseManager();
+                                final db = await dbHelper.database;
+
+                                final List<Map<String, dynamic>> existingUser =
+                                    await db.query(
+                                  'User',
+                                  where: 'email = ? AND deleted_at IS NULL',
+                                  whereArgs: [emailController.text],
+                                );
+
+                                if (existingUser.isNotEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('email_exists'.tr(context)),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+
+                                // Proceed with registration
+                                context.read<AuthBloc>().add(
+                                  RegisterEvent(
+                                    fullName: nameController.text,
+                                    email: emailController.text,
+                                    password: passwordController.text,
+                                    phone: phoneController.text,
+                                    country: countryController.text,
+                                    gender: gender ?? 'male',
+                                  ),
+                                );
+                              }
+                            },
+                          );
+                  },
+                ),
+                SizedBox(height: deviceHeight * 0.02),
+                CustomTextButton(
+                  text: '${'have_account'.tr(context)} ${'login_button'.tr(context)}',
+                  onPressed: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    phoneController.dispose();
+    countryController.dispose();
+    super.dispose();
   }
 }

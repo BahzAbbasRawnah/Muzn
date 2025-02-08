@@ -4,20 +4,18 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:muzn/app/theme/dark_theme.dart';
 import 'package:muzn/app/theme/light_theme.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/bloc/CircleBloc/circle_bloc.dart';
-import 'package:muzn/bloc/LocaleBloc/locale_bloc.dart';
-import 'package:muzn/bloc/SchoolBloc/schools_bloc.dart';
-import 'package:muzn/bloc/ThemeBloc/theme_bloc.dart';
-import 'package:muzn/bloc/ThemeBloc/theme_state.dart';
-import 'package:muzn/bloc/User/user_bloc.dart';
-import 'package:muzn/bloc/User/user_event.dart';
-import 'package:muzn/controllers/circle_controller.dart';
-import 'package:muzn/controllers/school_controller.dart';
-import 'package:muzn/controllers/user_controller.dart';
-import 'package:muzn/repository/circle_repository.dart';
-import 'package:muzn/repository/user_repository.dart';
+import 'package:muzn/blocs/LocaleBloc/locale_bloc.dart';
+import 'package:muzn/blocs/ThemeBloc/theme_bloc.dart';
+import 'package:muzn/blocs/ThemeBloc/theme_state.dart';
+import 'package:muzn/blocs/auth/auth_bloc.dart';
+import 'package:muzn/blocs/circle/circle_bloc.dart';
+import 'package:muzn/blocs/circle_student/circle_student_bloc.dart';
+import 'package:muzn/blocs/school/school_bloc.dart';
 import 'package:muzn/services/database_service.dart';
+import 'package:muzn/views/screens/home_screen.dart';
+import 'package:muzn/views/screens/login_screen.dart';
 import 'package:muzn/views/screens/onBoarding_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 void main() async {
@@ -27,23 +25,40 @@ void main() async {
   final dbHelper = DatabaseManager();
   final database = await dbHelper.database;
 
-  runApp(Muzn(database: database));
+  // Check if this is the first launch
+  final prefs = await SharedPreferences.getInstance();
+  final isFirstLaunch = prefs.getBool('is_first_launch') ?? true;
+
+  // Check if user is authenticated
+  final authToken = prefs.getString('auth_token');
+  final isAuthenticated = authToken != null;
+
+  runApp(Muzn(
+    database: database,
+    isFirstLaunch: isFirstLaunch,
+    isAuthenticated: isAuthenticated,
+  ));
+
+  // Set first launch to false after app starts
+  if (isFirstLaunch) {
+    await prefs.setBool('is_first_launch', false);
+  }
 }
 
 class Muzn extends StatelessWidget {
   final Database database;
+  final bool isFirstLaunch;
+  final bool isAuthenticated;
 
-  const Muzn({Key? key, required this.database}) : super(key: key);
+  const Muzn({
+    Key? key,
+    required this.database,
+    required this.isFirstLaunch,
+    required this.isAuthenticated,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Initialize repositories
-
-    final userController = UserController();
-
-     SchoolController _schoolController = SchoolController();
-     
-
     return MultiBlocProvider(
       providers: [
         // Locale BLoC for language management
@@ -56,29 +71,37 @@ class Muzn extends StatelessWidget {
           create: (_) => ThemeBloc(),
         ),
 
-        // User BLoC for authentication and user management
-        BlocProvider<UserBloc>(
-          create: (_) => UserBloc(
-            userController: userController,
-          )..add(GetUserProfileEvent()), // Fetch current user profile on app start
+        // Auth BLoC for authentication
+        BlocProvider<AuthBloc>(
+          create: (_) => AuthBloc(),
         ),
-         BlocProvider<SchoolBloc>(
-  create: (_) => SchoolBloc(schoolController: _schoolController),
-),
-BlocProvider<CircleBloc>(
-  create: (_) => CircleBloc(),
-),
+
+        // School BLoC for school management
+        BlocProvider<SchoolBloc>(
+          create: (_) => SchoolBloc(),
+        ),
+        BlocProvider<CircleBloc>(
+          create: (_) => CircleBloc(),
+        ),
+             BlocProvider<CircleStudentBloc>(
+          create: (_) => CircleStudentBloc(),
+        ),
       ],
       child: BlocBuilder<LocaleBloc, LocaleState>(
         builder: (context, localeState) {
           return BlocBuilder<ThemeBloc, ThemeState>(
             builder: (context, themeState) {
+              // Get the current locale from state
+              final currentLocale = localeState is LocaleLoadedState
+                  ? localeState.locale
+                  : const Locale('ar'); // Default to Arabic
+
               return MaterialApp(
-                locale: localeState.locale,
+                locale: currentLocale,
                 theme: themeState is ThemeLight ? lightTheme : darkTheme,
                 debugShowCheckedModeBanner: false,
                 title: 'Muzn Quran',
-                supportedLocales: const [Locale('ar'), Locale('en')],
+                supportedLocales: LocaleBloc.getSupportedLocales(),
                 localizationsDelegates: const [
                   AppLocalization.delegate,
                   GlobalCupertinoLocalizations.delegate,
@@ -86,6 +109,12 @@ BlocProvider<CircleBloc>(
                   GlobalWidgetsLocalizations.delegate,
                 ],
                 localeListResolutionCallback: (deviceLocales, supportedLocales) {
+                  // If we have a current locale state, use it
+                  if (localeState is LocaleLoadedState) {
+                    return localeState.locale;
+                  }
+                  
+                  // Otherwise, try to match device locale
                   if (deviceLocales != null) {
                     for (var locale in deviceLocales) {
                       if (supportedLocales.contains(locale)) {
@@ -93,14 +122,28 @@ BlocProvider<CircleBloc>(
                       }
                     }
                   }
-                  return supportedLocales.first;
+                  
+                  // Default to Arabic
+                  return const Locale('ar');
                 },
-                home: OnboardingScreen(),
+                home: _getInitialScreen(),
               );
             },
           );
         },
       ),
     );
+  }
+
+  Widget _getInitialScreen() {
+    if (isFirstLaunch) {
+      return OnboardingScreen();
+    }
+
+    if (isAuthenticated) {
+      return const HomeScreen();
+    }
+
+    return const LoginScreen();
   }
 }

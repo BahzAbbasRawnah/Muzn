@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:muzn/bloc/ThemeBloc/theme_state.dart';
 
 class AppThemes {
   static final ThemeData lightTheme = ThemeData(
