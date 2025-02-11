@@ -27,11 +27,9 @@ class RatingStudentScreen extends StatefulWidget {
 }
 
 class _RatingStudentScreenState extends State<RatingStudentScreen> {
-    int readingWrongs = 0;
-  int tajweedWrong = 0;
+  int readingWrongs = 0;
+  int tajweedWrongs = 0;
   int tashkeelWrongs = 0;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -70,12 +68,14 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                     _buildItem(
                       context,
                       "from_surah".tr(context) +
-                          quran.getSurahNameArabic(widget.homework.startSurahNumber),
+                          quran.getSurahNameArabic(
+                              widget.homework.startSurahNumber),
                     ),
                     _buildItem(
                       context,
                       "to_surah".tr(context) +
-                          quran.getSurahNameArabic(widget.homework.endSurahNumber),
+                          quran.getSurahNameArabic(
+                              widget.homework.endSurahNumber),
                     ),
                   ],
                 ),
@@ -90,7 +90,8 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                     ),
                     _buildItem(
                       context,
-                      "to_ayah".tr(context) + widget.homework.endAyahNumber.toString(),
+                      "to_ayah".tr(context) +
+                          widget.homework.endAyahNumber.toString(),
                     ),
                   ],
                 ),
@@ -124,7 +125,8 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                               size: 20, color: Colors.grey),
                           const SizedBox(width: 8),
                           Text(
-                            JHijri(fDate: widget.homework.homeworkDate).toString() +
+                            JHijri(fDate: widget.homework.homeworkDate)
+                                    .toString() +
                                 ' هــ ',
                             style: Theme.of(context).textTheme.bodyMedium,
                             overflow: TextOverflow.ellipsis,
@@ -142,28 +144,28 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-Column(
-      children: [
-        QuantityInput(
-          label: "reading_wrongs".tr(context),
-          onQuantityChanged: (value) {
-            setState(() => readingWrongs = value);
-          },
-        ),
-        QuantityInput(
-          label: "tajweed_wrongs".tr(context),
-          onQuantityChanged: (value) {
-            setState(() => tajweedWrong = value);
-          },
-        ),
-        QuantityInput(
-          label: "tashkeel_wrongs".tr(context),
-          onQuantityChanged: (value) {
-            setState(() => tashkeelWrongs = value);
-          },
-        ),
-      ],
-    ),
+                Column(
+                  children: [
+                    QuantityInput(
+                      label: "reading_wrongs".tr(context),
+                      onQuantityChanged: (value) {
+                        setState(() => readingWrongs = value);
+                      },
+                    ),
+                    QuantityInput(
+                      label: "tajweed_wrongs".tr(context),
+                      onQuantityChanged: (value) {
+                        setState(() => tajweedWrongs = value);
+                      },
+                    ),
+                    QuantityInput(
+                      label: "tashkeel_wrongs".tr(context),
+                      onQuantityChanged: (value) {
+                        setState(() => tashkeelWrongs = value);
+                      },
+                    ),
+                  ],
+                ),
                 const SizedBox(height: 20),
                 Center(
                   child: Text(
@@ -186,7 +188,21 @@ Column(
                     text: 'save'.tr(context),
                     icon: Icons.save,
                     onPressed: () {
-                      _saveProgress(context, widget.homework);
+                      StudentProgress progress = new StudentProgress(
+                          id: 0,
+                          circleId: widget.homework.circleId,
+                          studentId: widget.homework.studentId,
+                          homeworkId: widget.homework.id,
+                          readingRating:_selectedRating!,
+                          reviewRating: _selectedRating!,
+                          telawahRating: _selectedRating!,
+                          readingWrong: readingWrongs,
+                          tajweedWrong: tajweedWrongs,
+                          tashqeelWrong: tashkeelWrongs,
+                          createdAt: DateTime.now(),
+                          updatedAt: DateTime.now()
+                          );
+                      _saveProgress(context,progress);
                     },
                   ),
                 ),
@@ -198,31 +214,9 @@ Column(
     );
   }
 
-  void _saveProgress(BuildContext context, Homework homework) {
-    final readingRating = Rating.good;
-    final reviewRating =
-        Rating.good; // Replace with actual selected review rating
-    final telawahRating =
-        Rating.good; // Replace with actual selected telawah rating
-    final readingWrong = 0; // Replace with actual input from QuantityInputRow
-    final tajweedWrong = 0; // Replace with actual input from QuantityInputRow
-    final tashqeelWrong = 0; // Replace with actual input from QuantityInputRow
-
+  void _saveProgress(BuildContext context,StudentProgress studentProgress) {
     // Create an instance of StudentProgress
-    final studentProgress = StudentProgress(
-      id: 0,
-      circleId: homework.circleId,
-      studentId: homework.studentId,
-      homeworkId: homework.id,
-      readingRating: readingRating,
-      reviewRating: reviewRating,
-      telawahRating: telawahRating,
-      readingWrong: readingWrong,
-      tajweedWrong: tajweedWrong,
-      tashqeelWrong: tashqeelWrong,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
+
 
     context.read<StudentProgressBloc>().setStudentProgress(studentProgress);
 

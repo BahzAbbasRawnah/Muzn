@@ -43,7 +43,7 @@ class StudentProgress {
       homeworkId: map['homework_id'],
     readingRating: Rating.values.firstWhere(
       (e) => e.name == map['reading_rating'].toString(),
-      orElse: () => Rating.good, // Default if value is invalid
+      orElse: () => Rating.excellent, // Default if value is invalid
     ),
     reviewRating: Rating.values.firstWhere(
       (e) => e.name == map['review_rating'].toString(),
@@ -51,7 +51,7 @@ class StudentProgress {
     ),
     telawahRating: Rating.values.firstWhere(
       (e) => e.name == map['telawah_rating'].toString(),
-      orElse: () => Rating.good, // Default
+      orElse: () => Rating.weak, // Default
     ),
       readingWrong: map['reading_wrong'],
       tajweedWrong: map['tajweed_wrong'],
