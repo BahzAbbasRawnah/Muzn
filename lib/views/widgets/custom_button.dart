@@ -25,7 +25,7 @@ class CustomButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon ?? Icons.touch_app), 
+            Icon(icon ?? Icons.touch_app,size: 20,), 
             const SizedBox(width: 8.0),
             Text(text),
           ],

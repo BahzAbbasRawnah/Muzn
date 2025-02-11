@@ -19,6 +19,13 @@ enum AttendanceStatuse{
   not_listened,
   late,
 }
+enum Rating {
+  excellent,
+  veryGood,
+  good,
+  average,
+  weak,
+}
 
 
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/views/screens/quraan_screen.dart';
+import 'package:muzn/views/screens/quran_screen.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;

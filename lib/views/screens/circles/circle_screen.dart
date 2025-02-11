@@ -4,10 +4,13 @@ import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/circle_student/circle_student_bloc.dart';
 import 'package:muzn/models/circle_student.dart';
 import 'package:muzn/models/enums.dart';
-import 'package:muzn/views/screens/student_progress_screen.dart';
-import 'package:muzn/views/widgets/add_student_to_circle_bottomsheet.dart';
+import 'package:muzn/views/screens/homework/student_progress_screen.dart';
+import 'package:muzn/views/screens/students/add_student_to_circle_bottomsheet.dart';
 import 'package:muzn/views/widgets/attendance_status_bottomsheet.dart';
+import 'package:muzn/views/widgets/custom_leaf_container.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
+import 'package:muzn/views/widgets/empty_data.dart';
+import 'package:muzn/views/widgets/screen_header.dart';
 
 class CircleScreen extends StatefulWidget {
   final int circleId;
@@ -54,7 +57,10 @@ class _CircleScreenState extends State<CircleScreen> {
       ),
       body: Column(
         children: [
-          // Statistics cards
+               ScreenHeader(),
+
+
+          ///Page Header
           BlocBuilder<CircleStudentBloc, CircleStudentState>(
             builder: (context, state) {
               if (state is CircleStudentsLoaded) {
@@ -64,8 +70,10 @@ class _CircleScreenState extends State<CircleScreen> {
                     .fold(0, (sum, entry) => sum + entry.value);
                 final remaining = total - attended;
 
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                return 
+                
+                Container(
+                  
                   child: Row(
                     children: [
                       Expanded(
@@ -80,7 +88,7 @@ class _CircleScreenState extends State<CircleScreen> {
                         child: _buildStatCard(
                           'attended'.tr(context),
                           attended.toString(),
-                          Icons.check_circle,
+                          Icons.check_circle
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -91,6 +99,7 @@ class _CircleScreenState extends State<CircleScreen> {
                           Icons.pending,
                         ),
                       ),
+                        
                     ],
                   ),
                 );
@@ -99,18 +108,19 @@ class _CircleScreenState extends State<CircleScreen> {
             },
           ),
 
+
+          ///Page Content
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(5.0),
             child: Column(
               children: [
-                // Search field
                 CustomTextField(
                   controller: _searchController,
                   labelText: 'search_student'.tr(context),
                   hintText: 'search_student_hint'.tr(context),
                   onChanged: (value) => _loadStudents(),
                 ),
-                const SizedBox(height: 16),
+             
                 // Filter chips
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
@@ -119,8 +129,7 @@ class _CircleScreenState extends State<CircleScreen> {
                       FilterChip(
                         label: Text('all'.tr(context)),
                         selected: _selectedFilter == null,
-                        backgroundColor:
-                            Theme.of(context).primaryColor.withAlpha(100),
+                        backgroundColor:Theme.of(context).primaryColor.withAlpha(100),
                         selectedColor: Theme.of(context).primaryColor,
                         onSelected: (bool selected) {
                           setState(() {
@@ -129,14 +138,14 @@ class _CircleScreenState extends State<CircleScreen> {
                           _loadStudents();
                         },
                       ),
-                      const SizedBox(width: 8),
                       ...AttendanceStatuse.values.map((status) {
                         if (status == AttendanceStatuse.none)
                           return const SizedBox();
                         return Padding(
-                          padding: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.all(5),
                           child: FilterChip(
                             label: Text(status.name.tr(context)),
+                             backgroundColor:Colors.grey[200],
                             selected: _selectedFilter == status,
                             onSelected: (bool selected) {
                               setState(() {
@@ -154,7 +163,6 @@ class _CircleScreenState extends State<CircleScreen> {
             ),
           ),
 
-          const SizedBox(height: 16),
           // Students list
           Expanded(
             child: BlocBuilder<CircleStudentBloc, CircleStudentState>(
@@ -167,23 +175,7 @@ class _CircleScreenState extends State<CircleScreen> {
                 }
                 if (state is CircleStudentsLoaded) {
                   if (state.students.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/empty_box.png',
-                            width: 150,
-                            height: 150,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'empty_data'.tr(context),
-                            style: Theme.of(context).textTheme.displayMedium,
-                          ),
-                        ],
-                      ),
-                    );
+                    return EmptyDataList();
                   }
                   return ListView.builder(
                     itemCount: state.students.length,
@@ -204,6 +196,10 @@ class _CircleScreenState extends State<CircleScreen> {
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
+            useSafeArea: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
             builder: (context) => AddStudentToCircleBottomSheet(
               circleId: widget.circleId,
             ),
@@ -238,51 +234,63 @@ class _CircleScreenState extends State<CircleScreen> {
   }
 
   Widget _buildStudentListItem(CircleStudent student) {
-    return Container(
-      decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.black, // Border color
-                        width: 0.5, // Border width
-                      ),
-                    ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1,horizontal: 5),
+      child: Card(
+        elevation: 4,
+        surfaceTintColor: Colors.white,
+        shadowColor: Colors.black,
+        child: ListTile(
+          key: Key(student.id.toString()),
+          leading: CircleAvatar(
+            child: Icon(
+              Icons.person,
+              size: 30,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            backgroundColor: Theme.of(context).primaryColor.withAlpha(100),
+          ),
+          title: Text(student.name),
+          // subtitle: student. != null ? Text(student.phoneNumber!) : null,
+          trailing: Container(
+            decoration: BoxDecoration(
+              color: _getStatusColor(student.todayAttendance),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            child: GestureDetector(
+              child: Text(
+                student.todayAttendance?.name.tr(context) ??
+                    'attendance'.tr(context),
+                style: const TextStyle(color: Colors.white),
+              ),
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  useSafeArea: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   ),
-      child: ListTile(
-      key: Key(student.id.toString()),
-        title: Text(student.name),
-        // subtitle: student.phoneNumber != null ? Text(student.phoneNumber!) : null,
-        trailing: Container(
-          decoration: BoxDecoration(
-            color: _getStatusColor(student.todayAttendance),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          child: GestureDetector(
-            child: Text(
-              student.todayAttendance?.name.tr(context) ?? 'attendance'.tr(context),
-              style: const TextStyle(color: Colors.white),
+                  builder: (context) => AttendanceStatusBottomSheet(
+                    studentId: student.id,
+                    circleId: widget.circleId,
+                    currentStatus: student.todayAttendance,
+                  ),
+                );
+              },
             ),
-         onTap: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) => AttendanceStatusBottomSheet(
-              studentId: student.id,
-              circleId: widget.circleId,
-              currentStatus: student.todayAttendance,
-            ),
-          );
-        },
           ),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => StudentProgressScreen(
+                    circleId: widget.circleId, studentId: student.id),
+              ),
+            );
+          },
         ),
-onTap: () {
-  Navigator.push(
-    context, 
-    MaterialPageRoute(
-      builder: (context) => StudentProgressScreen(),
-    ),
-  );
-},
-
       ),
     );
   }

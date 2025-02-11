@@ -6,12 +6,13 @@ import 'package:muzn/blocs/LocaleBloc/locale_bloc.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/services/database_service.dart';
 import 'package:muzn/views/screens/home_screen.dart';
+import 'package:muzn/views/screens/quran_pdf_screen.dart';
 
-import 'package:muzn/views/screens/quraan_screen.dart';
+import 'package:muzn/views/screens/quran_screen.dart';
 
-import '../widgets/custom_text_field.dart';
-import '../widgets/custom_button.dart';
-import '../widgets/custom_text_button.dart';
+import '../../widgets/custom_text_field.dart';
+import '../../widgets/custom_button.dart';
+import '../../widgets/custom_text_button.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -119,7 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => QuranScreen(),
+                      builder: (context) => QuranPdfScreen(),
                     ),
                   );
                 },

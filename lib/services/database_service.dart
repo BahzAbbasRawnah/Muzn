@@ -92,12 +92,12 @@ await db.execute('''
 ''');
 
 // Insert initial data into CirclesCategory
-await db.insert('CirclesCategory', {'name': 'حلقة حفظ', 'namevalue': 'Listening'});
-await db.insert('CirclesCategory', {'name': 'حلقة مراجعة صغرى', 'namevalue': 'MinorReview'});
-await db.insert('CirclesCategory', {'name': 'حلقة مراجعة كبرى', 'namevalue': 'MajorReview'});
-await db.insert('CirclesCategory', {'name': 'حلقة إتقان', 'namevalue': 'Mastery'});
-await db.insert('CirclesCategory', {'name': 'حلقة تجويد', 'namevalue': 'Tajweed'});
-await db.insert('CirclesCategory', {'name': 'حلقة تلاوه', 'namevalue': 'Telawah'});
+await db.insert('CirclesCategory', {'name': '  حفظ و مراجعة', 'namevalue': 'Listening'});
+// await db.insert('CirclesCategory', {'name': 'حلقة مراجعة صغرى', 'namevalue': 'MinorReview'});
+// await db.insert('CirclesCategory', {'name': 'حلقة مراجعة كبرى', 'namevalue': 'MajorReview'});
+// await db.insert('CirclesCategory', {'name': 'حلقة إتقان', 'namevalue': 'Mastery'});
+await db.insert('CirclesCategory', {'name': '  تحسين تلاوة و تجويد', 'namevalue': 'TajweedAndTelawah'});
+await db.insert('CirclesCategory', {'name': ' تثبيت', 'namevalue': 'Tathbeet'});
 
 // Ensure `updated_at` updates automatically on updates
 await db.execute('''
@@ -183,18 +183,22 @@ await db.execute('''
   CREATE TABLE IF NOT EXISTS Homework (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     circle_id INTEGER,
+    circle_category_id INTEGER,
     student_id INTEGER,
     start_surah_number INTEGER NOT NULL,
     end_surah_number INTEGER NOT NULL,
     start_ayah_number INTEGER NOT NULL,
     end_ayah_number INTEGER NOT NULL,
-    lesson_date DATETIME NOT NULL,
+    homework_date DATETIME NOT NULL,
+    checked INTEGER DEFAULT 0,
     notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME,
-    FOREIGN KEY (student_id) REFERENCES User(id),
+    FOREIGN KEY (student_id) REFERENCES Student(id),
+    FOREIGN KEY (circle_category_id) REFERENCES CirclesCategory(id)
     FOREIGN KEY (circle_id) REFERENCES Circle(id)
+
   )
 ''');
 

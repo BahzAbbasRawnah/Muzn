@@ -4,11 +4,13 @@ import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/circle/circle_bloc.dart';
 import 'package:muzn/models/circle.dart';
 import 'package:muzn/models/enums.dart';
-import 'package:muzn/views/screens/circle_screen.dart';
+import 'package:muzn/views/screens/circles/circle_screen.dart';
 
-import 'package:muzn/views/widgets/add_circle_bottomsheet.dart';
+import 'package:muzn/views/screens/circles/add_circle_bottomsheet.dart';
 import 'package:muzn/views/widgets/app_drawer.dart';
 import 'package:muzn/views/widgets/custom_app_bar.dart';
+import 'package:muzn/views/widgets/empty_data.dart';
+import 'package:muzn/views/widgets/screen_header.dart';
 
 class CirclesListScreen extends StatefulWidget {
   final int? schoolId;
@@ -47,29 +49,21 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
             return Center(child: Text(state.message.tr(context)));
           } else if (state is CirclesLoaded) {
             if (state.circles.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/images/empty_box.png',
-                      width: 150,
-                      height: 150,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'empty_data'.tr(context),
-                      style: Theme.of(context).textTheme.displayMedium,
-                    ),
-                  ],
-                ),
-              );
+              return EmptyDataList();
             }
-            return ListView.builder(
-              itemCount: state.circles.length,
-              itemBuilder: (context, index) {
-                return _buildCircleListItem(state.circles[index]);
-              },
+            return Column(
+              children: [
+                  ScreenHeader(),
+                Expanded(
+                  child:
+                ListView.builder(
+                  itemCount: state.circles.length,
+                  itemBuilder: (context, index) {
+                    return _buildCircleListItem(state.circles[index]);
+                  },
+                ),
+                )
+              ]
             );
           }
           return const SizedBox();
@@ -80,6 +74,10 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
+            useSafeArea: true,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
             builder: (context) => AddCircleBottomSheet(
               schoolId: widget.schoolId ?? -1,
             ),
@@ -91,21 +89,21 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
   }
 
   Widget _buildCircleListItem(Circle circle) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.black, // Border color
-            width: 0.5, // Border width
-          ),
-        ),
-      ),
+    return Card(
+      elevation: 2,
+      shadowColor: Theme.of(context).primaryColor.withAlpha(100),
       child: ListTile(
         title: Row(
           children: [
-            Text(circle.name),
+            Text(
+              circle.name,
+              style: Theme.of(context).textTheme.displayMedium,
+            ),
             Spacer(),
-            Icon(Icons.person_2),
+            Icon(
+              Icons.person_2,
+              size: 20,
+            ),
             Text('${circle.studentCount ?? 0} ${'student'.tr(context)}'),
           ],
         ),
@@ -114,29 +112,36 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           children: [
             if (circle.categoryName != null)
               Text(circle.categoryName!.tr(context)),
-        
             SizedBox(
               height: 5,
             ),
             Row(
               children: [
-                Icon(Icons.timer),
+                Icon(
+                  Icons.timer,
+                  size: 20,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   CircleTime.values
                       .firstWhere(
-                        (time) => time.name == circle.circleTime?.split('.').last,
+                        (time) =>
+                            time.name == circle.circleTime?.split('.').last,
                         orElse: () => CircleTime.morning,
                       )
                       .toLocalizeTimedString(context),
                 ),
                 Spacer(),
-                Icon(Icons.location_on),
+                Icon(
+                  Icons.location_on,
+                  size: 20,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   CircleType.values
                       .firstWhere(
-                        (type) => type.name == circle.circleType?.split('.').last,
+                        (type) =>
+                            type.name == circle.circleType?.split('.').last,
                         orElse: () => CircleType.offline,
                       )
                       .toLocalizedTypeString(context),
@@ -196,8 +201,10 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CircleScreen(circleId: circle.id,circleName: circle.name,)
-            ),
+                builder: (context) => CircleScreen(
+                      circleId: circle.id,
+                      circleName: circle.name,
+                    )),
           );
         },
       ),

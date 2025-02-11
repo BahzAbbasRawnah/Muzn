@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:muzn/app_localization.dart';
+import 'package:muzn/blocs/auth/auth_bloc.dart';
+import 'package:muzn/blocs/school/school_bloc.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
-import '../../app_localization.dart';
-import '../../blocs/auth/auth_bloc.dart';
-import '../../blocs/school/school_bloc.dart';
+
 
 class AddSchoolBottomSheet extends StatefulWidget {
   const AddSchoolBottomSheet({Key? key}) : super(key: key);

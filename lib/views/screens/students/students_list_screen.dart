@@ -4,6 +4,7 @@ import 'package:muzn/app_localization.dart';
 import 'package:muzn/views/screens/home_screen.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
+import 'package:muzn/views/widgets/empty_data.dart';
 
 class StudentsListScreen extends StatefulWidget {
   @override
@@ -62,7 +63,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
 
   Widget _buildStudentList() {
     return Expanded(
-      child: ListView.builder(
+      child:students.length > 0 ?
+       ListView.builder(
         itemCount: students.length,
         itemBuilder: (context, index) {
           final student = students[index];
@@ -77,7 +79,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
             ),
           );
         },
-      ),
+      ): EmptyDataList()
+
     );
   }
 

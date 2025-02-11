@@ -6,6 +6,7 @@ import 'package:muzn/app_localization.dart';
 import 'package:muzn/services/database_service.dart';
 import 'package:muzn/views/widgets/app_drawer.dart';
 import 'package:muzn/views/widgets/custom_app_bar.dart';
+import 'package:muzn/views/widgets/screen_header.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -14,13 +15,14 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 2;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late AnimationController _controller;
   late Animation<int> _animation;
 
-  final String _firstText = 'مزن لتعليم القرآن الكريم';
+  final String titleText = 'مزن لتعليم القرآن الكريم';
   int _currentIndex = 0;
 
   @override
@@ -41,7 +43,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     );
 
     // Initialize animation
-    _animation = IntTween(begin: 0, end: _firstText.length).animate(_controller)
+    _animation = IntTween(begin: 0, end: titleText.length).animate(_controller)
       ..addListener(() {
         setState(() {
           _currentIndex = _animation.value;
@@ -49,7 +51,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
       })
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
-            _controller.forward(from: 0); // Restart animation for the second text
+          _controller.forward(from: 0); // Restart animation for the second text
         }
       });
 
@@ -75,23 +77,22 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
     double deviceWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      key: _scaffoldKey,
-      appBar: CustomAppBar(
-        title: 'home'.tr(context),
-        scaffoldKey: _scaffoldKey,
-      ),
-      drawer: AppDrawer(), // Pass the userController here
-      body: SingleChildScrollView(
-        // Make the screen scrollable
-        child: SizedBox(
-          height: deviceHeight, // Set height to the device height
-          child: Column(
+        key: _scaffoldKey,
+        appBar: CustomAppBar(
+          title: 'home'.tr(context),
+          scaffoldKey: _scaffoldKey,
+        ),
+        drawer: AppDrawer(), // Pass the userController here
+        body: Column(children: [
+          ScreenHeader(),
+          Expanded(
+              child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Animated first text
               Text(
-                _firstText.substring(
-                    0, _currentIndex.clamp(0, _firstText.length)),
+                titleText.substring(
+                    0, _currentIndex.clamp(0, titleText.length)),
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
@@ -100,7 +101,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                 textAlign: TextAlign.center, // Center-align the text
               ),
               SizedBox(height: deviceHeight * 0.03), // Spacing between texts
-          
+
               // Gif
               Center(
                 child: GifView.asset(
@@ -112,9 +113,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
+          ))
+        ]));
   }
 }

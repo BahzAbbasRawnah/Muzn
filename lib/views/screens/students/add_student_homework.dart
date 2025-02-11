@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:input_quantity/input_quantity.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/blocs/circle_category/circle_category_bloc.dart';
+import 'package:muzn/blocs/homework/homework_bloc.dart';
+import 'package:muzn/models/homework.dart';
 import 'package:muzn/models/quran_model.dart';
 import 'package:muzn/views/widgets/circle_category.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
@@ -10,13 +10,18 @@ import 'package:muzn/views/widgets/custom_surah_dropdown.dart';
 import 'package:muzn/views/widgets/custom_ayah_dropdown.dart';
 
 class AddHomeworkBottomSheet extends StatefulWidget {
+  final int studentId;
+  final int circleId;
+
+  const AddHomeworkBottomSheet(
+      {super.key, required this.studentId, required this.circleId});
+
   @override
   _AddHomeworkBottomSheetState createState() => _AddHomeworkBottomSheetState();
 }
 
 class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
   final List<Surah> surahList = QuranService.getAllSurahs();
-  
   Surah? selectedFromSurah;
   int? selectedFromAyah;
   Surah? selectedToSurah;
@@ -26,7 +31,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => CircleCategoryBloc(),
+      create: (context) => HomeworkBloc(),
       child: Padding(
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -77,7 +82,8 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                           onChanged: (value) {
                             setState(() {
                               selectedFromSurah = value;
-                              selectedFromAyah = null; // Reset ayah when surah changes
+                              selectedFromAyah =
+                                  null; // Reset ayah when surah changes
                             });
                           },
                         ),
@@ -88,13 +94,13 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                           label: 'from_ayah'.tr(context),
                           selectedAyah: selectedFromAyah,
                           maxAyah: selectedFromSurah?.ayat_count,
-                          onChanged: selectedFromSurah != null 
-                            ? (value) {
-                                setState(() {
-                                  selectedFromAyah = value;
-                                });
-                              }
-                            : null,
+                          onChanged: selectedFromSurah != null
+                              ? (value) {
+                                  setState(() {
+                                    selectedFromAyah = value;
+                                  });
+                                }
+                              : null,
                         ),
                       ),
                     ],
@@ -112,7 +118,8 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                           onChanged: (value) {
                             setState(() {
                               selectedToSurah = value;
-                              selectedToAyah = null; // Reset ayah when surah changes
+                              selectedToAyah =
+                                  null; // Reset ayah when surah changes
                             });
                           },
                         ),
@@ -123,44 +130,51 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                           label: 'to_ayah'.tr(context),
                           selectedAyah: selectedToAyah,
                           maxAyah: selectedToSurah?.ayat_count,
-                          onChanged: selectedToSurah != null 
-                            ? (value) {
-                                setState(() {
-                                  selectedToAyah = value;
-                                });
-                              }
-                            : null,
+                          onChanged: selectedToSurah != null
+                              ? (value) {
+                                  setState(() {
+                                    selectedToAyah = value;
+                                  });
+                                }
+                              : null,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
 
-                  // Input Quantity for Mistakes
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     _buildInputQtyField(
-                  //         context, "reading_wrongs", Colors.green, Colors.red),
-                  //     _buildInputQtyField(
-                  //         context, "tashkeel_wrongs", Colors.green, Colors.red),
-                  //     _buildInputQtyField(
-                  //         context, "tajweed_wrongs", Colors.green, Colors.red),
-                  //   ],
-                  // ),
-                  const SizedBox(height: 40),
-
                   // Save Button
-                  CustomButton(
-                    text: 'save'.tr(context),
-                    icon: Icons.save,
-                    onPressed: () {
-                      // Handle the selected values
-                      print('Selected category: $selectedCategoryId');
-                      print('From Surah: ${selectedFromSurah?.number}, Ayah: $selectedFromAyah');
-                      print('To Surah: ${selectedToSurah?.number}, Ayah: $selectedToAyah');
-                      Navigator.pop(context);
+                  BlocBuilder<HomeworkBloc, HomeworkState>(
+                    builder: (context, state) {
+                      return CustomButton(
+                        text: 'save'.tr(context),
+                        icon: Icons.save,
+                        onPressed: () {
+                          // Create Homework object
+                          Homework homework = Homework(
+                            id: 0,
+                            circleCategoryId: selectedCategoryId!,
+                            circleId: widget.circleId,
+                            studentId: widget.studentId,
+                            startSurahNumber: selectedFromSurah?.number ?? 0,
+                            endSurahNumber: selectedToSurah?.number ?? 0,
+                            startAyahNumber: selectedFromAyah ?? 1,
+                            endAyahNumber: selectedToAyah ?? 1,
+                            homeworkDate: DateTime.now(),
+                            checked: 0,
+                            notes: null,
+                            createdAt: DateTime.now(),
+                            updatedAt: DateTime.now(),
+                          );
+
+                          // Dispatch AddHomeworkEvent
+                          BlocProvider.of<HomeworkBloc>(context)
+                              .add(AddHomeworkEvent(context, homework));
+
+                          // Close the bottom sheet after successful insertion
+                          Navigator.pop(context);
+                        },
+                      );
                     },
                   ),
                 ],
@@ -171,46 +185,4 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
       ),
     );
   }
-
-  Widget _buildInputQtyField(
-      BuildContext context, String label, Color plusColor, Color minusColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label.tr(context),
-          style: Theme.of(context).textTheme.labelMedium,
-        ),
-        const SizedBox(height: 2),
-        InputQty(
-          maxVal: 100,
-          initVal: 0,
-          steps: 1,
-          minVal: 0,
-          qtyFormProps: QtyFormProps(enableTyping: true),
-          decoration: QtyDecorationProps(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide:
-                  BorderSide(width: 1, color: Theme.of(context).primaryColor),
-            ),
-            isBordered: true,
-            plusBtn: Icon(Icons.plus_one, color: plusColor, size: 30),
-            minusBtn: Icon(Icons.exposure_minus_1, color: minusColor, size: 30),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-void showAddHomeworkBottomSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-    ),
-    builder: (context) => AddHomeworkBottomSheet(),
-  );
 }

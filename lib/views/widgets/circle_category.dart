@@ -52,8 +52,8 @@ class _CircleCategorySelectorState extends State<CircleCategorySelector> {
           }
 
           return Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: 5,
+            runSpacing: 5,
             children: state.categories.map((category) {
               return CircleCategoryItem(
                 category: category,
@@ -92,12 +92,10 @@ class CircleCategoryItem extends StatelessWidget {
           color: isSelected ? Theme.of(context).primaryColor : Colors.grey[300]!,
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 0),
       child: InkWell(
         onTap: onSelected,
         borderRadius: BorderRadius.circular(10),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Radio<bool>(
               value: true,
@@ -107,11 +105,8 @@ class CircleCategoryItem extends StatelessWidget {
             ),
             Text(
               category.name,
-              style: TextStyle(
-                color:  Colors.black87,
-              ),
+              style:Theme.of(context).textTheme.labelMedium
             ),
-            const SizedBox(width: 8),
           ],
         ),
       ),

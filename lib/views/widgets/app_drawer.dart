@@ -8,8 +8,8 @@ import 'package:muzn/blocs/ThemeBloc/theme_bloc.dart';
 import 'package:muzn/blocs/ThemeBloc/theme_state.dart';
 import 'package:muzn/views/screens/contact_screen.dart';
 import 'package:muzn/views/screens/home_screen.dart';
-import 'package:muzn/views/screens/login_screen.dart';
-import 'package:muzn/views/screens/quraan_screen.dart';
+import 'package:muzn/views/screens/users/login_screen.dart';
+import 'package:muzn/views/screens/quran_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({Key? key}) : super(key: key);

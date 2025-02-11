@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:muzn/app_localization.dart'; // Adjust the import path as needed
 import 'package:muzn/views/screens/home_screen.dart';
-import 'package:muzn/views/screens/login_screen.dart'; // Adjust the import path as needed
+import 'package:muzn/views/screens/users/login_screen.dart'; // Adjust the import path as needed
 
 class OnboardingScreen extends StatelessWidget {
   @override

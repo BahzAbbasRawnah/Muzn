@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
+import 'package:muzn/views/widgets/screen_header.dart';
 
 class ContactScreen extends StatelessWidget {
   @override
@@ -13,9 +14,16 @@ class ContactScreen extends StatelessWidget {
         title: Text('contact'.tr(context)),
         centerTitle: true,
       ),
-      body: Padding(
+      body:
+      
+       Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
+        child:
+          Column(
+              children: [
+               ScreenHeader(),
+                Expanded( 
+          child:SingleChildScrollView(
           controller: controller,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -76,13 +84,13 @@ class ContactScreen extends StatelessWidget {
                   text: 'send_message'.tr(context),
                   icon: Icons.send,
                   onPressed: () {}),
-              const Divider(thickness: 1.0),
-
               
             ],
           ),
         ),
       ),
+              ]
+          ))
     );
   }
 }

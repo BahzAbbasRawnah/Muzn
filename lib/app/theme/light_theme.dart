@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   primaryColor: const Color(0xffda9f35),
-  scaffoldBackgroundColor: Colors.white,
+  scaffoldBackgroundColor: Color(0xfff5f5f5),
   appBarTheme: AppBarTheme(
     centerTitle: true,
     backgroundColor: const Color(0xffda9f35),
@@ -119,21 +119,21 @@ floatingActionButtonTheme: FloatingActionButtonThemeData(
       textStyle: const TextStyle(
         fontSize: 22.0,
         fontWeight: FontWeight.bold,
-        color: Color(0xffda9f35),
+        color: Color(0xff1f1f1f),
       ),
     ),
     titleMedium: GoogleFonts.amiri(
       textStyle: const TextStyle(
         fontSize: 20.0,
         fontWeight: FontWeight.bold,
-        color: Color(0xffda9f35),
+        color: Color(0xff1f1f1f),
       ),
     ),
     titleSmall: GoogleFonts.amiri(
       textStyle: const TextStyle(
         fontSize: 18.0,
         fontWeight: FontWeight.normal,
-        color: Color(0xffda9f35),
+        color: Color(0xff1f1f1f),
       ),
     ),
     labelLarge: GoogleFonts.amiri(

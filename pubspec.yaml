@@ -32,7 +32,8 @@ dependencies:
   equatable: ^2.0.5   
   just_audio: ^0.9.44
   jhijri: ^1.0.0
-  pdfx: ^2.8.0
+  syncfusion_flutter_pdfviewer: ^28.1.37
+  scroll_loop_auto_scroll: ^0.0.5
 
 
 

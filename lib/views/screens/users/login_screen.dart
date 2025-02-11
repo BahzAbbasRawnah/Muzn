@@ -4,8 +4,9 @@ import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/LocaleBloc/locale_bloc.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/views/screens/home_screen.dart';
-import 'package:muzn/views/screens/quraan_screen.dart';
-import 'package:muzn/views/screens/registration_screen.dart';
+import 'package:muzn/views/screens/quran_pdf_screen.dart';
+import 'package:muzn/views/screens/quran_screen.dart';
+import 'package:muzn/views/screens/users/registration_screen.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_text_button.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
@@ -84,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => QuranScreen()),
+                MaterialPageRoute(builder: (context) => QuranPdfScreen()),
               ),
             ),
           ),

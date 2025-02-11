@@ -9,11 +9,14 @@ import 'package:muzn/blocs/ThemeBloc/theme_bloc.dart';
 import 'package:muzn/blocs/ThemeBloc/theme_state.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/circle/circle_bloc.dart';
+import 'package:muzn/blocs/circle_category/circle_category_bloc.dart';
 import 'package:muzn/blocs/circle_student/circle_student_bloc.dart';
+import 'package:muzn/blocs/homework/homework_bloc.dart';
 import 'package:muzn/blocs/school/school_bloc.dart';
+import 'package:muzn/blocs/student/student_progress_bloc.dart';
 import 'package:muzn/services/database_service.dart';
 import 'package:muzn/views/screens/home_screen.dart';
-import 'package:muzn/views/screens/login_screen.dart';
+import 'package:muzn/views/screens/users/login_screen.dart';
 import 'package:muzn/views/screens/onBoarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -85,6 +88,17 @@ class Muzn extends StatelessWidget {
         ),
              BlocProvider<CircleStudentBloc>(
           create: (_) => CircleStudentBloc(),
+        ),
+
+                     BlocProvider<CircleCategoryBloc>(
+          create: (_) => CircleCategoryBloc(),
+        ),
+                   BlocProvider<HomeworkBloc>(
+          create: (_) => HomeworkBloc(),
+                   ),
+          BlocProvider<StudentProgressBloc>(
+          create: (_) => StudentProgressBloc(),
+        
         ),
       ],
       child: BlocBuilder<LocaleBloc, LocaleState>(

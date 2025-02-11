@@ -101,6 +101,7 @@ class _AttendanceStatusBottomSheetState
                   setState(() {
                     _selectedStatus = selected ? status : null;
                   });
+                
                 },
                 selectedColor: _getStatusColor(status),
                 backgroundColor:

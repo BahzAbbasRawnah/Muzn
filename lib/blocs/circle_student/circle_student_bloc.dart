@@ -102,6 +102,8 @@ class CircleStudentError extends CircleStudentState {
 // Bloc
 class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
   final DatabaseManager _databaseManager = DatabaseManager();
+  List<CircleStudent> _allStudents =
+      []; // Store all students for local filtering
 
   CircleStudentBloc() : super(CircleStudentInitial()) {
     on<LoadCircleStudents>(_onLoadCircleStudents);
@@ -138,19 +140,27 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
 
       List<dynamic> args = [event.circleId, event.circleId];
 
+      final results = await db.rawQuery(query, args);
+
+      // Store all students for local filtering
+      _allStudents = results.map((row) => CircleStudent.fromMap(row)).toList();
+
+      // Filter based on search query and status
+      List<CircleStudent> filteredStudents = _allStudents;
+
       if (event.searchQuery != null && event.searchQuery!.isNotEmpty) {
-        query += ' AND u.full_name LIKE ?';
-        args.add('%${event.searchQuery}%');
+        filteredStudents = filteredStudents.where((student) {
+          return student.name
+              .toLowerCase()
+              .contains(event.searchQuery!.toLowerCase());
+        }).toList();
       }
 
       if (event.filterStatus != null) {
-        query += ' AND sa.status = ?';
-        args.add(event.filterStatus!.name);
+        filteredStudents = filteredStudents.where((student) {
+          return student.todayAttendance == event.filterStatus;
+        }).toList();
       }
-
-      query += ' ORDER BY u.full_name';
-
-      final results = await db.rawQuery(query, args);
 
       // Get attendance summary
       final summaryResults = await db.rawQuery('''
@@ -177,7 +187,7 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
       }
 
       emit(CircleStudentsLoaded(
-        students: results.map((row) => CircleStudent.fromMap(row)).toList(),
+        students: filteredStudents,
         attendanceSummary: summary,
       ));
     } catch (e) {
@@ -191,7 +201,7 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
   ) async {
     try {
       final db = await _databaseManager.database;
-
+      print("student id = " + event.studentId.toString());
       // Check if attendance record exists for today
       final existing = await db.query(
         'StudentAttendance',
@@ -216,14 +226,20 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         });
       } else {
         // Update existing record
+
         await db.update(
           'StudentAttendance',
           {
             'status': event.status.name,
             'updated_at': DateTime.now().toIso8601String(),
           },
-          where: 'id = ?',
-          whereArgs: [existing.first['id']],
+           where: '''
+          student_id = ? AND 
+          circle_id = ? AND 
+          DATE(attendance_date) = DATE('now') AND
+          deleted_at IS NULL
+        ''',
+        whereArgs: [event.studentId, event.circleId],
         );
       }
 
@@ -251,7 +267,8 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         ORDER BY u.full_name
       ''';
 
-      final results = await db.rawQuery(query, [event.circleId, event.circleId]);
+      final results =
+          await db.rawQuery(query, [event.circleId, event.circleId]);
 
       // Get attendance summary
       final summaryResults = await db.rawQuery('''
@@ -282,7 +299,6 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         students: results.map((row) => CircleStudent.fromMap(row)).toList(),
         attendanceSummary: summary,
       ));
-
     } catch (e) {
       emit(CircleStudentError(e.toString()));
     }

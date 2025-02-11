@@ -97,27 +97,22 @@ extension CircleTypeExtension on CircleType {
   }
 }
 
-// extension StudentStatusExtension on StudentStatus {
-//   String localized(BuildContext context) {
-//     switch (this) {
-//       case StudentStatus.none:
-//         return 'all'.tr(context);
-//       case StudentStatus.present:
-//         return 'present'.tr(context);
-//       case StudentStatus.absent:
-//         return 'absent'.tr(context);
-//       case StudentStatus.excused:
-//         return 'excused'.tr(context);
-//       case StudentStatus.late:
-//         return 'late'.tr(context);
-//       case StudentStatus.permissionGranted:
-//         return 'permission_granted'.tr(context);
-//       case StudentStatus.notHeard:
-//         return 'not_heard'.tr(context);
-//          case StudentStatus.withdrew:
-//         return 'withdrew'.tr(context);
-
-//     }
-//   }
-// }
+extension RatingTranslation on Rating {
+  String translate(BuildContext context) {
+    switch (this) {
+        case Rating.excellent:
+        return "excellent".tr(context);
+          case Rating.veryGood:
+        return "very_good".tr(context);
+      case Rating.good:
+        return "good".tr(context);  
+      case Rating.average:
+        return "average".tr(context);
+      case Rating.weak:
+        return "weak".tr(context);
+      default:
+        return this.name; 
+    }
+  }
+}
 

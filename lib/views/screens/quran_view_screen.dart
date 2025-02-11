@@ -18,11 +18,14 @@ class _QuranViewScreenState extends State<QuranViewScreen> {
   final ScrollController _scrollController = ScrollController();
   double _scrollSpeed = 0.0; // Scroll speed in pixels per second
   Timer? _autoScrollTimer;
+  int _currentPageNumber = 1;
+  int _currentJuzNumber = 1;
 
   @override
   void initState() {
     super.initState();
     _startAutoScroll();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -32,85 +35,153 @@ class _QuranViewScreenState extends State<QuranViewScreen> {
     super.dispose();
   }
 
+  void _onScroll() {
+    int currentVerse = (_scrollController.offset / 100).floor() + 1;
+    int pageNumber = quran.getPageNumber(widget.surahNumber, currentVerse);
+    int juzNumber = quran.getJuzNumber(widget.surahNumber, currentVerse);
+
+    if (_currentPageNumber != pageNumber || _currentJuzNumber != juzNumber) {
+      setState(() {
+        _currentPageNumber = pageNumber;
+        _currentJuzNumber = juzNumber;
+      });
+    }
+  }
+
   void _startAutoScroll() {
-    _autoScrollTimer?.cancel(); // Cancel any existing timer
+    _autoScrollTimer?.cancel();
     _autoScrollTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       if (_scrollSpeed > 0) {
         double newOffset = _scrollController.offset + (_scrollSpeed / 10);
         if (newOffset >= _scrollController.position.maxScrollExtent) {
-          newOffset = 0; // Loop back to the top
+          newOffset = 0; // Reset scroll position
         }
         _scrollController.jumpTo(newOffset);
       }
     });
   }
 
+  String getJuzName(int juzNumber) => 'juz_$juzNumber'.tr(context);
+
+  String getHezbName(int pageNumber) {
+    int hezbNumber = (pageNumber) ~/ 10 + 1;
+    return 'hezb_$hezbNumber'.tr(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Combine all verses into a single string
-    String allVerses = '';
-    for (int i = 1; i <= quran.getVerseCount(widget.surahNumber); i++) {
-      allVerses += quran.getVerse(widget.surahNumber, i, verseEndSymbol: true) + ' ';
-    }
+    List<String> verses = List.generate(
+      quran.getVerseCount(widget.surahNumber),
+      (i) => quran.getVerse(widget.surahNumber, i + 1, verseEndSymbol: true),
+    );
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('surah'.tr(context) + ' ' + quran.getSurahNameArabic(widget.surahNumber),
-        ),
+        title: Text('surah'.tr(context) +
+            ' ' +
+            quran.getSurahNameArabic(widget.surahNumber),
+           
+            ),
       ),
       body: Column(
         children: [
-          Text(quran.basmala,style: GoogleFonts.amiriQuran(
-            color: Colors.black,
-            fontSize: 20,
-            height: 2, 
-            fontWeight: FontWeight.bold
-          )),
-          Divider(),
-          Expanded(
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              padding: EdgeInsets.all(10),
-              child: Text(
-                allVerses,
-                style: GoogleFonts.amiriQuran(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 20,
-                  wordSpacing: 0.2,
-                  height: 2
-                  
-                ),
-                
-                textAlign: TextAlign.justify, // Justify text for better readability
-              ),
-            ),
+          _buildHeader(context),
+          _buildQuranContent(verses),
+          _buildScrollSpeedControl(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+           border: Border.all(
+            color: Theme.of(context).primaryColor.withAlpha(80),
+            width: 2,
           ),
-          // Slider to control scroll speed
-          Container(
-            color: Colors.grey[200],
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                children: [
-                  Text('scroll_speed'.tr(context),style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
-                  Expanded(
-                    child: Slider(
-                      value: _scrollSpeed,
-                      min: 0,
-                      max: 100, // Adjust max speed as needed
-                      onChanged: (value) {
-                        setState(() {
-                          _scrollSpeed = value;
-                        });
-                      },
-                        activeColor: Theme.of(context).primaryColor,
-                            inactiveColor: Theme.of(context).primaryColor.withAlpha(100),
-                            thumbColor: Theme.of(context).primaryColor,
-                    ),
-                  ),
-                ],
-              ),
+          borderRadius: BorderRadius.circular(5),
+                color: Theme.of(context).primaryColor.withAlpha(100),
+
+      ),
+      margin: EdgeInsets.all(2),
+      padding: const EdgeInsets.all(2.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildText(getJuzName(_currentJuzNumber)),
+          _buildText('{ $_currentPageNumber }'),
+          _buildText(getHezbName(_currentPageNumber)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildText(String text) {
+    return Text(
+      text,
+      style: GoogleFonts.amiri(
+        color: Colors.black,
+        fontWeight: FontWeight.w900,
+        fontSize: 18,
+        height: 2,
+        
+      ),
+      overflow: TextOverflow.fade,
+    );
+  }
+
+  Widget _buildQuranContent(List<String> verses) {
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.all(3),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).primaryColor,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(10),
+          color: Theme.of(context).primaryColor.withAlpha(20),
+        ),
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+          child: Text(
+            verses.join(' '),
+            style: GoogleFonts.amiri(
+              color: Colors.black,
+              fontWeight: FontWeight.w500,
+              fontSize: 25,
+              wordSpacing: 0.2,
+              letterSpacing: 0.3,
+              height: 2,
+            ),
+            textAlign: TextAlign.justify,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScrollSpeedControl() {
+    return Container(
+      color: Colors.grey[200],
+      padding: const EdgeInsets.symmetric(vertical: 3.0,horizontal: 5),
+      child: Row(
+        children: [
+          Text(
+            'scroll_speed'.tr(context),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          Expanded(
+            child: Slider(
+              value: _scrollSpeed,
+              min: 0,
+              max: 100,
+              onChanged: (value) => setState(() => _scrollSpeed = value),
+              activeColor: Theme.of(context).primaryColor,
+              inactiveColor: Theme.of(context).primaryColor.withAlpha(100),
+              thumbColor: Theme.of(context).primaryColor,
             ),
           ),
         ],
