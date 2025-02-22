@@ -2,24 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/circle_student/circle_student_bloc.dart';
+import 'package:muzn/models/circle.dart';
 import 'package:muzn/models/circle_student.dart';
 import 'package:muzn/models/enums.dart';
 import 'package:muzn/views/screens/homework/student_progress_screen.dart';
 import 'package:muzn/views/screens/students/add_student_to_circle_bottomsheet.dart';
+import 'package:muzn/views/screens/students/edit_student_bottomsheet.dart';
 import 'package:muzn/views/widgets/attendance_status_bottomsheet.dart';
-import 'package:muzn/views/widgets/custom_leaf_container.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 import 'package:muzn/views/widgets/empty_data.dart';
 import 'package:muzn/views/widgets/screen_header.dart';
 
 class CircleScreen extends StatefulWidget {
-  final int circleId;
-  final String circleName;
+  final Circle circle;
 
   const CircleScreen({
     Key? key,
-    required this.circleId,
-    required this.circleName,
+    required this.circle,
   }) : super(key: key);
 
   @override
@@ -29,6 +28,7 @@ class CircleScreen extends StatefulWidget {
 class _CircleScreenState extends State<CircleScreen> {
   final TextEditingController _searchController = TextEditingController();
   AttendanceStatuse? _selectedFilter;
+  List<CircleStudent> _filteredStudents = [];
 
   @override
   void initState() {
@@ -40,156 +40,183 @@ class _CircleScreenState extends State<CircleScreen> {
     context.read<CircleStudentBloc>().add(
           LoadCircleStudents(
             context,
-            circleId: widget.circleId,
-            searchQuery:
-                _searchController.text.isEmpty ? null : _searchController.text,
-            filterStatus: _selectedFilter,
+            circleId: widget.circle.id!,
           ),
         );
+  }
+
+  void _filterAndSearchStudents(List<CircleStudent> Circle_students) {
+    setState(() {
+      _filteredStudents = Circle_students.where((Circle_student) {
+        final matchesSearch = Circle_student.student.user!.fullName
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase());
+        final matchesFilter = _selectedFilter == null ||
+            Circle_student.todayAttendance == _selectedFilter;
+        return matchesSearch && matchesFilter;
+      }).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.circleName),
+        title: Text(widget.circle.name),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-               ScreenHeader(),
+      body: BlocListener<CircleStudentBloc, CircleStudentState>(
+        listener: (context, state) {
+          if (state is CircleStudentsLoaded) {
+            _filterAndSearchStudents(state.students);
+          }
+        },
+        child: Column(
+          children: [
+            ScreenHeader(),
 
-
-          ///Page Header
-          BlocBuilder<CircleStudentBloc, CircleStudentState>(
-            builder: (context, state) {
-              if (state is CircleStudentsLoaded) {
-                final total = state.students.length;
-                final attended = state.attendanceSummary.entries
-                    .where((e) => e.key != AttendanceStatuse.none)
-                    .fold(0, (sum, entry) => sum + entry.value);
-                final remaining = total - attended;
-
-                return 
-                
-                Container(
-                  
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          'total_students'.tr(context),
-                          total.toString(),
-                          Icons.people,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildStatCard(
-                          'attended'.tr(context),
-                          attended.toString(),
-                          Icons.check_circle
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildStatCard(
-                          'remaining'.tr(context),
-                          remaining.toString(),
-                          Icons.pending,
-                        ),
-                      ),
-                        
-                    ],
-                  ),
-                );
-              }
-              return const SizedBox();
-            },
-          ),
-
-
-          ///Page Content
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Column(
-              children: [
-                CustomTextField(
-                  controller: _searchController,
-                  labelText: 'search_student'.tr(context),
-                  hintText: 'search_student_hint'.tr(context),
-                  onChanged: (value) => _loadStudents(),
-                ),
-             
-                // Filter chips
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      FilterChip(
-                        label: Text('all'.tr(context)),
-                        selected: _selectedFilter == null,
-                        backgroundColor:Theme.of(context).primaryColor.withAlpha(100),
-                        selectedColor: Theme.of(context).primaryColor,
-                        onSelected: (bool selected) {
-                          setState(() {
-                            _selectedFilter = null;
-                          });
-                          _loadStudents();
-                        },
-                      ),
-                      ...AttendanceStatuse.values.map((status) {
-                        if (status == AttendanceStatuse.none)
-                          return const SizedBox();
-                        return Padding(
-                          padding: const EdgeInsets.all(5),
-                          child: FilterChip(
-                            label: Text(status.name.tr(context)),
-                             backgroundColor:Colors.grey[200],
-                            selected: _selectedFilter == status,
-                            onSelected: (bool selected) {
-                              setState(() {
-                                _selectedFilter = selected ? status : null;
-                              });
-                              _loadStudents();
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Students list
-          Expanded(
-            child: BlocBuilder<CircleStudentBloc, CircleStudentState>(
+            /// Page Header
+            BlocBuilder<CircleStudentBloc, CircleStudentState>(
               builder: (context, state) {
-                if (state is CircleStudentLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (state is CircleStudentError) {
-                  return Center(child: Text(state.message));
-                }
                 if (state is CircleStudentsLoaded) {
-                  if (state.students.isEmpty) {
-                    return EmptyDataList();
-                  }
-                  return ListView.builder(
-                    itemCount: state.students.length,
-                    itemBuilder: (context, index) {
-                      final student = state.students[index];
-                      return _buildStudentListItem(student);
-                    },
+                  final total = _filteredStudents.length;
+                  final attended = _filteredStudents
+                      .where((student) =>
+                          student.todayAttendance != AttendanceStatuse.none)
+                      .length;
+                  final remaining = total - attended;
+
+                  return Container(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildStatCard(
+                            'total_students'.tr(context),
+                            total.toString(),
+                            Icons.people,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildStatCard(
+                            'attended'.tr(context),
+                            attended.toString(),
+                            Icons.check_circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildStatCard(
+                            'remaining'.tr(context),
+                            remaining.toString(),
+                            Icons.pending,
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 }
                 return const SizedBox();
               },
             ),
-          ),
-        ],
+
+            /// Page Content
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Column(
+                children: [
+                  CustomTextField(
+                    controller: _searchController,
+                    labelText: 'search_student'.tr(context),
+                    hintText: 'search_student_hint'.tr(context),
+                    onChanged: (value) {
+                      final state = context.read<CircleStudentBloc>().state;
+                      if (state is CircleStudentsLoaded) {
+                        _filterAndSearchStudents(state.students);
+                      }
+                    },
+                  ),
+
+                  // Filter chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        FilterChip(
+                          label: Text('all'.tr(context)),
+                          selected: _selectedFilter == null,
+                          backgroundColor:
+                              Theme.of(context).primaryColor.withAlpha(100),
+                          selectedColor: Theme.of(context).primaryColor,
+                          onSelected: (bool selected) {
+                            setState(() {
+                              _selectedFilter = null;
+                            });
+                            final state =
+                                context.read<CircleStudentBloc>().state;
+                            if (state is CircleStudentsLoaded) {
+                              _filterAndSearchStudents(state.students);
+                            }
+                          },
+                        ),
+                        ...AttendanceStatuse.values.map((status) {
+                          if (status == AttendanceStatuse.none)
+                            return const SizedBox();
+                          return Padding(
+                            padding: const EdgeInsets.all(5),
+                            child: FilterChip(
+                              label: Text(status.name.tr(context)),
+                              backgroundColor: Colors.grey[200],
+                              selected: _selectedFilter == status,
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  _selectedFilter = selected ? status : null;
+                                });
+                                final state =
+                                    context.read<CircleStudentBloc>().state;
+                                if (state is CircleStudentsLoaded) {
+                                  _filterAndSearchStudents(state.students);
+                                }
+                              },
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Students list
+            Expanded(
+              child: BlocBuilder<CircleStudentBloc, CircleStudentState>(
+                builder: (context, state) {
+                  if (state is CircleStudentLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (state is CircleStudentError) {
+                    return Center(child: Text(state.message));
+                  }
+                  if (state is CircleStudentsLoaded) {
+                    if (_filteredStudents.isEmpty) {
+                      return EmptyDataList();
+                    }
+                    return ListView.builder(
+                      itemCount: _filteredStudents.length,
+                      itemBuilder: (context, index) {
+                        final circle_student = _filteredStudents[index];
+                        return _buildStudentListItem(circle_student);
+                      },
+                    );
+                  }
+                  return const SizedBox();
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -198,10 +225,9 @@ class _CircleScreenState extends State<CircleScreen> {
             isScrollControlled: true,
             useSafeArea: true,
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
             builder: (context) => AddStudentToCircleBottomSheet(
-              circleId: widget.circleId,
+              circleId: widget.circle.id!,
             ),
           );
         },
@@ -233,15 +259,14 @@ class _CircleScreenState extends State<CircleScreen> {
     );
   }
 
-  Widget _buildStudentListItem(CircleStudent student) {
+  Widget _buildStudentListItem(CircleStudent Circle_student) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1,horizontal: 5),
+      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
       child: Card(
         elevation: 4,
         surfaceTintColor: Colors.white,
         shadowColor: Colors.black,
         child: ListTile(
-          key: Key(student.id.toString()),
           leading: CircleAvatar(
             child: Icon(
               Icons.person,
@@ -250,18 +275,52 @@ class _CircleScreenState extends State<CircleScreen> {
             ),
             backgroundColor: Theme.of(context).primaryColor.withAlpha(100),
           ),
-          title: Text(student.name),
-          // subtitle: student. != null ? Text(student.phoneNumber!) : null,
+          title:Row(
+            children: [
+            Text(Circle_student.student.user!.fullName),
+            Spacer(),
+            IconButton(
+              icon:Icon(
+                Icons.edit,
+                size: 30,
+              ),
+              onPressed: (){
+              Navigator.push(
+                context, MaterialPageRoute(
+                builder: (context) => 
+                EditStudentBottomSheet(circleStudent: Circle_student,circleId: widget.circle.id!)
+                )
+                );
+              
+              },
+            ),
+              IconButton(
+              icon:Icon(
+                Icons.delete,
+                color: Colors.red,
+                size: 30,
+                
+              ),
+              onPressed: (){
+                
+              },
+            )
+            ],
+          ),
+          
+          
           trailing: Container(
             decoration: BoxDecoration(
-              color: _getStatusColor(student.todayAttendance),
+              color: _getStatusColor(Circle_student.todayAttendance),
               borderRadius: BorderRadius.circular(10),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
             child: GestureDetector(
               child: Text(
-                student.todayAttendance?.name.tr(context) ??
-                    'attendance'.tr(context),
+                (Circle_student.todayAttendance == null ||
+                        Circle_student.todayAttendance!.name == 'none')
+                    ? 'attendance'.tr(context)
+                    : Circle_student.todayAttendance!.name.tr(context),
                 style: const TextStyle(color: Colors.white),
               ),
               onTap: () {
@@ -270,12 +329,12 @@ class _CircleScreenState extends State<CircleScreen> {
                   isScrollControlled: true,
                   useSafeArea: true,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20))),
                   builder: (context) => AttendanceStatusBottomSheet(
-                    studentId: student.id,
-                    circleId: widget.circleId,
-                    currentStatus: student.todayAttendance,
+                    studentId: Circle_student.student.id,
+                    circleId: widget.circle.id!,
+                    currentStatus: Circle_student.todayAttendance,
                   ),
                 );
               },
@@ -286,10 +345,12 @@ class _CircleScreenState extends State<CircleScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => StudentProgressScreen(
-                    circleId: widget.circleId, studentId: student.id),
+                    circleId: widget.circle.id!,
+                    student: Circle_student.student),
               ),
             );
           },
+         
         ),
       ),
     );

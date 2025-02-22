@@ -1,5 +1,4 @@
-// lib/bloc/theme_state.dart
-import 'package:equatable/equatable.dart';
+part of 'theme_bloc.dart';
 
 abstract class ThemeState extends Equatable {
   const ThemeState();

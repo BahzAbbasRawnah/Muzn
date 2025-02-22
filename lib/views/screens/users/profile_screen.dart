@@ -19,7 +19,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -83,29 +83,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
               key: _formKey,
               child: ListView(
                 children: [
-                  Center(
-                    child: Stack(
-                      children: [
-                        const CircleAvatar(
-                          radius: 50,
-                          child: Icon(Icons.person, size: 50),
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: IconButton(
-                            icon: Icon(Icons.camera_alt,
-                                color: Theme.of(context).primaryColor),
-                            onPressed: () {
-                              // Handle avatar update
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Center(
+                  //   child: Stack(
+                  //     children: [
+                  //       const CircleAvatar(
+                  //         radius: 50,
+                  //         child: Icon(Icons.person, size: 50),
+                  //       ),
+                  //       Positioned(
+                  //         bottom: 0,
+                  //         right: 0,
+                  //         child: IconButton(
+                  //           icon: Icon(Icons.camera_alt,
+                  //               color: Theme.of(context).primaryColor),
+                  //           onPressed: () {
+                  //             // Handle avatar update
+                  //           },
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                   SizedBox(height: deviceHeight * 0.03),
-
                   CustomTextField(
                     controller: nameController,
                     hintText: 'full_name_hint'.tr(context),
@@ -119,7 +118,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   SizedBox(height: deviceHeight * 0.02),
-
                   CustomTextField(
                     controller: emailController,
                     hintText: 'email_hint'.tr(context),
@@ -137,7 +135,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   SizedBox(height: deviceHeight * 0.02),
-
                   IntlPhoneField(
                     controller: phoneController,
                     searchText: 'search_country'.tr(context),
@@ -164,7 +161,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   SizedBox(height: deviceHeight * 0.02),
-
                   CustomTextField(
                     controller: countryController,
                     hintText: 'country'.tr(context),
@@ -172,7 +168,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     prefixIcon: Icons.map,
                   ),
                   SizedBox(height: deviceHeight * 0.02),
-
                   CustomTextField(
                     controller: oldPasswordController,
                     hintText: 'old_password_hint'.tr(context),
@@ -181,7 +176,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     obscureText: true,
                   ),
                   SizedBox(height: deviceHeight * 0.02),
-
                   CustomTextField(
                     controller: newPasswordController,
                     hintText: 'new_password_hint'.tr(context),
@@ -190,7 +184,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     obscureText: true,
                   ),
                   SizedBox(height: deviceHeight * 0.02),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -220,22 +213,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ),
                   SizedBox(height: deviceHeight * 0.03),
-
                   if (state is AuthLoading)
                     const Center(child: CircularProgressIndicator())
                   else
                     CustomButton(
-                      text: 'update_profile'.tr(context),
+                      text: 'update_profile_button'.tr(context),
+                      icon: Icons.update,
                       onPressed: () {
+                        final updatedUser = User(
+                            id: state.user.id,
+                            fullName: nameController.text,
+                            email: emailController.text,
+                            password: oldPasswordController.text.trim(),
+                            phone: phoneController.text,
+                            country: countryController.text,
+                            gender: gender ?? 'male',
+                            role: state.user.role
+                            
+                            );
+
                         if (_formKey.currentState!.validate()) {
+
                           context.read<AuthBloc>().add(
                                 UpdateProfileEvent(
-                                  fullName: nameController.text,
-                                  email: emailController.text,
-                                  phone: phoneController.text,
-                                  country: countryController.text,
-                                  gender: gender ?? 'male',
-                                  oldPassword: oldPasswordController.text,
+                                  user: updatedUser,
                                   newPassword: newPasswordController.text,
                                 ),
                               );

@@ -34,7 +34,11 @@ dependencies:
   jhijri: ^1.0.0
   syncfusion_flutter_pdfviewer: ^28.1.37
   scroll_loop_auto_scroll: ^0.0.5
-
+  fl_chart: ^0.70.2
+  path_provider: any
+  pdf: ^3.10.4
+  printing: ^5.11.0
+  bloc: ^9.0.0
 
 
 
@@ -53,7 +57,7 @@ flutter:
     - assets/flags/ # Directory for image 
     - assets/static/
     - assets/static/quran.pdf
-
+    - assets/fonts/
     - assets/static/muzn_database.db # Directory for database
 
 

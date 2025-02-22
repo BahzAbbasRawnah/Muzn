@@ -29,6 +29,16 @@ class UpdateStudentProgress extends StudentEvent {
   List<Object> get props => [progress];
 }
 
+class AddStudentToCircle extends StudentEvent {
+  final Student student;
+  final int circleId;
+
+  AddStudentToCircle({required this.student, required this.circleId});
+
+  @override
+  List<Object> get props => [student, circleId];
+}
+
 // States
 abstract class StudentState extends Equatable {
   @override
@@ -67,6 +77,7 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
     on<LoadStudents>(_onLoadStudents);
     on<LoadStudentProgress>(_onLoadStudentProgress);
     on<UpdateStudentProgress>(_onUpdateStudentProgress);
+    on<AddStudentToCircle>(_onAddStudentToCircle);
   }
 
   Future<void> _onLoadStudents(LoadStudents event, Emitter<StudentState> emit) async {
@@ -130,6 +141,21 @@ class StudentBloc extends Bloc<StudentEvent, StudentState> {
       ));
     } catch (e) {
       emit(StudentError('Failed to update progress: ${e.toString()}'));
+    }
+  }
+
+  Future<void> _onAddStudentToCircle(AddStudentToCircle event, Emitter<StudentState> emit) async {
+    emit(StudentLoading());
+    try {
+      final db = await DatabaseManager().database;
+      await db.insert('CircleStudent', {
+        'student_id': event.student.id,
+        'circle_id': event.circleId,
+        'created_at': DateTime.now().toIso8601String(),
+      });
+      // emit(StudentsLoaded(await _loadStudents())); // Assuming _loadStudents fetches all students
+    } catch (e) {
+      emit(StudentError('Failed to add student to circle: $e'));
     }
   }
 }

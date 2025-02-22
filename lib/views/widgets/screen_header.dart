@@ -17,7 +17,7 @@ class ScreenHeader extends StatelessWidget {
         }
 
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+          padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
           margin: EdgeInsets.all(3),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.only(
@@ -40,11 +40,12 @@ class ScreenHeader extends StatelessWidget {
               children: [
                 Text('welcome'.tr(context)),
                 Text(userName),
+                
 
               ],
             ),
             trailing: SizedBox(
-              width: 140,
+              width: MediaQuery.of(context).size.width * 0.3,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -56,7 +57,7 @@ class ScreenHeader extends StatelessWidget {
                       Expanded(
                         child: Text(
                           DateTime.now().toString().split(' ')[0] + ' مــ ',
-                          style: Theme.of(context).textTheme.displayMedium,
+                          style: Theme.of(context).textTheme.displaySmall,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -69,7 +70,7 @@ class ScreenHeader extends StatelessWidget {
                       Expanded(
                         child: Text(
                           JHijri(fDate: DateTime.now()).toString() + ' هــ ',
-                                                  style: Theme.of(context).textTheme.displayMedium,
+                                                  style: Theme.of(context).textTheme.displaySmall,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

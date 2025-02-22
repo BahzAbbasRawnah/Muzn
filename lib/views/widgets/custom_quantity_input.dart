@@ -34,8 +34,8 @@ class _QuantityInputState extends State<QuantityInput> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(5),
-      margin: EdgeInsets.only(top: 10),
+      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 0),
+      margin: EdgeInsets.only(top: 5),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         borderRadius: BorderRadius.circular(10),
@@ -47,7 +47,7 @@ class _QuantityInputState extends State<QuantityInput> {
         children: [
           Text(
             widget.label,
-            style: Theme.of(context).textTheme.displayMedium,
+            style: Theme.of(context).textTheme.displaySmall,
           ),
           const Spacer(),
           Row(
@@ -60,7 +60,7 @@ class _QuantityInputState extends State<QuantityInput> {
               ),
               Text(
                 quantity.toString(),
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.displaySmall,
               ),
               IconButton(
                 icon: const Icon(Icons.add),

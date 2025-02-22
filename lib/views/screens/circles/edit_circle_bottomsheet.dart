@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/circle/circle_bloc.dart';
 import 'package:muzn/models/circle.dart';
+import 'package:muzn/models/circle_category.dart';
 import 'package:muzn/models/enums.dart';
 import 'package:muzn/services/database_service.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_dropdown.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 
-class AddCircleBottomSheet extends StatefulWidget {
-  final int schoolId;
+class EditCircleBottomSheet extends StatefulWidget {
+  final Circle circle;
 
-  const AddCircleBottomSheet({Key? key, required this.schoolId})
-      : super(key: key);
+  const EditCircleBottomSheet({Key? key, required this.circle}) : super(key: key);
 
   @override
-  AddCircleBottomSheetState createState() => AddCircleBottomSheetState();
+  EditCircleBottomSheetState createState() => EditCircleBottomSheetState();
 }
 
-class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
+class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  String? _selectedCategory;
+  CircleCategory? _selectedCategory;
   CircleType? _selectedType;
   CircleTime? _selectedTime;
   List<Map<String, dynamic>> _categories = [];
@@ -33,7 +32,24 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
   @override
   void initState() {
     super.initState();
+    _nameController.text = widget.circle.name;
+    _descriptionController.text = widget.circle.description ?? '';
+    _selectedType = CircleType.values.firstWhere(
+      (type) => type.name == widget.circle.circleType,
+      orElse: () => CircleType.offline,
+    );
+    _selectedTime = CircleTime.values.firstWhere(
+      (time) => time.name == widget.circle.circleTime,
+      orElse: () => CircleTime.morning,
+    );
     _loadCategories();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCategories() async {
@@ -49,33 +65,30 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
       _categoryNameToId = {
         for (var cat in results) cat['name'].toString(): cat['id'] as int
       };
+      // Initialize selected category
+      if (widget.circle.circleCategoryId != null) {
+        final category = _categories.firstWhere(
+          (cat) => cat['id'] == widget.circle.circleCategoryId,
+          orElse: () => _categories.first,
+        );
+        _selectedCategory = CircleCategory.fromMap(category);
+      }
     });
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
   }
 
   void _handleSave(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      final authState = context.read<AuthBloc>().state;
-      if (authState is AuthAuthenticated) {
-        Circle circle = Circle(
-          name: _nameController.text,
-          schoolId: widget.schoolId,
-          teacherId: authState.user.id,
-          description: _descriptionController.text,
-          circleCategoryId: _selectedCategory != null
-              ? _categoryNameToId[_selectedCategory]
-              : null,
-          circleType: _selectedType?.name,
-          circleTime: _selectedTime?.name,
-        );
-        context.read<CircleBloc>().add(AddCircle(circle: circle));
-      }
+      final updatedCircle = Circle(
+        id: widget.circle.id,
+        name: _nameController.text,
+        description: _descriptionController.text,
+        schoolId: widget.circle.schoolId,
+        teacherId: widget.circle.teacherId,
+        circleCategoryId: _selectedCategory?.id,
+        circleType: _selectedType?.name,
+        circleTime: _selectedTime?.name,
+      );
+      context.read<CircleBloc>().add(UpdateCircle(circle: updatedCircle));
     }
   }
 
@@ -106,7 +119,7 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'new_circle'.tr(context),
+                  'edit_circle'.tr(context),
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
@@ -125,12 +138,13 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
                 const SizedBox(height: 16),
                 CustomDropdown(
                   label: 'circle_category'.tr(context),
-                  selectedValue: _selectedCategory,
-                  items:
-                      _categories.map((cat) => cat['name'].toString()).toList(),
+                  selectedValue: _selectedCategory?.name,
+                  items: _categories.map((cat) => cat['name'].toString()).toList(),
                   onChanged: (value) {
                     setState(() {
-                      _selectedCategory = value;
+                      _selectedCategory = CircleCategory.fromMap(
+                        _categories.firstWhere((cat) => cat['name'] == value),
+                      );
                     });
                   },
                 ),
@@ -143,8 +157,9 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
                       .toList(),
                   onChanged: (value) {
                     setState(() {
-                      _selectedType = CircleType.values.firstWhere((type) =>
-                          type.toLocalizedTypeString(context) == value);
+                      _selectedType = CircleType.values.firstWhere(
+                        (type) => type.toLocalizedTypeString(context) == value,
+                      );
                     });
                   },
                 ),
@@ -157,8 +172,9 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
                       .toList(),
                   onChanged: (value) {
                     setState(() {
-                      _selectedTime = CircleTime.values.firstWhere((time) =>
-                          time.toLocalizeTimedString(context) == value);
+                      _selectedTime = CircleTime.values.firstWhere(
+                        (time) => time.toLocalizeTimedString(context) == value,
+                      );
                     });
                   },
                 ),
@@ -178,8 +194,8 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
                       );
                     }
                     return CustomButton(
-                      text: 'save'.tr(context),
-                      icon: Icons.save,
+                      text: 'update'.tr(context),
+                      icon: Icons.update,
                       onPressed: () => _handleSave(context),
                     );
                   },

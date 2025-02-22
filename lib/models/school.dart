@@ -4,8 +4,8 @@ class School {
   final String name;
   final String? type;
   final String? address;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final DateTime? deletedAt;
   int? circleCount; // Count of circles associated with this school
 
@@ -15,40 +15,38 @@ class School {
     required this.name,
     this.type,
     this.address,
-    required this.createdAt,
-    required this.updatedAt,
+   this.createdAt,
+    this.updatedAt,
     this.deletedAt,
     this.circleCount,
   });
 
-  factory School.fromMap(Map<String, dynamic> map) {
-    return School(
-      id: map['id'] as int,
-      teacherId: map['teacher_id'] as int?,
-      name: map['name'] as String,
-      type: map['type'] as String?,
-      address: map['address'] as String?,
-      createdAt: DateTime.parse(map['created_at'] as String),
-      updatedAt: DateTime.parse(map['updated_at'] as String),
-      deletedAt: map['deleted_at'] != null 
-          ? DateTime.parse(map['deleted_at'] as String)
-          : null,
-      circleCount: map['circle_count'] as int?,
-    );
-  }
+factory School.fromMap(Map<String, dynamic> map) {
+  return School(
+    id: map['id'] as int,
+    teacherId: map['teacher_id'] as int?,
+    name: map['name'] as String,
+    type: map['type'] as String? ?? '', // Provide a default value if null
+    address: map['address'] as String? ?? '', // Provide a default value if null
+    createdAt: map['created_at'] != null ? DateTime.parse(map['created_at'] as String) : null,
+    updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at'] as String) : null,
+    deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at'] as String) : null,
+    circleCount: map['circle_count'] as int?,
+  );
+}
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'teacher_id': teacherId,
-      'name': name,
-      'type': type,
-      'address': address,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-      'deleted_at': deletedAt?.toIso8601String(),
-    };
-  }
+Map<String, dynamic> toMap() {
+  return {
+    'id': id,
+    'teacher_id': teacherId,
+    'name': name,
+    'type': type,
+    'address': address,
+    'created_at': createdAt?.toIso8601String(), // Handle null
+    'updated_at': updatedAt?.toIso8601String(), // Handle null
+    'deleted_at': deletedAt?.toIso8601String(), // Handle null
+  };
+}
 
   School copyWith({
     int? id,

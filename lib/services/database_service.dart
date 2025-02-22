@@ -71,13 +71,6 @@ await db.execute('''
 // Set the autoincrement counter to start from 2
 await db.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('School', 1)");
 
-// Insert first row with id = 2
-await db.insert('School', {
-  'name': 'تعليم عن بعد',
-  'address': 'عبر مكالمات الفيديو',
-  'type': 'Virtual',
-  'teacher_id': '1'
-});
 
 // Create CirclesCategory Table
 await db.execute('''
@@ -93,9 +86,6 @@ await db.execute('''
 
 // Insert initial data into CirclesCategory
 await db.insert('CirclesCategory', {'name': '  حفظ و مراجعة', 'namevalue': 'Listening'});
-// await db.insert('CirclesCategory', {'name': 'حلقة مراجعة صغرى', 'namevalue': 'MinorReview'});
-// await db.insert('CirclesCategory', {'name': 'حلقة مراجعة كبرى', 'namevalue': 'MajorReview'});
-// await db.insert('CirclesCategory', {'name': 'حلقة إتقان', 'namevalue': 'Mastery'});
 await db.insert('CirclesCategory', {'name': '  تحسين تلاوة و تجويد', 'namevalue': 'TajweedAndTelawah'});
 await db.insert('CirclesCategory', {'name': ' تثبيت', 'namevalue': 'Tathbeet'});
 

@@ -4,37 +4,51 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/circle_student/circle_student_bloc.dart';
+import 'package:muzn/models/circle_student.dart';
 import 'package:muzn/services/database_service.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 import 'package:muzn/views/widgets/message.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class AddStudentToCircleBottomSheet extends StatefulWidget {
+class EditStudentBottomSheet extends StatefulWidget {
+  final CircleStudent circleStudent;
   final int circleId;
 
-  const AddStudentToCircleBottomSheet({
+  const EditStudentBottomSheet({
     Key? key,
+    required this.circleStudent,
     required this.circleId,
   }) : super(key: key);
 
   @override
-  _AddStudentToCircleBottomSheetState createState() =>
-      _AddStudentToCircleBottomSheetState();
+  _EditStudentBottomSheetState createState() => _EditStudentBottomSheetState();
 }
 
-class _AddStudentToCircleBottomSheetState
-    extends State<AddStudentToCircleBottomSheet> {
+class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController countryController = TextEditingController();
-  String? gender = 'male';
-  String? country = 'السعودية';
+  String? gender;
+  String? country;
   bool _isLoading = false;
   String _phoneNumber = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Pre-fill the form with the student's current data
+    nameController.text = widget.circleStudent.student.user!.fullName;
+    emailController.text = widget.circleStudent.student.user!.email;
+    phoneController.text = widget.circleStudent.student.user!.phone;
+    countryController.text = widget.circleStudent.student.user!.country ?? 'السعودية';
+    gender = widget.circleStudent.student.user!.gender ?? 'male';
+    country = widget.circleStudent.student.user!.country ?? 'السعودية';
+    _phoneNumber = widget.circleStudent.student.user!.phone ?? '';
+  }
 
   @override
   void dispose() {
@@ -46,74 +60,72 @@ class _AddStudentToCircleBottomSheetState
     super.dispose();
   }
 
-  Future<void> _saveStudent() async {
+  Future<void> _updateStudent() async {
     if (!_formKey.currentState!.validate()) return;
-
 
     setState(() => _isLoading = true);
 
     try {
-      // Get current authenticated user from AuthBloc
-      final authState = context.read<AuthBloc>().state;
-      if (authState is! AuthAuthenticated) {
-        throw Exception('No authenticated user found');
-      }
-
-
-      final teacherId = authState.user.id;
       final db = await DatabaseManager().database;
 
-      // Check if email or phone exists
+      // Step 1: Fetch the user_id from the Student table using student_id
+      final List<Map<String, dynamic>> studentResult = await db.query(
+        'Student',
+        where: 'id = ?',
+        whereArgs: [widget.circleStudent.id],
+      );
+
+      if (studentResult.isEmpty) {
+        throw Exception('Student not found');
+      }
+
+      final int userId = studentResult.first['user_id'] as int;
+
+      // Step 2: Check if email or phone exists for another user
       final List<Map<String, dynamic>> existingUser = await db.query(
         'User',
-        where: '(email = ? OR phone = ?) AND deleted_at IS NULL',
-        whereArgs: [emailController.text, _phoneNumber],
+        where: '(email = ? OR phone = ?) AND id != ? AND deleted_at IS NULL',
+        whereArgs: [emailController.text, _phoneNumber, userId],
       );
 
       if (existingUser.isNotEmpty) {
         throw Exception('email_or_phone_exists'.tr(context));
       }
 
-      // Begin transaction
+      // Step 3: Update the User table using the fetched user_id
       await db.transaction((txn) async {
-        // 1. Insert into User table
-        final userId = await txn.insert('User', {
-          'full_name': nameController.text,
-          'email': emailController.text,
-          'password': passwordController.text,
-          'phone': _phoneNumber,
-          'country': country,
-          'gender': gender,
-          'role': 'student',
-          'status': 'active',
-          'created_at': DateTime.now().toIso8601String(),
-          'updated_at': DateTime.now().toIso8601String(),
-        });
+        // Update User table
+        await txn.update(
+          'User',
+          {
+            'full_name': nameController.text,
+            'email': emailController.text,
+            'phone': _phoneNumber,
+            'country': country,
+            'gender': gender,
+            'updated_at': DateTime.now().toIso8601String(),
+          },
+          where: 'id = ?',
+          whereArgs: [userId],
+        );
 
-        // 2. Insert into Student table
-       final studentId= await txn.insert('Student', {
-          'user_id': userId,
-          'teacher_id': teacherId,
-          'created_at': DateTime.now().toIso8601String(),
-          'updated_at': DateTime.now().toIso8601String(),
-        });
-
-        // 3. Insert into CircleStudent table
-       await txn.insert('CircleStudent', {
-          'circle_id': widget.circleId,
-          'student_id': studentId,
-          'teacher_id': teacherId,
-          'created_at': DateTime.now().toIso8601String(),
-          'updated_at': DateTime.now().toIso8601String(),
-        });
-
+        // Update Student table (if needed)
+        await txn.update(
+          'Student',
+          {
+            'updated_at': DateTime.now().toIso8601String(),
+          },
+          where: 'id = ?',
+          whereArgs: [widget.circleStudent.id],
+        );
       });
 
-      // First close the bottom sheet
+      // Close the bottom sheet
       if (mounted) {
         Navigator.pop(context);
       }
 
+      // Reload the student list
       if (mounted) {
         context.read<CircleStudentBloc>().add(
               LoadCircleStudents(
@@ -121,8 +133,10 @@ class _AddStudentToCircleBottomSheetState
                 circleId: widget.circleId,
               ),
             );
-       SuccessSnackbar.show(context: context, successText: 'inserted_successfully'.tr(context));
-
+        SuccessSnackbar.show(
+          context: context,
+          successText: 'updated_successfully'.tr(context),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -154,12 +168,12 @@ class _AddStudentToCircleBottomSheetState
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'add_new_student'.tr(context),
+                  'edit_student'.tr(context),
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-      
+
                 // Full Name field
                 CustomTextField(
                   controller: nameController,
@@ -174,7 +188,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Email field
                 CustomTextField(
                   controller: emailController,
@@ -194,7 +208,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Country field
                 IntlPhoneField(
                   controller: countryController,
@@ -224,7 +238,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Phone field
                 IntlPhoneField(
                   controller: phoneController,
@@ -255,27 +269,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
-                // Password field
-                CustomTextField(
-                  controller: passwordController,
-                  hintText: 'password_hint'.tr(context),
-                  labelText: 'password'.tr(context),
-                  prefixIcon: Icons.lock,
-                  obscureText: true,
-                  suffixIcon: Icons.visibility,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
-                    }
-                    if (value.length < 6) {
-                      return 'invalid_password'.tr(context);
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Gender selection
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -306,14 +300,14 @@ class _AddStudentToCircleBottomSheetState
                   ],
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Save button
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())
                 else
                   CustomButton(
-                    text: 'save'.tr(context),
-                    onPressed: _saveStudent,
+                    text: 'update'.tr(context),
+                    onPressed: _updateStudent,
                     icon: Icons.save,
                   ),
               ],

@@ -35,17 +35,12 @@ class _AttendanceStatusBottomSheetState
 
   void _saveAttendance() {
     if (_selectedStatus == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('please_select_status'.tr(context)),
-          backgroundColor: Colors.red,
-        ),
-      );
+    
       return;
     }
 
     setState(() => _isLoading = true);
-
+ 
     context.read<CircleStudentBloc>().add(
           UpdateStudentAttendance(
             context,

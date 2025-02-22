@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/database_service.dart';
 import '../../models/user.dart';
 import 'package:crypto/crypto.dart';
@@ -43,26 +44,13 @@ class RegisterEvent extends AuthEvent {
 }
 
 class UpdateProfileEvent extends AuthEvent {
-  final String fullName;
-  final String email;
-  final String phone;
-  final String country;
-  final String gender;
-  final String oldPassword;
-  final String newPassword;
+  final User user;
+  final String? newPassword;
 
-  UpdateProfileEvent({
-    required this.fullName,
-    required this.email,
-    required this.phone,
-    required this.country,
-    required this.gender,
-    required this.oldPassword,
-    required this.newPassword,
-  });
+  UpdateProfileEvent({required this.user, this.newPassword});
 
   @override
-  List<Object> get props => [fullName, email, phone, country, gender, oldPassword, newPassword];
+  List<Object> get props => [user, newPassword!];
 }
 
 class LogoutEvent extends AuthEvent {}
@@ -74,7 +62,9 @@ abstract class AuthState extends Equatable {
 }
 
 class AuthInitial extends AuthState {}
+
 class AuthLoading extends AuthState {}
+
 class AuthAuthenticated extends AuthState {
   final User user;
   AuthAuthenticated(this.user);
@@ -82,6 +72,7 @@ class AuthAuthenticated extends AuthState {
   @override
   List<Object> get props => [user];
 }
+
 class AuthError extends AuthState {
   final String message;
   AuthError(this.message);
@@ -89,6 +80,7 @@ class AuthError extends AuthState {
   @override
   List<Object> get props => [message];
 }
+
 class AuthUnauthenticated extends AuthState {}
 
 // BLoC
@@ -113,29 +105,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final db = await _databaseManager.database;
       final hashedPassword = _hashPassword(event.password);
-      
-      // Check if input is email or phone
       final bool isEmail = event.emailOrPhone.contains('@');
-      
-      // Query based on email or phone
+
       final List<Map<String, dynamic>> result = await db.query(
         'User',
-        where: '${isEmail ? 'email' : 'phone'} = ? AND password = ? AND deleted_at IS NULL',
+        where:
+            '${isEmail ? 'email' : 'phone'} = ? AND password = ? AND deleted_at IS NULL',
         whereArgs: [event.emailOrPhone, hashedPassword],
       );
 
       if (result.isNotEmpty) {
         final user = User.fromMap(result.first);
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setBool('authToken', true);
+
         if (user.status == 'active') {
           emit(AuthAuthenticated(user));
         } else {
-          emit(AuthError('account_inactive'));
+          emit(AuthError('User is inactive'));
         }
       } else {
-        emit(AuthError('invalid_credentials'));
+        emit(AuthError('Invalid email/phone or password'));
       }
     } catch (e) {
-      emit(AuthError('login_failed'));
+      emit(AuthError('Login failed: $e'));
     }
   }
 
@@ -143,7 +136,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       final db = await _databaseManager.database;
-      
+
       // Check if email already exists
       final List<Map<String, dynamic>> existingEmail = await db.query(
         'User',
@@ -171,7 +164,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       // Create new user
       final hashedPassword = _hashPassword(event.password);
       final now = DateTime.now().toIso8601String();
-      
+
       final userId = await db.insert('User', {
         'full_name': event.fullName,
         'email': event.email,
@@ -201,20 +194,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-  Future<void> _onUpdateProfile(UpdateProfileEvent event, Emitter<AuthState> emit) async {
+  Future<void> _onUpdateProfile(
+      UpdateProfileEvent event, Emitter<AuthState> emit) async {
+    // Check if the user is authenticated
     if (state is! AuthAuthenticated) {
       emit(AuthError('not_authenticated'));
       return;
     }
 
+    // Store the current user before emitting AuthLoading
+    final currentUser = (state as AuthAuthenticated).user;
+
     emit(AuthLoading());
+
     try {
       final db = await _databaseManager.database;
-      final currentUser = (state as AuthAuthenticated).user;
-      
-      // Verify old password if new password is provided
-      if (event.newPassword.isNotEmpty) {
-        final hashedOldPassword = _hashPassword(event.oldPassword);
+
+      if (event.newPassword != null && event.newPassword!.isNotEmpty) {
+        if (event.user.password == null || event.user.password!.isEmpty) {
+          emit(AuthError('old_password_required'));
+          return;
+        }
+
+        final hashedOldPassword = _hashPassword(event.user.password!);
         final List<Map<String, dynamic>> user = await db.query(
           'User',
           where: 'id = ? AND password = ?',
@@ -224,38 +226,46 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (user.isEmpty) {
           emit(AuthError('invalid_old_password'));
           return;
-        }
+        } else {}
       }
 
-      // Update user data
+      // Prepare updates for the user profile
       final updates = {
-        'full_name': event.fullName,
-        'email': event.email,
-        'phone': event.phone,
-        'country': event.country,
-        'gender': event.gender,
+        'full_name': event.user.fullName,
+        'email': event.user.email,
+        'phone': event.user.phone,
+        'country': event.user.country,
+        'gender': event.user.gender,
         'updated_at': DateTime.now().toIso8601String(),
       };
 
-      if (event.newPassword.isNotEmpty) {
-        updates['password'] = _hashPassword(event.newPassword);
+      // Update password if a new one is provided
+      if (event.newPassword != null && event.newPassword!.isNotEmpty) {
+        final hashedNewPassword = _hashPassword(event.newPassword!);
+        updates['password'] = hashedNewPassword;
       }
 
-      await db.update(
+      // Perform the update in the database
+      final rowsUpdated = await db.update(
         'User',
         updates,
         where: 'id = ?',
         whereArgs: [currentUser.id],
       );
 
-      final List<Map<String, dynamic>> updatedUser = await db.query(
-        'User',
-        where: 'id = ?',
-        whereArgs: [currentUser.id],
-      );
+      if (rowsUpdated > 0) {
+        // Fetch the updated user data
+        final List<Map<String, dynamic>> updatedUser = await db.query(
+          'User',
+          where: 'id = ?',
+          whereArgs: [currentUser.id],
+        );
 
-      if (updatedUser.isNotEmpty) {
-        emit(AuthAuthenticated(User.fromMap(updatedUser.first)));
+        if (updatedUser.isNotEmpty) {
+          emit(AuthAuthenticated(User.fromMap(updatedUser.first)));
+        } else {
+          emit(AuthError('profile_update_failed'));
+        }
       } else {
         emit(AuthError('profile_update_failed'));
       }
@@ -265,6 +275,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
-    emit(AuthUnauthenticated());
+    try {
+      // Clear SharedPreferences
+      final pref = await SharedPreferences.getInstance();
+      await pref.remove('authToken'); // Remove the authentication token
+      await pref.clear(); // Optionally, clear all stored data
+
+      // Reset the state to unauthenticated
+      emit(AuthUnauthenticated());
+    } catch (e) {
+      // Handle any errors during logout
+      emit(AuthError('Logout failed: $e'));
+    }
   }
 }

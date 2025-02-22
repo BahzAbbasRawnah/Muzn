@@ -1,5 +1,5 @@
 class Circle {
-  final int id;
+  final int? id;
   final int? schoolId;
   final int teacherId;
   final String name;
@@ -9,15 +9,15 @@ class Circle {
   final String? circleTime;
   final String? jitsiLink;
   final String? recordingUrl;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final DateTime? deletedAt;
   int? studentCount; // Count of students in this circle
   String? categoryName; // Name of the circle category
   String? schoolName; // Name of the school
 
   Circle({
-    required this.id,
+    this.id,
     this.schoolId,
     required this.teacherId,
     required this.name,
@@ -27,8 +27,8 @@ class Circle {
     this.circleTime,
     this.jitsiLink,
     this.recordingUrl,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdAt,
+    this.updatedAt,
     this.deletedAt,
     this.studentCount,
     this.categoryName,
@@ -37,7 +37,7 @@ class Circle {
 
   factory Circle.fromMap(Map<String, dynamic> map) {
     return Circle(
-      id: map['id'] as int,
+      id: map['id'] as int?,
       schoolId: map['school_id'] as int?,
       teacherId: map['teacher_id'] as int,
       name: map['name'] as String,
@@ -47,9 +47,13 @@ class Circle {
       circleTime: map['circle_time'] as String?,
       jitsiLink: map['jitsi_link'] as String?,
       recordingUrl: map['recording_url'] as String?,
-      createdAt: DateTime.parse(map['created_at'] as String),
-      updatedAt: DateTime.parse(map['updated_at'] as String),
-      deletedAt: map['deleted_at'] != null 
+      createdAt: map['created_at'] != null
+          ? DateTime.parse(map['created_at'] as String)
+          : null,
+      updatedAt: map['updated_at'] != null
+          ? DateTime.parse(map['updated_at'] as String)
+          : null,
+      deletedAt: map['deleted_at'] != null
           ? DateTime.parse(map['deleted_at'] as String)
           : null,
       studentCount: map['student_count'] as int?,
@@ -70,8 +74,8 @@ class Circle {
       'circle_time': circleTime,
       'jitsi_link': jitsiLink,
       'recording_url': recordingUrl,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
     };
   }

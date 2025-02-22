@@ -7,63 +7,47 @@ import '../../services/database_service.dart';
 
 // Events
 abstract class CircleEvent extends Equatable {
-  final BuildContext context;
-  
-  const CircleEvent(this.context);
+  const CircleEvent();
   
   @override
-  List<Object> get props => [context];
+  List<Object> get props => [];
 }
 
 class LoadCircles extends CircleEvent {
   final int? schoolId;
-  
-  const LoadCircles(BuildContext context, {this.schoolId}) : super(context);
+  final int teacherId;
+
+  const LoadCircles({this.schoolId, required this.teacherId});
   
   @override
-  List<Object> get props => [context, if (schoolId != null) schoolId!];
+  List<Object> get props => [teacherId, if (schoolId != null) schoolId!];
 }
 
 class AddCircle extends CircleEvent {
-  final String name;
-  final int? schoolId;
-  final int teacherId;
-  final String? description;
-  final int? circleCategoryId;
-  final String? circleType;
-  final String? circleTime;
+  final Circle circle;
 
-  const AddCircle({
-    required BuildContext context,
-    required this.name,
-    this.schoolId,
-    required this.teacherId,
-    this.description,
-    this.circleCategoryId,
-    this.circleType,
-    this.circleTime,
-  }) : super(context);
+  const AddCircle({required this.circle});
 
   @override
-  List<Object> get props => [context, name, teacherId];
+  List<Object> get props => [circle];
 }
 
 class UpdateCircle extends CircleEvent {
   final Circle circle;
-
-  const UpdateCircle(BuildContext context, this.circle) : super(context);
+  const UpdateCircle({required this.circle});
 
   @override
-  List<Object> get props => [context, circle];
+  List<Object> get props => [circle];
 }
 
 class DeleteCircle extends CircleEvent {
   final int circleId;
+  final int teacherId;
 
-  const DeleteCircle(BuildContext context, this.circleId) : super(context);
+  const DeleteCircle(this.circleId, this.teacherId);
 
   @override
-  List<Object> get props => [context, circleId];
+  List<Object> get props => [circleId, teacherId];
 }
 
 // States
@@ -106,39 +90,48 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
     on<UpdateCircle>(_onUpdateCircle);
     on<DeleteCircle>(_onDeleteCircle);
   }
+Future<void> _onLoadCircles(LoadCircles event, Emitter<CircleState> emit) async {
+  emit(CircleLoading());
+  try {
+    final db = await _databaseManager.database;
 
-  Future<void> _onLoadCircles(LoadCircles event, Emitter<CircleState> emit) async {
-    emit(CircleLoading());
-    try {
-      final db = await _databaseManager.database;
-      final List<Map<String, dynamic>> results = await db.rawQuery('''
-        SELECT 
-          c.*,
-          cc.name as category_name,
-          s.name as school_name,
-          COUNT(DISTINCT cs.student_id) as student_count
-        FROM Circle c
-        LEFT JOIN CirclesCategory cc ON c.circle_category_id = cc.id
-        LEFT JOIN School s ON c.school_id = s.id
-        LEFT JOIN CircleStudent cs ON c.id = cs.circle_id AND cs.deleted_at IS NULL
-        WHERE c.deleted_at IS NULL 
-        AND c.teacher_id = ?
-        ${event.schoolId != null ? 'AND c.school_id = ?' : ''}
-        GROUP BY c.id
-        ORDER BY c.created_at DESC
-      ''', [
-        event.context.read<AuthBloc>().state is AuthAuthenticated 
-            ? (event.context.read<AuthBloc>().state as AuthAuthenticated).user.id 
-            : -1,
-        if (event.schoolId != null) event.schoolId,
-      ]);
+    // Build the SQL query
+    final query = '''
+      SELECT 
+        c.*,
+        cc.name as category_name,
+        s.name as school_name,
+      COUNT(DISTINCT cs.student_id) as student_count
+      FROM Circle c
+      LEFT JOIN CirclesCategory cc ON c.circle_category_id = cc.id
+      LEFT JOIN School s ON c.school_id = s.id
+      LEFT JOIN CircleStudent cs ON c.id = cs.circle_id AND cs.deleted_at IS NULL
+      WHERE c.deleted_at IS NULL 
+        AND c.teacher_id = ? -- Filter by teacher_id
+        ${event.schoolId != null ? 'AND c.school_id = ?' : ''} -- Optional school filter
+      GROUP BY c.id
+      ORDER BY c.created_at DESC
+    ''';
 
-      final circles = results.map((map) => Circle.fromMap(map)).toList();
-      emit(CirclesLoaded(circles));
-    } catch (e) {
-      emit(const CircleError('failed_to_load_circles'));
+    // Prepare query arguments
+    final List<dynamic> args = [event.teacherId];
+    if (event.schoolId != null) {
+      args.add(event.schoolId);
     }
+
+    // Execute the query
+    final List<Map<String, dynamic>> results = await db.rawQuery(query, args);
+
+    // Map results to Circle objects
+    final circles = results.map((map) => Circle.fromMap(map)).toList();
+
+    // Emit the loaded state
+    emit(CirclesLoaded(circles));
+  } catch (e) {
+    // Handle errors
+    emit(CircleError('Failed to load circles: $e'));
   }
+}
 
   Future<void> _onAddCircle(AddCircle event, Emitter<CircleState> emit) async {
     emit(CircleLoading());
@@ -146,21 +139,23 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
       final db = await _databaseManager.database;
       final now = DateTime.now().toIso8601String();
 
+      // Insert the circle using the Circle model
       await db.insert('Circle', {
-        'name': event.name,
-        'school_id': event.schoolId,
-        'teacher_id': event.teacherId,
-        'description': event.description,
-        'circle_category_id': event.circleCategoryId,
-        'circle_type': event.circleType,
-        'circle_time': event.circleTime,
+        'name': event.circle.name,
+        'school_id': event.circle.schoolId,
+        'teacher_id': event.circle.teacherId,
+        'description': event.circle.description,
+        'circle_category_id': event.circle.circleCategoryId,
+        'circle_type': event.circle.circleType,
+        'circle_time': event.circle.circleTime,
         'created_at': now,
         'updated_at': now,
       });
 
-      add(LoadCircles(event.context, schoolId: event.schoolId));
+      // Reload circles after adding
+      add(LoadCircles(schoolId: event.circle.schoolId, teacherId: event.circle.teacherId));
     } catch (e) {
-      emit(const CircleError('failed_to_add_circle'));
+      emit(CircleError('Failed to add circle: $e'));
     }
   }
 
@@ -170,24 +165,21 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
       final db = await _databaseManager.database;
       final now = DateTime.now().toIso8601String();
 
+      // Update the circle using the Circle model
       await db.update(
         'Circle',
         {
-          'name': event.circle.name,
-          'school_id': event.circle.schoolId,
-          'description': event.circle.description,
-          'circle_category_id': event.circle.circleCategoryId,
-          'circle_type': event.circle.circleType,
-          'circle_time': event.circle.circleTime,
+          ...event.circle.toMap(),
           'updated_at': now,
         },
         where: 'id = ?',
         whereArgs: [event.circle.id],
       );
 
-      add(LoadCircles(event.context, schoolId: event.circle.schoolId));
+      // Reload circles after updating
+      add(LoadCircles(schoolId: event.circle.schoolId, teacherId: event.circle.teacherId));
     } catch (e) {
-      emit(const CircleError('failed_to_update_circle'));
+      emit(CircleError('Failed to update circle: $e'));
     }
   }
 
@@ -197,6 +189,7 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
       final db = await _databaseManager.database;
       final now = DateTime.now().toIso8601String();
 
+      // Soft delete the circle
       await db.update(
         'Circle',
         {'deleted_at': now},
@@ -204,9 +197,10 @@ class CircleBloc extends Bloc<CircleEvent, CircleState> {
         whereArgs: [event.circleId],
       );
 
-      add(LoadCircles(event.context));
+      // Reload circles after deletion
+      add(LoadCircles(teacherId: event.teacherId));
     } catch (e) {
-      emit(const CircleError('failed_to_delete_circle'));
+      emit(CircleError('Failed to delete circle: $e'));
     }
   }
 }

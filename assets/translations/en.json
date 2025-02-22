@@ -1,4 +1,7 @@
 {
+
+"app_name":"Muzn ",
+"app_title":"Muzn Quran Learning App",
 "inserted_successfully":" Saved successfully",
 "updated_successfully":"Updated successfully",
 "deleted_successfully":"Deleted successfully",
@@ -35,8 +38,10 @@
   "welcome":"Welcome",
   "home": "Home",
   "circles": "Circles",
+  "circles_count":"Circles Count",
   "circle": "Circle",
   "student": "Student",
+  "students_count":"Students Count",
   "community": "Community",
   "school": "School",
   "calculate": "Calculate",
@@ -63,6 +68,7 @@
   "new_password_hint": "Your new password",
   "new_password_label": "New password",
   "student_count": "Student Count",
+  "schools_count": "Schools Count",
   "attendance": "Prepare",
   "student_attendance":"Student Attendance",
   "contact_welcome": "We are looking for your contact",
@@ -97,7 +103,8 @@
   "weak": "Weak",
   "student_score":"Student Score",
   "new_circle": "New Circle",
-  "circle_name": "Circle Name",
+  "circle_name_label": "Circle Name",
+  "circle_name_hint": "Type Circle Name",
   "circle_description_label": "Circle Description",
   "circle_description_hint": "Circle Description (optional)",
   "circle_category": "Circle Category",
@@ -112,8 +119,10 @@
   "evening": "Evening",
   "circle_timing": "Circle Timing",
   "school_name": "School Name",
-  "student_lesson": "Student Lesson",
-  "add_student_homework": "Add Student Lesson",
+  "student_homework": "Student Homework",
+  "add_student_homework": "Add Student Homework",
+  "edit_student_homework": "Edit Student Homework",
+"student_progress":" Student's Following & history",
   "from_surah": "From Surah",
   "from_ayah": "From Ayah",
   "to_surah": "To Surah",
@@ -137,6 +146,14 @@
   "verse": "Verse",
   "surah": "Surah",
   "ayah": "Ayah",
+
+"statistics": "Statistics",
+"top_present_students": "Top Present Students",
+"top_absent_students": "Top Absent Students",
+
+
+
+
   "juz":"juz",
   "juz_1": "Part One",
   "juz_2": "Part Two",

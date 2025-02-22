@@ -21,7 +21,7 @@ enum AttendanceStatuse{
 }
 enum Rating {
   excellent,
-  veryGood,
+  very_good,
   good,
   average,
   weak,

@@ -17,7 +17,7 @@ ThemeData lightTheme = ThemeData(
       
     ),
     iconTheme: const IconThemeData(
-      color: Color(0xff1f1f1f),
+      color: Colors.white,
     ),
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(

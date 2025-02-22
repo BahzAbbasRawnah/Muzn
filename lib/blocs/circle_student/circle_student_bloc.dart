@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:muzn/models/circle_student.dart';
 import 'package:muzn/models/enums.dart';
+import 'package:muzn/models/student.dart';
+import 'package:muzn/models/user.dart';
 import 'package:muzn/services/database_service.dart';
 
 // Events
@@ -16,23 +18,14 @@ abstract class CircleStudentEvent extends Equatable {
 
 class LoadCircleStudents extends CircleStudentEvent {
   final int circleId;
-  final String? searchQuery;
-  final AttendanceStatuse? filterStatus;
 
   const LoadCircleStudents(
     BuildContext context, {
     required this.circleId,
-    this.searchQuery,
-    this.filterStatus,
   }) : super(context);
 
   @override
-  List<Object> get props => [
-        context,
-        circleId,
-        if (searchQuery != null) searchQuery!,
-        if (filterStatus != null) filterStatus!,
-      ];
+  List<Object> get props => [context, circleId];
 }
 
 class UpdateStudentAttendance extends CircleStudentEvent {
@@ -78,7 +71,7 @@ class CircleStudentInitial extends CircleStudentState {}
 class CircleStudentLoading extends CircleStudentState {}
 
 class CircleStudentsLoaded extends CircleStudentState {
-  final List<CircleStudent> students;
+  final List<CircleStudent> students; // All students loaded from the database
   final Map<AttendanceStatuse, int> attendanceSummary;
 
   const CircleStudentsLoaded({
@@ -102,8 +95,6 @@ class CircleStudentError extends CircleStudentState {
 // Bloc
 class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
   final DatabaseManager _databaseManager = DatabaseManager();
-  List<CircleStudent> _allStudents =
-      []; // Store all students for local filtering
 
   CircleStudentBloc() : super(CircleStudentInitial()) {
     on<LoadCircleStudents>(_onLoadCircleStudents);
@@ -119,63 +110,72 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
     try {
       final db = await _databaseManager.database;
 
-      // Build the query with proper joins
-      String query = '''
-        SELECT 
-          s.id as student_id,
-          u.full_name,
-          u.phone,
-          u.email,
-          sa.status as today_attendance
-        FROM CircleStudent cs
-        INNER JOIN Student s ON s.id = cs.student_id
-        INNER JOIN User u ON u.id = s.user_id
-        LEFT JOIN StudentAttendance sa ON sa.student_id = cs.student_id 
-          AND sa.circle_id = ? 
-          AND date(sa.attendance_date) = date('now')
-          AND sa.deleted_at IS NULL
-        WHERE cs.circle_id = ? 
-          AND cs.deleted_at IS NULL
-      ''';
+      // Load all students from the database
+      final results = await db.rawQuery('''
+      SELECT 
+        cs.id,
+        s.id as student_id,
+        s.teacher_id,
+        s.user_id,
+        u.id as user_id,
+        u.full_name,
+        u.phone,
+        u.email,
+        u.country,
+        u.gender,
+        u.role as role,
+        sa.status as today_attendance
+      FROM CircleStudent cs
+      INNER JOIN Student s ON s.id = cs.student_id
+      INNER JOIN User u ON u.id = s.user_id
+      LEFT JOIN StudentAttendance sa ON sa.student_id = cs.student_id 
+        AND sa.circle_id = ? 
+        AND date(sa.attendance_date) = date('now')
+        AND sa.deleted_at IS NULL
+      WHERE cs.circle_id = ? 
+        AND cs.deleted_at IS NULL
+    ''', [event.circleId, event.circleId]);
 
-      List<dynamic> args = [event.circleId, event.circleId];
-
-      final results = await db.rawQuery(query, args);
-
-      // Store all students for local filtering
-      _allStudents = results.map((row) => CircleStudent.fromMap(row)).toList();
-
-      // Filter based on search query and status
-      List<CircleStudent> filteredStudents = _allStudents;
-
-      if (event.searchQuery != null && event.searchQuery!.isNotEmpty) {
-        filteredStudents = filteredStudents.where((student) {
-          return student.name
-              .toLowerCase()
-              .contains(event.searchQuery!.toLowerCase());
-        }).toList();
-      }
-
-      if (event.filterStatus != null) {
-        filteredStudents = filteredStudents.where((student) {
-          return student.todayAttendance == event.filterStatus;
-        }).toList();
-      }
+      final students = results
+          .map((row) => CircleStudent(
+              id: row['id'] as int,
+              student: Student(
+                id: row['student_id'] as int,
+                teacherId: row['teacher_id'] as int,
+                userId: row['user_id'] as int,
+                user: User(
+                  id: row['user_id'] as int,
+                  fullName: row['full_name'] as String,
+                  phone: row['phone'] as String,
+                  email: row['email'] as String,
+                  country: row['country'] as String?,
+                  gender: row['gender'] as String,
+                  role: row['role'] as String,
+                ),
+              ),
+              todayAttendance: row['today_attendance'] == null
+                  ? AttendanceStatuse.none
+                  : AttendanceStatuse.values.firstWhere(
+                      (e) => e.name == (row['today_attendance'] as String),
+                      orElse: () => AttendanceStatuse.none,
+                    )))
+          .toList();
+    
 
       // Get attendance summary
       final summaryResults = await db.rawQuery('''
-        SELECT 
-          COALESCE(sa.status, 'none') as status,
-          COUNT(*) as count
-        FROM CircleStudent cs
-        LEFT JOIN StudentAttendance sa ON sa.student_id = cs.student_id 
-          AND sa.circle_id = ?
-          AND date(sa.attendance_date) = date('now')
-          AND sa.deleted_at IS NULL
-        WHERE cs.circle_id = ? 
-          AND cs.deleted_at IS NULL
-        GROUP BY sa.status
-      ''', [event.circleId, event.circleId]);
+      SELECT 
+        COALESCE(sa.status, 'none') as status,
+        COUNT(*) as count
+      FROM CircleStudent cs
+      LEFT JOIN StudentAttendance sa ON sa.student_id = cs.student_id 
+        AND sa.circle_id = ?
+        AND date(sa.attendance_date) = date('now')
+        AND sa.deleted_at IS NULL
+      WHERE cs.circle_id = ? 
+        AND cs.deleted_at IS NULL
+      GROUP BY sa.status
+    ''', [event.circleId, event.circleId]);
 
       final Map<AttendanceStatuse, int> summary = {};
       for (var row in summaryResults) {
@@ -187,7 +187,7 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
       }
 
       emit(CircleStudentsLoaded(
-        students: filteredStudents,
+        students: students,
         attendanceSummary: summary,
       ));
     } catch (e) {
@@ -201,7 +201,9 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
   ) async {
     try {
       final db = await _databaseManager.database;
-      print("student id = " + event.studentId.toString());
+  print('----------------------------------------------------------');
+
+      
       // Check if attendance record exists for today
       final existing = await db.query(
         'StudentAttendance',
@@ -213,6 +215,7 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         ''',
         whereArgs: [event.studentId, event.circleId],
       );
+              print("check if attendance record exists for today" + existing.toString());
 
       if (existing.isEmpty) {
         // Insert new record
@@ -224,81 +227,30 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
+          print(" attendance record not exists for today" );
+
       } else {
         // Update existing record
-
         await db.update(
           'StudentAttendance',
           {
             'status': event.status.name,
             'updated_at': DateTime.now().toIso8601String(),
           },
-           where: '''
-          student_id = ? AND 
-          circle_id = ? AND 
-          DATE(attendance_date) = DATE('now') AND
-          deleted_at IS NULL
-        ''',
-        whereArgs: [event.studentId, event.circleId],
+          where: '''
+            student_id = ? AND 
+            circle_id = ? AND 
+            DATE(attendance_date) = DATE('now') AND
+            deleted_at IS NULL
+          ''',
+          whereArgs: [event.studentId, event.circleId],
         );
+
+                  print(" attendance record updated for today" );
+
       }
 
-      // After updating attendance, reload the students list
-      // First emit loading state
-      emit(CircleStudentLoading());
-
-      // Then load the updated data using the same query as _onLoadCircleStudents
-      String query = '''
-        SELECT 
-          s.id as student_id,
-          u.full_name,
-          u.phone,
-          u.email,
-          sa.status as today_attendance
-        FROM CircleStudent cs
-        INNER JOIN Student s ON s.id = cs.student_id
-        INNER JOIN User u ON u.id = s.user_id
-        LEFT JOIN StudentAttendance sa ON sa.student_id = cs.student_id 
-          AND sa.circle_id = ? 
-          AND date(sa.attendance_date) = date('now')
-          AND sa.deleted_at IS NULL
-        WHERE cs.circle_id = ? 
-          AND cs.deleted_at IS NULL
-        ORDER BY u.full_name
-      ''';
-
-      final results =
-          await db.rawQuery(query, [event.circleId, event.circleId]);
-
-      // Get attendance summary
-      final summaryResults = await db.rawQuery('''
-        SELECT 
-          COALESCE(sa.status, 'none') as status,
-          COUNT(*) as count
-        FROM CircleStudent cs
-        LEFT JOIN StudentAttendance sa ON sa.student_id = cs.student_id 
-          AND sa.circle_id = ?
-          AND date(sa.attendance_date) = date('now')
-          AND sa.deleted_at IS NULL
-        WHERE cs.circle_id = ? 
-          AND cs.deleted_at IS NULL
-        GROUP BY sa.status
-      ''', [event.circleId, event.circleId]);
-
-      final Map<AttendanceStatuse, int> summary = {};
-      for (var row in summaryResults) {
-        final status = AttendanceStatuse.values.firstWhere(
-          (e) => e.name == (row['status'] as String),
-          orElse: () => AttendanceStatuse.none,
-        );
-        summary[status] = row['count'] as int;
-      }
-
-      // Emit the updated state
-      emit(CircleStudentsLoaded(
-        students: results.map((row) => CircleStudent.fromMap(row)).toList(),
-        attendanceSummary: summary,
-      ));
+      add(LoadCircleStudents(event.context, circleId: event.circleId));
     } catch (e) {
       emit(CircleStudentError(e.toString()));
     }

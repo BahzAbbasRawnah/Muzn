@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:muzn/app_localization.dart';
+import 'package:muzn/models/circle_student.dart';
 import 'package:muzn/models/homework.dart';
+import 'package:muzn/models/student.dart';
+import 'package:muzn/views/screens/homework/edit_student_homework.dart';
 import 'package:muzn/views/screens/students/rating_student.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:quran/quran.dart' as quran;
@@ -9,10 +12,12 @@ import 'package:jhijri/jHijri.dart';
 
 class HomeworksItem extends StatelessWidget {
   final Homework homework;
+  final Student student;
 
   const HomeworksItem({
     super.key,
     required this.homework,
+    required this.student,
   });
 
   @override
@@ -116,6 +121,7 @@ class HomeworksItem extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => RatingStudentScreen(
                             homework: homework,
+                            student: student,
                           ),
                         ),
                       );
@@ -131,10 +137,14 @@ class HomeworksItem extends StatelessWidget {
               left: -5, // Moves the icon to the right side
               top: -5,
               child: IconButton(
+                icon: const Icon(Icons.edit),
                 onPressed: () {
-                  // Handle edit action
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) => EditStudentHomeworkBottomSheet(homework: homework),
+                  );
                 },
-                icon: const Icon(Icons.edit_note, size: 28),
               ),
             ),
           ],

@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/homework/homework_bloc.dart';
-import 'package:muzn/models/homework.dart';
+import 'package:muzn/models/student.dart';
 import 'package:muzn/views/screens/homework/progress_following_tab.dart';
 import 'package:muzn/views/screens/homework/progress_history_tab.dart';
-import 'package:muzn/views/screens/students/add_student_homework.dart';
+import 'package:muzn/views/screens/homework/add_student_homework.dart';
 
 class StudentProgressScreen extends StatefulWidget {
-  final int studentId;
+  final Student student;
   final int circleId;
 
   const StudentProgressScreen({
-    required this.studentId,
+    required this.student,
     required this.circleId,
   });
 
@@ -21,17 +21,19 @@ class StudentProgressScreen extends StatefulWidget {
 }
 
 class _StudentScreenState extends State<StudentProgressScreen> {
+
   @override
   void initState() {
     super.initState();
-    // Load homework when the screen is initialized
+    // Load homework and student name when the screen is initialized
     _loadHomework();
   }
 
   void _loadHomework() {
     BlocProvider.of<HomeworkBloc>(context)
-        .add(LoadHomeworkEvent(context, widget.studentId));
+        .add(LoadHomeworkEvent(context, widget.student.id));
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,12 +50,32 @@ class _StudentScreenState extends State<StudentProgressScreen> {
             ],
           ),
         ),
-        body: TabBarView(
+        body: Column(
           children: [
-            // First Tab: Current Homework
-            ProgressFollowingTab(studentId: widget.studentId),
-            // Second Tab: Homework History
-            ProgressHistoryTab(studentId: widget.studentId),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children:[ 
+                  Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Text(
+                     widget.student.user!.fullName,
+                    style: Theme.of(context).textTheme.displayMedium,
+                                    ),
+                  ),
+                ]
+              ),
+            Divider(),
+            // TabBarView for the tabs
+            Expanded(
+              child: TabBarView(
+                children: [
+                  // First Tab: Current Homework
+                  ProgressFollowingTab(student: widget.student),
+                  // Second Tab: Homework History
+                  ProgressHistoryTab(studentId: widget.student.id),
+                ],
+              ),
+            ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
@@ -65,7 +87,9 @@ class _StudentScreenState extends State<StudentProgressScreen> {
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               builder: (context) => AddHomeworkBottomSheet(
-                  studentId: widget.studentId, circleId: widget.circleId),
+                studentId: widget.student.id,
+                circleId: widget.circleId,
+              ),
             );
           },
           child: const Icon(Icons.add),

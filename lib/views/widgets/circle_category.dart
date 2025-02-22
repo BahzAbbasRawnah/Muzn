@@ -6,10 +6,11 @@ import 'package:muzn/models/circle_category.dart';
 
 class CircleCategorySelector extends StatefulWidget {
   final Function(int) onCategorySelected;
-
+  
   const CircleCategorySelector({
     Key? key,
     required this.onCategorySelected,
+
   }) : super(key: key);
 
   @override

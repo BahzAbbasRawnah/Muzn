@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:muzn/app_localization.dart';
-import 'package:muzn/views/screens/calculate_screen.dart';
+import 'package:muzn/views/screens/statistics_screen.dart';
 import 'package:muzn/views/screens/circles/circles_list_screen.dart';
 import 'package:muzn/views/screens/main_screen.dart';
 import 'package:muzn/views/screens/users/profile_screen.dart';
 import 'package:muzn/views/screens/schools/schools_list_screen.dart';
-import 'package:muzn/views/widgets/app_drawer.dart';
-import 'package:muzn/views/widgets/custom_app_bar.dart';
-import 'package:muzn/views/widgets/custom_app_bar.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -27,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
     SchoolsListScreen(),
     CirclesListScreen(),
     const MainScreen(),
-     CalculateScreen(),
+     StatisticsScreen(),
     const ProfileScreen(),
   ];
 
@@ -36,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
     'schools',
     'circles',
     'home',
-    'calculate',
+    'statistics',
     'profile',
   ];
 
@@ -75,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TabItem(
             icon: Icons.query_stats_sharp,
-            title: 'calculate'.tr(context),
+            title: 'statistics'.tr(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
           TabItem(

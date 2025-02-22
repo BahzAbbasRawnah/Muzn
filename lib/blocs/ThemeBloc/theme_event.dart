@@ -1,5 +1,4 @@
-// lib/bloc/theme/theme_event.dart
-import 'package:equatable/equatable.dart';
+part of 'theme_bloc.dart';
 
 abstract class ThemeEvent extends Equatable {
   const ThemeEvent();

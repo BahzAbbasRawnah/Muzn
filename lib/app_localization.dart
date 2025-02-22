@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:muzn/models/enums.dart';
 
-
 class AppLocalization {
   final Locale? local;
   AppLocalization({this.local});
@@ -31,9 +30,12 @@ class AppLocalization {
     });
   }
 
-  String translate(String key) =>
-      _localizedString[key] ??
-      key; // Return the key itself if translation is not found
+  String translate(String key) {
+    if (_localizedString == null || !_localizedString.containsKey(key)) {
+      return key; // Return the key itself if translation is not found
+    }
+    return _localizedString[key]!;
+  }
 }
 
 class _AppLocalizationDelegate extends LocalizationsDelegate<AppLocalization> {
@@ -77,8 +79,7 @@ extension CircleTimeExtension on CircleTime {
       case CircleTime.evening:
         return 'evening'.tr(context);
       default:
-     return 'morning'.tr(context);
-
+        return 'morning'.tr(context);
     }
   }
 }
@@ -100,19 +101,18 @@ extension CircleTypeExtension on CircleType {
 extension RatingTranslation on Rating {
   String translate(BuildContext context) {
     switch (this) {
-        case Rating.excellent:
+      case Rating.excellent:
         return "excellent".tr(context);
-          case Rating.veryGood:
+      case Rating.very_good:
         return "very_good".tr(context);
       case Rating.good:
-        return "good".tr(context);  
+        return "good".tr(context);
       case Rating.average:
         return "average".tr(context);
       case Rating.weak:
         return "weak".tr(context);
       default:
-        return this.name; 
+        return this.name;
     }
   }
 }
-

@@ -1,26 +1,24 @@
 import 'package:muzn/models/enums.dart';
+import 'package:muzn/models/student.dart';
+
+
+
 
 class CircleStudent {
   final int id;
-  final String name;
-  final String? phoneNumber;
-  final String? email;
+  final Student student;
   final AttendanceStatuse? todayAttendance;
 
   CircleStudent({
     required this.id,
-    required this.name,
-    this.phoneNumber,
-    this.email,
+    required this.student,
     this.todayAttendance,
   });
 
   factory CircleStudent.fromMap(Map<String, dynamic> map) {
     return CircleStudent(
-      id: map['student_id'] as int,
-      name: map['full_name'] as String,
-      phoneNumber: map['phone'] as String?,
-      email: map['email'] as String?,
+      id: map['student_id'] as int? ?? 0, 
+      student: Student.fromMap(map),
       todayAttendance: map['today_attendance'] != null
           ? AttendanceStatuse.values.firstWhere(
               (e) => e.name == (map['today_attendance'] as String),

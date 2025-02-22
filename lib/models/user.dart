@@ -4,11 +4,12 @@ class User {
   final String email;
   final String phone;
   final String? country;
+  final String? password;
   final String gender;
   final String role;
-  final String status;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? status;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
   final DateTime? deletedAt;
 
   User({
@@ -17,11 +18,12 @@ class User {
     required this.email,
     required this.phone,
     this.country,
+    this.password,
     required this.gender,
     required this.role,
-    required this.status,
-    required this.createdAt,
-    required this.updatedAt,
+    this.status,
+    this.createdAt,
+    this.updatedAt,
     this.deletedAt,
   });
 
@@ -34,9 +36,10 @@ class User {
       country: map['country'],
       gender: map['gender'],
       role: map['role'],
-      status: map['status'],
-      createdAt: DateTime.parse(map['created_at']),
-      updatedAt: DateTime.parse(map['updated_at']),
+      password: map['password'] as String?,
+      status: map['status'] as String?,
+      createdAt:map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
+      updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null,
       deletedAt: map['deleted_at'] != null ? DateTime.parse(map['deleted_at']) : null,
     );
   }
@@ -47,12 +50,13 @@ class User {
       'full_name': fullName,
       'email': email,
       'phone': phone,
+      'password': password!,
       'country': country,
       'gender': gender,
       'role': role,
       'status': status,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'created_at': createdAt!.toIso8601String(),
+      'updated_at': updatedAt!.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
     };
   }

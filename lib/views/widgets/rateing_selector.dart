@@ -41,7 +41,7 @@ class _RatingSelectorState extends State<RatingSelector> {
             widget.onChanged(rating);
           },
           child: Container(
-            width: (MediaQuery.of(context).size.width / 2) -30,
+            width: (MediaQuery.of(context).size.width / 3) -30,
                 
             decoration: BoxDecoration(
               color: isSelected
@@ -67,11 +67,10 @@ class _RatingSelectorState extends State<RatingSelector> {
                   },
                   activeColor: Theme.of(context).primaryColor,
                 ),
-                Expanded(
-                  child: Text(
+                Text(
                     rating.translate(context),
-                    style: Theme.of(context).textTheme.displayMedium,
-                  ),
+                    style: Theme.of(context).textTheme.displaySmall,
+                  
                 ),
               ],
             ),

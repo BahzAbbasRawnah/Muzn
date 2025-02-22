@@ -5,6 +5,7 @@ import 'package:muzn/views/screens/home_screen.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 import 'package:muzn/views/widgets/empty_data.dart';
+import 'package:muzn/views/widgets/message.dart';
 
 class StudentsListScreen extends StatefulWidget {
   @override
@@ -225,9 +226,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
     confirmPasswordController.clear();
     phoneController.clear();
     Navigator.pop(context);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('student_added_successfully'.tr(context))),
-    );
+    SuccessSnackbar.show(context: context, successText: 'inserted_successfully'.tr(context));
+    
   }
 }

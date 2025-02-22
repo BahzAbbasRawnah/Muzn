@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
+import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/circle/circle_bloc.dart';
 import 'package:muzn/models/circle.dart';
 import 'package:muzn/models/enums.dart';
 import 'package:muzn/views/screens/circles/circle_screen.dart';
-
 import 'package:muzn/views/screens/circles/add_circle_bottomsheet.dart';
+import 'package:muzn/views/screens/circles/edit_circle_bottomsheet.dart';
 import 'package:muzn/views/widgets/app_drawer.dart';
 import 'package:muzn/views/widgets/custom_app_bar.dart';
 import 'package:muzn/views/widgets/empty_data.dart';
@@ -25,12 +26,23 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-  void initState() {
-    super.initState();
-    context
-        .read<CircleBloc>()
-        .add(LoadCircles(context, schoolId: widget.schoolId));
+@override
+void initState() {
+  super.initState();
+
+  // Get the current authenticated user from the AuthBloc
+  final authState = context.read<AuthBloc>().state;
+  if (authState is AuthAuthenticated) {
+    final teacherId = authState.user.id;
+    // Load circles for the current teacher
+    context.read<CircleBloc>().add(LoadCircles(
+          schoolId: widget.schoolId,
+          teacherId: teacherId,
+        ));
+  } else {
+
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +52,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
         title: 'circles'.tr(context),
         scaffoldKey: scaffoldKey,
       ),
-      drawer: widget.schoolId == null ? AppDrawer() : null,
+      drawer: widget.schoolId == null ? const AppDrawer() : null,
       body: BlocBuilder<CircleBloc, CircleState>(
         builder: (context, state) {
           if (state is CircleLoading) {
@@ -53,17 +65,16 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
             }
             return Column(
               children: [
-                  ScreenHeader(),
+                const ScreenHeader(),
                 Expanded(
-                  child:
-                ListView.builder(
-                  itemCount: state.circles.length,
-                  itemBuilder: (context, index) {
-                    return _buildCircleListItem(state.circles[index]);
-                  },
+                  child: ListView.builder(
+                    itemCount: state.circles.length,
+                    itemBuilder: (context, index) {
+                      return _buildCircleListItem(state.circles[index]);
+                    },
+                  ),
                 ),
-                )
-              ]
+              ],
             );
           }
           return const SizedBox();
@@ -90,20 +101,23 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
 
   Widget _buildCircleListItem(Circle circle) {
     return Card(
-      elevation: 2,
-      shadowColor: Theme.of(context).primaryColor.withAlpha(100),
+      elevation: 4,
+      shadowColor: Colors.black,
+      surfaceTintColor: Colors.white,
       child: ListTile(
-        title: Row(
+    contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
+          title: Row(
           children: [
             Text(
               circle.name,
-              style: Theme.of(context).textTheme.displayMedium,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            Spacer(),
-            Icon(
+            const Spacer(),
+            const Icon(
               Icons.person_2,
               size: 20,
             ),
+            const SizedBox(width: 4),
             Text('${circle.studentCount ?? 0} ${'student'.tr(context)}'),
           ],
         ),
@@ -111,13 +125,14 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (circle.categoryName != null)
-              Text(circle.categoryName!.tr(context)),
-            SizedBox(
-              height: 5,
-            ),
+              Text(
+                'circle_category'.tr(context) + "/" +circle.categoryName!.tr(context),
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+            const SizedBox(height: 8),
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.timer,
                   size: 20,
                 ),
@@ -130,9 +145,10 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
                         orElse: () => CircleTime.morning,
                       )
                       .toLocalizeTimedString(context),
+                      style: Theme.of(context).textTheme.displaySmall,
                 ),
-                Spacer(),
-                Icon(
+                const Spacer(),
+                const Icon(
                   Icons.location_on,
                   size: 20,
                 ),
@@ -147,7 +163,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
                       .toLocalizedTypeString(context),
                 ),
               ],
-            )
+            ),
           ],
         ),
         trailing: PopupMenuButton(
@@ -166,7 +182,15 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           ],
           onSelected: (value) {
             if (value == 'edit') {
-              // TODO: Implement edit
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                useSafeArea: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                builder: (context) => EditCircleBottomSheet(circle: circle),
+              );
             } else if (value == 'delete') {
               showDialog(
                 context: context,
@@ -182,7 +206,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
                       onPressed: () {
                         context
                             .read<CircleBloc>()
-                            .add(DeleteCircle(context, circle.id));
+                            .add(DeleteCircle(circle.id!, circle.teacherId!));
                         Navigator.pop(context);
                       },
                       child: Text(
@@ -197,14 +221,13 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           },
         ),
         onTap: () {
-          // TODO: Navigate to circle details screen
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => CircleScreen(
-                      circleId: circle.id,
-                      circleName: circle.name,
-                    )),
+              builder: (context) => CircleScreen(
+                circle: circle,
+              ),
+            ),
           );
         },
       ),

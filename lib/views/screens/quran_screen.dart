@@ -20,7 +20,7 @@ class _QuranScreenState extends State<QuranScreen> {
   final TextStyle _surahTextStyle = TextStyle(
     fontSize: 18.0,
     color: Colors.black,
-    fontFamily: GoogleFonts.amiriQuran().fontFamily,
+    fontFamily: GoogleFonts.amiri().fontFamily,
     fontWeight: FontWeight.w800,
   );
 
@@ -74,16 +74,8 @@ class _QuranScreenState extends State<QuranScreen> {
                 itemCount: _filteredSurahNumbers.length,
                 itemBuilder: (context, index) {
                   int surahNumber = _filteredSurahNumbers[index];
-                  return Container(
-                    padding: EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      border: Border(
-                        bottom: BorderSide(
-                          color: Colors.black, // Border color
-                          width: 0.5, // Border width
-                        ),
-                      ),
-                    ),
+                  return Card(
+                    elevation: 4,
                     child: GestureDetector(
                       
                       child: Row(
