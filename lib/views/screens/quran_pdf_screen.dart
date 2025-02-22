@@ -61,7 +61,7 @@ class _QuranPdfScreenState extends State<QuranPdfScreen> {
         children: [
           Expanded(
             child: SfPdfViewer.asset(
-              'assets/static/green_quran.pdf',
+              'assets/static/quran.pdf',
               controller: _pdfController, // Correct controller usage
             ),
           ),
