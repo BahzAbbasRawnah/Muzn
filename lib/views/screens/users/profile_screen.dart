@@ -46,6 +46,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       countryController.text = user.country ?? '';
       gender = user.gender;
       selectedCountry = user.country ?? 'SA';
+    }else{
+      if(BlocProvider.of<AuthBloc>(context).userModel!=null) {
+        print('auth model !=null');
+        print(BlocProvider.of<AuthBloc>(context).userModel);
+        final user = BlocProvider
+            .of<AuthBloc>(context).userModel;
+        nameController.text = user?.fullName??"";
+        emailController.text = user?.email??"";
+        phoneController.text = user?.phone??"";
+        countryController.text = user?.country ?? '';
+        gender = user?.gender;
+        selectedCountry = user?.country ?? 'SA';
+        // context.read<StatisticsBloc>().add(FetchStatistics(teacherId: BlocProvider
+        //     .of<AuthBloc>(context)
+        //     .userModel
+        // !.id));
+
+setState(() {
+
+});
+      }
     }
   }
 
@@ -73,11 +94,188 @@ class _ProfileScreenState extends State<ProfileScreen> {
           }
         },
         builder: (context, state) {
+          print('state is ');
+           print(state);
+          if(BlocProvider.of<AuthBloc>(context).userModel!=null) {
+
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  children: [
+                    // Center(
+                    //   child: Stack(
+                    //     children: [
+                    //       const CircleAvatar(
+                    //         radius: 50,
+                    //         child: Icon(Icons.person, size: 50),
+                    //       ),
+                    //       Positioned(
+                    //         bottom: 0,
+                    //         right: 0,
+                    //         child: IconButton(
+                    //           icon: Icon(Icons.camera_alt,
+                    //               color: Theme.of(context).primaryColor),
+                    //           onPressed: () {
+                    //             // Handle avatar update
+                    //           },
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    SizedBox(height: deviceHeight * 0.03),
+                    CustomTextField(
+                      controller: nameController,
+                      hintText: 'full_name_hint'.tr(context),
+                      labelText: 'full_name'.tr(context),
+                      prefixIcon: Icons.person,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'full_name_required'.tr(context);
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+                    CustomTextField(
+                      controller: emailController,
+                      hintText: 'email_hint'.tr(context),
+                      labelText: 'email'.tr(context),
+                      prefixIcon: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'email_required'.tr(context);
+                        }
+                        if (!value.contains('@')) {
+                          return 'email_invalid'.tr(context);
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+                    IntlPhoneField(
+                      controller: phoneController,
+                      searchText: 'search_country'.tr(context),
+                      languageCode: 'ar',
+                      decoration: InputDecoration(
+                        labelText: 'phone'.tr(context),
+                        hintText: 'phone_hint'.tr(context),
+                        prefixIcon: const Icon(Icons.phone),
+                        border: OutlineInputBorder(),
+                      ),
+                      textAlign: TextAlign.start,
+                      initialCountryCode: selectedCountry,
+                      onCountryChanged: (selectedCountry) {
+                        String translatedCountryName =
+                            selectedCountry.nameTranslations['ar'] ??
+                                selectedCountry.name;
+                        countryController.text = translatedCountryName;
+                      },
+                      validator: (value) {
+                        if (value == null || value.number.isEmpty) {
+                          return 'phone_required'.tr(context);
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+                    CustomTextField(
+                      controller: countryController,
+                      hintText: 'country'.tr(context),
+                      labelText: 'country'.tr(context),
+                      prefixIcon: Icons.map,
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+                    CustomTextField(
+                      controller: oldPasswordController,
+                      hintText: 'old_password_hint'.tr(context),
+                      labelText: 'old_password_label'.tr(context),
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+                    CustomTextField(
+                      controller: newPasswordController,
+                      hintText: 'new_password_hint'.tr(context),
+                      labelText: 'new_password_label'.tr(context),
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('gender'.tr(context)),
+                        Radio<String>(
+                          value: 'male',
+                          groupValue: gender,
+                          activeColor: Theme.of(context).primaryColor,
+                          onChanged: (value) {
+                            setState(() {
+                              gender = value;
+                            });
+                          },
+                        ),
+                        Text('male'.tr(context)),
+                        Radio<String>(
+                          value: 'female',
+                          groupValue: gender,
+                          activeColor: Theme.of(context).primaryColor,
+                          onChanged: (value) {
+                            setState(() {
+                              gender = value;
+                            });
+                          },
+                        ),
+                        Text('female'.tr(context)),
+                      ],
+                    ),
+                    SizedBox(height: deviceHeight * 0.03),
+                    if (state is AuthLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      CustomButton(
+                        text: 'update_profile_button'.tr(context),
+                        icon: Icons.update,
+                        onPressed: () {
+                          // final updatedUser = User(
+                          //     id: state.user.id,
+                          //     fullName: nameController.text,
+                          //     email: emailController.text,
+                          //     password: oldPasswordController.text.trim(),
+                          //     phone: phoneController.text,
+                          //     country: countryController.text,
+                          //     gender: gender ?? 'male',
+                          //     role: state.user.role
+                          //
+                          // );
+
+                          if (_formKey.currentState!.validate()) {
+
+                            // context.read<AuthBloc>().add(
+                            //   UpdateProfileEvent(
+                            //     user: updatedUser,
+                            //     newPassword: newPasswordController.text,
+                            //   ),
+                            // );
+                          }
+                        },
+                      ),
+                  ],
+                ),
+              ),
+            );
+          }
           if (state is! AuthAuthenticated) {
+
             return const Center(child: CircularProgressIndicator());
           }
+          if(BlocProvider.of<AuthBloc>(context).userModel!=null) {
 
-          return Padding(
+            return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
@@ -240,6 +438,177 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   newPassword: newPasswordController.text,
                                 ),
                               );
+                        }
+                      },
+                    ),
+                ],
+              ),
+            ),
+          );
+          }
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                children: [
+                  // Center(
+                  //   child: Stack(
+                  //     children: [
+                  //       const CircleAvatar(
+                  //         radius: 50,
+                  //         child: Icon(Icons.person, size: 50),
+                  //       ),
+                  //       Positioned(
+                  //         bottom: 0,
+                  //         right: 0,
+                  //         child: IconButton(
+                  //           icon: Icon(Icons.camera_alt,
+                  //               color: Theme.of(context).primaryColor),
+                  //           onPressed: () {
+                  //             // Handle avatar update
+                  //           },
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  SizedBox(height: deviceHeight * 0.03),
+                  CustomTextField(
+                    controller: nameController,
+                    hintText: 'full_name_hint'.tr(context),
+                    labelText: 'full_name'.tr(context),
+                    prefixIcon: Icons.person,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'full_name_required'.tr(context);
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: deviceHeight * 0.02),
+                  CustomTextField(
+                    controller: emailController,
+                    hintText: 'email_hint'.tr(context),
+                    labelText: 'email'.tr(context),
+                    prefixIcon: Icons.email,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'email_required'.tr(context);
+                      }
+                      if (!value.contains('@')) {
+                        return 'email_invalid'.tr(context);
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: deviceHeight * 0.02),
+                  IntlPhoneField(
+                    controller: phoneController,
+                    searchText: 'search_country'.tr(context),
+                    languageCode: 'ar',
+                    decoration: InputDecoration(
+                      labelText: 'phone'.tr(context),
+                      hintText: 'phone_hint'.tr(context),
+                      prefixIcon: const Icon(Icons.phone),
+                      border: OutlineInputBorder(),
+                    ),
+                    textAlign: TextAlign.start,
+                    initialCountryCode: selectedCountry,
+                    onCountryChanged: (selectedCountry) {
+                      String translatedCountryName =
+                          selectedCountry.nameTranslations['ar'] ??
+                              selectedCountry.name;
+                      countryController.text = translatedCountryName;
+                    },
+                    validator: (value) {
+                      if (value == null || value.number.isEmpty) {
+                        return 'phone_required'.tr(context);
+                      }
+                      return null;
+                    },
+                  ),
+                  SizedBox(height: deviceHeight * 0.02),
+                  CustomTextField(
+                    controller: countryController,
+                    hintText: 'country'.tr(context),
+                    labelText: 'country'.tr(context),
+                    prefixIcon: Icons.map,
+                  ),
+                  SizedBox(height: deviceHeight * 0.02),
+                  CustomTextField(
+                    controller: oldPasswordController,
+                    hintText: 'old_password_hint'.tr(context),
+                    labelText: 'old_password_label'.tr(context),
+                    prefixIcon: Icons.lock,
+                    obscureText: true,
+                  ),
+                  SizedBox(height: deviceHeight * 0.02),
+                  CustomTextField(
+                    controller: newPasswordController,
+                    hintText: 'new_password_hint'.tr(context),
+                    labelText: 'new_password_label'.tr(context),
+                    prefixIcon: Icons.lock,
+                    obscureText: true,
+                  ),
+                  SizedBox(height: deviceHeight * 0.02),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('gender'.tr(context)),
+                      Radio<String>(
+                        value: 'male',
+                        groupValue: gender,
+                        activeColor: Theme.of(context).primaryColor,
+                        onChanged: (value) {
+                          setState(() {
+                            gender = value;
+                          });
+                        },
+                      ),
+                      Text('male'.tr(context)),
+                      Radio<String>(
+                        value: 'female',
+                        groupValue: gender,
+                        activeColor: Theme.of(context).primaryColor,
+                        onChanged: (value) {
+                          setState(() {
+                            gender = value;
+                          });
+                        },
+                      ),
+                      Text('female'.tr(context)),
+                    ],
+                  ),
+                  SizedBox(height: deviceHeight * 0.03),
+                  if (state is AuthLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else
+                    CustomButton(
+                      text: 'update_profile_button'.tr(context),
+                      icon: Icons.update,
+                      onPressed: () {
+                        final updatedUser = User(
+                            id: state.user.id,
+                            fullName: nameController.text,
+                            email: emailController.text,
+                            password: oldPasswordController.text.trim(),
+                            phone: phoneController.text,
+                            country: countryController.text,
+                            gender: gender ?? 'male',
+                            role: state.user.role
+
+                        );
+
+                        if (_formKey.currentState!.validate()) {
+
+                          context.read<AuthBloc>().add(
+                            UpdateProfileEvent(
+                              user: updatedUser,
+                              newPassword: newPasswordController.text,
+                            ),
+                          );
                         }
                       },
                     ),

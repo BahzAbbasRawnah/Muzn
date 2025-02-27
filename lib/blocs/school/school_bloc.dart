@@ -86,7 +86,7 @@ class SchoolError extends SchoolState {
 // BLoC
 class SchoolBloc extends Bloc<SchoolEvent, SchoolState> {
   final DatabaseManager _databaseManager = DatabaseManager();
-
+  List<School>? schoolsList;
   SchoolBloc() : super(SchoolInitial()) {
     on<LoadSchools>(_onLoadSchools);
     on<AddSchool>(_onAddSchool);
@@ -103,6 +103,7 @@ class SchoolBloc extends Bloc<SchoolEvent, SchoolState> {
         return;
       }
 
+
       final List<Map<String, dynamic>> results = await db.rawQuery('''
         SELECT s.*, COUNT(c.id) as circle_count 
         FROM School s 
@@ -114,6 +115,7 @@ class SchoolBloc extends Bloc<SchoolEvent, SchoolState> {
       ''', [event.teacherId]);
 
       final schools = results.map((map) => School.fromMap(map)).toList();
+      schoolsList=schools;
       emit(SchoolsLoaded(schools));
     } catch (e) {
       emit(SchoolError('Failed to load schools: $e'));

@@ -187,8 +187,9 @@ class _CircleScreenState extends State<CircleScreen> {
                           },
                         ),
                         ...AttendanceStatuse.values.map((status) {
-                          if (status == AttendanceStatuse.none)
+                          if (status == AttendanceStatuse.none) {
                             return const SizedBox();
+                          }
                           return Padding(
                             padding: const EdgeInsets.all(5),
                             child: FilterChip(
@@ -294,17 +295,17 @@ class _CircleScreenState extends State<CircleScreen> {
         shadowColor: Colors.black,
         child: ListTile(
           leading: CircleAvatar(
+            backgroundColor: Theme.of(context).primaryColor.withAlpha(100),
             child: Icon(
               Icons.person,
               size: 30,
               color: Theme.of(context).iconTheme.color,
             ),
-            backgroundColor: Theme.of(context).primaryColor.withAlpha(100),
           ),
           title:Row(
             children: [
-            Text(Circle_student.student.user!.fullName),
-            Spacer(),
+            Expanded(child: Text(Circle_student.student.user!.fullName,)),
+            // Spacer(),
             IconButton(
               icon:Icon(
                 Icons.edit,

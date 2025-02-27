@@ -24,6 +24,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     if (authState is AuthAuthenticated) {
       if (mounted) {
         context.read<StatisticsBloc>().add(FetchStatistics(teacherId: authState.user.id));
+      }else{
+
+      }
+      // }
+    }
+    else{
+      if(BlocProvider.of<AuthBloc>(context).userModel!=null) {
+        context.read<StatisticsBloc>().add(FetchStatistics(teacherId: BlocProvider
+            .of<AuthBloc>(context)
+            .userModel
+        !.id));
+
+
       }
     }
   }

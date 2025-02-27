@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:muzn/app/core/check_if_login.dart';
 import 'package:muzn/app/theme/dark_theme.dart';
 import 'package:muzn/app/theme/light_theme.dart';
 import 'package:muzn/app_localization.dart';
@@ -37,15 +38,19 @@ void main() async {
 
     // Get shared preferences
     final prefs = await SharedPreferences.getInstance();
-
+    final isLogin = await checkIfLogin();
+    print('is Login value ');
+    print(isLogin);
     // Check first launch
     final isFirstLaunch = prefs.getBool('is_first_launch') ?? true;
-    final isAuthenticated = prefs.getBool('authToken') ?? false; // Ensuring it's never null
+    final isAuthenticated =
+        prefs.getBool('authToken') ?? false; // Ensuring it's never null
 
     runApp(Muzn(
       database: database,
       isFirstLaunch: isFirstLaunch,
-      isAuthenticated: isAuthenticated,
+      isAuthenticated: isLogin,
+      // isAuthenticated,
     ));
 
     // Set first launch to false
@@ -61,6 +66,7 @@ class Muzn extends StatelessWidget {
   final Database database;
   final bool isFirstLaunch;
   final bool isAuthenticated;
+  // final bool isAuthenticated;
 
   const Muzn({
     Key? key,
@@ -83,12 +89,13 @@ class Muzn extends StatelessWidget {
         BlocProvider<StudentProgressBloc>(create: (_) => StudentProgressBloc()),
         BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
         BlocProvider<StatisticsBloc>(create: (_) => StatisticsBloc()),
-
       ],
       child: BlocBuilder<LocaleBloc, LocaleState>(
         builder: (context, localeState) {
           return BlocBuilder<ThemeBloc, ThemeState>(
             builder: (context, themeState) {
+              print('state is ');
+              print(themeState.toString());
               return BlocBuilder<AuthBloc, AuthState>(
                 builder: (context, authState) {
                   // Get the current locale from state, default to Arabic
@@ -100,7 +107,8 @@ class Muzn extends StatelessWidget {
                     locale: currentLocale,
                     theme: themeState is ThemeLight ? lightTheme : darkTheme,
                     debugShowCheckedModeBanner: false,
-                    title: 'Muzn Quran', // Static title for now
+                    title: 'Muzn Quran',
+                    // Static title for now
                     supportedLocales: LocaleBloc.getSupportedLocales(),
                     localizationsDelegates: const [
                       AppLocalization.delegate,
@@ -108,7 +116,8 @@ class Muzn extends StatelessWidget {
                       GlobalMaterialLocalizations.delegate,
                       GlobalWidgetsLocalizations.delegate,
                     ],
-                    localeListResolutionCallback: (deviceLocales, supportedLocales) {
+                    localeListResolutionCallback:
+                        (deviceLocales, supportedLocales) {
                       if (localeState is LocaleLoadedState) {
                         return localeState.locale;
                       }
@@ -121,7 +130,39 @@ class Muzn extends StatelessWidget {
                       }
                       return const Locale('ar'); // Default to Arabic
                     },
-                    home: _getInitialScreen(authState),
+                    // home: FutureBuilder<Widget>(
+                    //   future: _getInitialScreen(authState),
+                    //   // Call the async method
+                    //   builder: (context, snapshot) {
+                    //     if (snapshot.connectionState ==
+                    //         ConnectionState.waiting) {
+                    //       // Show a loading indicator while waiting for the result
+                    //       return const Scaffold(
+                    //         body: Center(
+                    //           child: CircularProgressIndicator(),
+                    //         ),
+                    //       );
+                    //     } else if (snapshot.hasError) {
+                    //       // Handle errors
+                    //       return Scaffold(
+                    //         body: Center(
+                    //           child: Text('Error: ${snapshot.error}'),
+                    //         ),
+                    //       );
+                    //     } else if (snapshot.hasData) {
+                    //       // Return the appropriate screen
+                    //       return snapshot.data!;
+                    //     } else {
+                    //       // Fallback in case of no data
+                    //       return const Scaffold(
+                    //         body: Center(
+                    //           child: Text('No screen to display'),
+                    //         ),
+                    //       );
+                    //     }
+                    //   },
+                    // ),
+                    home:isAuthenticated?HomeScreen(): _getInitialScreen(authState),
                   );
                 },
               );
@@ -136,6 +177,10 @@ class Muzn extends StatelessWidget {
     if (isFirstLaunch) {
       return OnboardingScreen();
     }
+    // if (await checkIfLogin()) {
+    //   print('to main');
+    //   return HomeScreen();
+    // }
     // if (isAuthenticated) {
     //   return const HomeScreen();
     // }

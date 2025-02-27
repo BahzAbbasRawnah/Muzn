@@ -83,7 +83,7 @@ class CircleError extends CircleState {
 // Bloc
 class CircleBloc extends Bloc<CircleEvent, CircleState> {
   final DatabaseManager _databaseManager = DatabaseManager();
-
+  List<Circle>? circlesList;
   CircleBloc() : super(CircleInitial()) {
     on<LoadCircles>(_onLoadCircles);
     on<AddCircle>(_onAddCircle);
@@ -126,6 +126,7 @@ Future<void> _onLoadCircles(LoadCircles event, Emitter<CircleState> emit) async 
     final circles = results.map((map) => Circle.fromMap(map)).toList();
 
     // Emit the loaded state
+    circlesList=circles;
     emit(CirclesLoaded(circles));
   } catch (e) {
     // Handle errors

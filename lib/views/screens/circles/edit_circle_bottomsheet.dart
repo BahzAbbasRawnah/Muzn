@@ -10,6 +10,8 @@ import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_dropdown.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 
+import '../../../app/core/show_success_message.dart';
+
 class EditCircleBottomSheet extends StatefulWidget {
   final Circle circle;
 
@@ -101,7 +103,13 @@ class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
             SnackBar(content: Text(state.message.tr(context))),
           );
         } else if (state is CirclesLoaded) {
-          Navigator.of(context).pop();
+          // SnackBar(content: Text(state.message.tr(context))),
+          Navigator.of(context).pop(); // Close the bottom sheet
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showSuccessMessage(context, 'edit_successfully'.tr(context));
+          });
+          // Navigator.of(context).pop();
+        // SnackBar(content: Text('success_add'.tr(context)));
         }
       },
       child: SingleChildScrollView(

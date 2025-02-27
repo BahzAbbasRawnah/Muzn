@@ -14,6 +14,8 @@ class ScreenHeader extends StatelessWidget {
         String userName = "User"; // Default value
         if (state is AuthAuthenticated) {
           userName = state.user.fullName; // Assuming fullName is a property of the user
+        }else{
+          userName=BlocProvider.of<AuthBloc>(context).userModel?.fullName??"";
         }
 
         return Container(
