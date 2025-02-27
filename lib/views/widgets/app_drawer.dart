@@ -4,6 +4,7 @@ import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/LocaleBloc/locale_bloc.dart';
 import 'package:muzn/blocs/ThemeBloc/theme_bloc.dart';
+import 'package:muzn/views/screens/about_screen.dart';
 import 'package:muzn/views/screens/contact_screen.dart';
 import 'package:muzn/views/screens/home_screen.dart';
 import 'package:muzn/views/screens/users/login_screen.dart';
@@ -30,9 +31,14 @@ class AppDrawer extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const CircleAvatar(
+                       CircleAvatar(
                         radius: 40,
-                        backgroundImage: AssetImage('assets/images/avatar_placeholder.png'),
+                        child: Icon(
+                          Icons.person,
+                          size: 50,
+                          color: Theme.of(context).iconTheme.color,
+                          ),
+                        backgroundColor: Colors.white,
                       ),
                       const SizedBox(height: 5),
                       if (authState is AuthAuthenticated) ...[
@@ -169,6 +175,18 @@ class AppDrawer extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ContactScreen(),
+                    ),
+                  );
+                },
+              ),
+                    ListTile(
+                leading: const Icon(Icons.info_outline),
+                title: Text('about'.tr(context)),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AboutScreen(),
                     ),
                   );
                 },

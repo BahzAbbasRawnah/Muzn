@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:muzn/app/constant/constant.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/views/screens/circles/circles_list_screen.dart';
-import 'package:muzn/views/screens/reports/schools_list.dart';
+import 'package:muzn/views/screens/reports/report_body.dart';
 import 'package:muzn/views/screens/schools/add_school_bottomSheet.dart';
 import 'package:muzn/views/screens/schools/edit_school_bottomSheet.dart';
 import 'package:muzn/views/widgets/app_drawer.dart';
@@ -43,7 +44,21 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
               Icons.print,
             ),
             onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>  SchoolsReport()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Report(
+  reportTitle: 'School Report',
+  startDateMiladi: '2023-10-01',
+  endDateMiladi: '2023-10-31',
+  startDateHijri: '1445-03-15',
+  endDateHijri: '1445-04-15',
+  headerTitles: ['Column 1', 'Column 2', 'Column 3', 'Column 4'],
+  tableData: [
+    ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
+    ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
+  ],
+  teacherName: 'John Doe',
+)
+                )
+                );
             },
           ),
         ],

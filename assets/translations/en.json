@@ -2,12 +2,24 @@
 
 "app_name":"Muzn ",
 "app_title":"Muzn Quran Learning App",
+"organization_name": "Muzn Quran",
 "inserted_successfully":" Saved successfully",
 "updated_successfully":"Updated successfully",
 "deleted_successfully":"Deleted successfully",
 "inserted_failed":"Failed to insert Data",
 "updated_failed":"Failed to update Data",
 "deleted_failed":"Failed to delete Data",
+
+
+
+
+  "about_description": "Enhance your Quran learning experience with our Circles Management App. Manage circles, read, and listen to the Holy Quran with ease.",
+  "manage_circles": "Manage Quran Learning Circles",
+  "full_quran": "Full Quran ",
+  "listen_quran": "Listen to beautiful recitations",
+  "search_quran": "Search any Surah or Ayah",
+  "arabic_and_english": "Arabic & English",
+  "dark_light_mode": "Dark & Light Mode Support",
 
 
 

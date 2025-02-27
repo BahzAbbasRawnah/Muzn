@@ -172,6 +172,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
+                
                 IntlPhoneField(
                   controller: countryController,
                   decoration: InputDecoration(
@@ -183,7 +184,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
-                  showCountryFlag: false,
+                  showCountryFlag: true,
+                  
                   initialValue: country,
                   initialCountryCode: 'SA',
                   languageCode: 'ar',
@@ -202,6 +204,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: deviceHeight * 0.02),
                 IntlPhoneField(
                   controller: phoneController,
+                  showCountryFlag: false,
+                  showDropdownIcon: false,
                   searchText: 'search_country'.tr(context),
                   languageCode: 'ar',
                   invalidNumberMessage: 'phone_min_length'.tr(context),

@@ -10,87 +10,80 @@ class ContactScreen extends StatelessWidget {
     ScrollController controller = ScrollController();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('contact'.tr(context)),
-        centerTitle: true,
-      ),
-      body:
-      
-       Padding(
-        padding: const EdgeInsets.all(16.0),
-        child:
-          Column(
-              children: [
-               ScreenHeader(),
-                Expanded( 
-          child:SingleChildScrollView(
-          controller: controller,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 5),
-              const Icon(
-                Icons.contact_mail,
-                size: 80,
-              ),
-              const SizedBox(height: 10),
-
-              Text(
-                'contact_welcome'.tr(context),
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 10),
-
-              Column(
-                children: [
-                  GestureDetector(
-                      onTap: () {},
-                      child: Row(
-                        children: [
-                          Icon(Icons.phone),
-                          const SizedBox(width: 5),
-                          Text(
-                            '+966 1234567898',
-                          ),
-                        ],
-                      )),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                      onTap: () {},
-                      child: Row(
-                        children: [
-                          Icon(Icons.email),
-                          const SizedBox(width: 5),
-                          Text(
-                            'support@example.com',
-                          ),
-                        ],
-                      )),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-
-              // Contact Form
-              CustomTextField(
-                labelText: 'type_message'.tr(context),
-                hintText: 'type_message'.tr(context),
-                line: 10,
-              ),
-
-              const SizedBox(height: 20),
-              CustomButton(
-                  text: 'send_message'.tr(context),
-                  icon: Icons.send,
-                  onPressed: () {}),
-              
-            ],
-          ),
+        appBar: AppBar(
+          title: Text('contact'.tr(context)),
+          centerTitle: true,
         ),
-      ),
-              ]
-          ))
-    );
+        body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 5),
+            child: Column(children: [
+              ScreenHeader(),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: controller,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 5),
+                      const Icon(
+                        Icons.contact_mail,
+                        size: 80,
+                      ),
+                      const SizedBox(height: 10),
+
+                      Text(
+                        'contact_welcome'.tr(context),
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 10),
+
+                      Column(
+                        children: [
+                          GestureDetector(
+                              onTap: () {},
+                              child: Row(
+                                children: [
+                                  Icon(Icons.phone),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    '+966 1234567898',
+                                  ),
+                                ],
+                              )),
+                          const SizedBox(height: 10),
+                          GestureDetector(
+                              onTap: () {},
+                              child: Row(
+                                children: [
+                                  Icon(Icons.email),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'support@example.com',
+                                  ),
+                                ],
+                              )),
+                        ],
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Contact Form
+                      CustomTextField(
+                        labelText: 'type_message'.tr(context),
+                        hintText: 'type_message'.tr(context),
+                        line: 10,
+                      ),
+
+                      const SizedBox(height: 20),
+                      CustomButton(
+                          text: 'send_message'.tr(context),
+                          icon: Icons.send,
+                          onPressed: () {}),
+                    ],
+                  ),
+                ),
+              ),
+            ])));
   }
 }

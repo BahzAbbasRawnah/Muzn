@@ -207,7 +207,7 @@ class _AddStudentToCircleBottomSheetState
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
-                  showCountryFlag: false,
+                  showCountryFlag: true,
                   initialValue: country,
                   initialCountryCode: 'SA',
                   languageCode: 'ar',
@@ -230,6 +230,8 @@ class _AddStudentToCircleBottomSheetState
                   controller: phoneController,
                   searchText: 'search_country'.tr(context),
                   languageCode: 'ar',
+                                    showCountryFlag: false,
+
                   invalidNumberMessage: 'phone_min_length'.tr(context),
                   decoration: InputDecoration(
                     labelText: 'phone'.tr(context),
