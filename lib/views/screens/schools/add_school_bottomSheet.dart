@@ -59,6 +59,11 @@ return Container(
         child: BlocBuilder<SchoolBloc, SchoolState>(
           builder: (context, state) {
             if (state is SchoolLoading) {
+              Navigator.of(context).pop(); // Close the bottom sheet
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                showSuccessMessage(context, 'school_added_successfully'.tr(context));
+              });
+              // showSuccessMessage(context, 'school_added_successfully'.tr(context)); /
               return const Center(
                 child: CircularProgressIndicator(),
               );
@@ -144,5 +149,14 @@ return Container(
           },
         ),
       );
+  }
+  void showSuccessMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green, // Customize the color
+        behavior: SnackBarBehavior.floating, // Optional: Make it floating
+      ),
+    );
   }
 }

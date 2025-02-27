@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:muzn/app/core/check_if_login.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/LocaleBloc/locale_bloc.dart';
@@ -193,7 +194,8 @@ class AppDrawer extends StatelessWidget {
               ),
 
               // Logout
-              if (authState is AuthAuthenticated)
+              // if (authState is AuthAuthenticated)
+              if (BlocProvider.of<AuthBloc>(context).isLogin)
                 ListTile(
                   leading: const Icon(Icons.exit_to_app),
                   title: Text('logout'.tr(context)),

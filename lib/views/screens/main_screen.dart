@@ -88,6 +88,7 @@ class _MainScreenState extends State<MainScreen>
           Expanded(
               child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Animated first text
               Text(

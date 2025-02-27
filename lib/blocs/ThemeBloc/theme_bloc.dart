@@ -10,7 +10,7 @@ part 'theme_event.dart';
 part 'theme_state.dart';
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
-  ThemeBloc() : super(ThemeInitial()) {
+  ThemeBloc() : super(ThemeLight()) {
     on<ToggleThemeEvent>(_onToggleTheme);
     on<LoadThemeEvent>(_onLoadTheme);
     on<SetSystemThemeEvent>(_onSetSystemTheme);
@@ -33,9 +33,11 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
       }
 
       final themeMode = prefs.getString(_themeKey) ?? 'light';
+      print('theme meod is $themeMode');
       emit(themeMode == 'dark' ? ThemeDark() : ThemeLight());
     } catch (e) {
       emit(ThemeError('Failed to load theme: ${e.toString()}'));
+      // emit(ThemeLight()); // Default to light theme
       emit(ThemeLight()); // Default to light theme
     }
   }

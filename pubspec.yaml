@@ -33,7 +33,9 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^28.1.37
   scroll_loop_auto_scroll: ^0.0.5
   bloc: ^9.0.0
- 
+  get:
+  flutter_secure_storage:
+
 
 
 
@@ -54,7 +56,3 @@ flutter:
     - assets/static/quran.pdf
     - assets/fonts/
     - assets/static/muzn_database.db # Directory for database
-
-
-
-

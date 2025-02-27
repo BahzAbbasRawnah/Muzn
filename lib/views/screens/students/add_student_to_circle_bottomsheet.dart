@@ -10,6 +10,8 @@ import 'package:muzn/views/widgets/custom_text_field.dart';
 import 'package:muzn/views/widgets/message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../app/core/show_success_message.dart';
+
 class AddStudentToCircleBottomSheet extends StatefulWidget {
   final int circleId;
 
@@ -111,22 +113,55 @@ class _AddStudentToCircleBottomSheetState
 
       // First close the bottom sheet
       if (mounted) {
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+        //   showSuccessMessage(context, 'added_successfully'.tr(context));
+        // });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('added_successfully'.tr(context)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.green,
+            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
+          ),
+        );
+
         Navigator.pop(context);
       }
 
       if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('added_successfully'.tr(context)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.green,
+            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
+          ),
+        );
+
+        // SuccessSnackbar.show(context: context, successText: 'inserted_successfully'.tr(context));
+        // WidgetsBinding.instance.addPostFrameCallback((_) {
+        //   showSuccessMessage(context, 'added_successfully'.tr(context));
+        // });
         context.read<CircleStudentBloc>().add(
               LoadCircleStudents(
                 context,
                 circleId: widget.circleId,
               ),
             );
-       SuccessSnackbar.show(context: context, successText: 'inserted_successfully'.tr(context));
+       // SuccessSnackbar.show(context: context, successText: 'inserted_successfully'.tr(context));
 
       }
     } catch (e) {
       if (mounted) {
-        ErrorSnackbar.show(context: context, errorText: e.toString());
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
+          ),
+        );
+        // ErrorSnackbar.show(context: context, errorText: e.toString());
       }
     } finally {
       if (mounted) {
@@ -159,7 +194,7 @@ class _AddStudentToCircleBottomSheetState
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
-      
+
                 // Full Name field
                 CustomTextField(
                   controller: nameController,
@@ -174,7 +209,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Email field
                 CustomTextField(
                   controller: emailController,
@@ -194,7 +229,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Country field
                 IntlPhoneField(
                   controller: countryController,
@@ -224,7 +259,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Phone field
                 IntlPhoneField(
                   controller: phoneController,
@@ -257,7 +292,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Password field
                 CustomTextField(
                   controller: passwordController,
@@ -277,7 +312,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Gender selection
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -308,7 +343,7 @@ class _AddStudentToCircleBottomSheetState
                   ],
                 ),
                 SizedBox(height: deviceHeight * 0.02),
-      
+
                 // Save button
                 if (_isLoading)
                   const Center(child: CircularProgressIndicator())

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:muzn/app/core/get_user_id.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/school/school_bloc.dart';
@@ -7,6 +8,8 @@ import 'package:muzn/models/school.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 import 'package:muzn/views/widgets/message.dart';
+
+import '../../../app/core/check_if_login.dart';
 
 class EditSchoolBottomSheet extends StatefulWidget {
   final int schoolId;
@@ -79,7 +82,7 @@ class _EditSchoolBottomSheetState extends State<EditSchoolBottomSheet> {
     final deviceHeight = MediaQuery.of(context).size.height;
 
     return BlocListener<SchoolBloc, SchoolState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         print("EditSchoolBottomSheet listener triggered with state: $state");
         if (state is SchoolError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -88,7 +91,23 @@ class _EditSchoolBottomSheetState extends State<EditSchoolBottomSheet> {
         } else if (state is SchoolsLoaded && mounted) {
           print("Closing EditSchoolBottomSheet"); // Debugging log
           print("SchoolsLoaded state emitted"); // Added log
-          Navigator.of(context).pop(); // Close the bottom sheet
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showSuccessMessage(context, 'edit_successfully'.tr(context));
+          });
+
+          // Close the bottom sheet after showing the message
+          if (await checkIfLogin()) {
+            BlocProvider.of<SchoolBloc>(context).add(LoadSchools(await getUserId()));
+          }
+          Navigator.of(context).pop();
+          // if(await checkIfLogin()){
+          //   BlocProvider.of<SchoolBloc>(context).add(LoadSchools(await getUserId()));
+          //   WidgetsBinding.instance.addPostFrameCallback((_) {
+          //     showSuccessMessage(context,'edit_successfully'.tr(context));
+          //   });
+          //
+          // }
+          // Navigator.of(context).pop(); // Close the bottom sheet
         }
       },
       child: Container(
@@ -178,4 +197,14 @@ class _EditSchoolBottomSheetState extends State<EditSchoolBottomSheet> {
       ),
     );
   }
+  void showSuccessMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green, // Customize the color
+        behavior: SnackBarBehavior.floating, // Optional: Make it floating
+      ),
+    );
+  }
+
 }

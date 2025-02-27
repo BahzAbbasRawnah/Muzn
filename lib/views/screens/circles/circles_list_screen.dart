@@ -28,56 +28,87 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  // Get the current authenticated user from the AuthBloc
-  final authState = context.read<AuthBloc>().state;
-  if (authState is AuthAuthenticated) {
-    final teacherId = authState.user.id;
-    // Load circles for the current teacher
-    context.read<CircleBloc>().add(LoadCircles(
+    // Get the current authenticated user from the AuthBloc
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      final teacherId = authState.user.id;
+      // Load circles for the current teacher
+      context.read<CircleBloc>().add(LoadCircles(
+            schoolId: widget.schoolId,
+            teacherId: teacherId,
+          ));
+    } else {
+      if(BlocProvider.of<AuthBloc>(context).userModel!=null) {
+        context.read<CircleBloc>().add(LoadCircles(
           schoolId: widget.schoolId,
-          teacherId: teacherId,
+          teacherId: BlocProvider.of<AuthBloc>(context).userModel!.id,
         ));
-  } else {
+        // context.read<SchoolBloc>().add(LoadSchools(BlocProvider
+        //     .of<AuthBloc>(context)
+        //     .userModel
+        // !.id));
+      }
 
-  }
-}
+    }
+    }
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            appBar: AppBar(
+      appBar: AppBar(
         title: Text('circles'.tr(context)),
         centerTitle: true,
-            actions: [
+        actions: [
           IconButton(
-            icon:  Icon(
+            icon: Icon(
               Icons.print,
             ),
             onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Report(
-  reportTitle: 'School Report',
-  startDateMiladi: '2023-10-01',
-  endDateMiladi: '2023-10-31',
-  startDateHijri: '1445-03-15',
-  endDateHijri: '1445-04-15',
-  headerTitles: ['Column 1', 'Column 2', 'Column 3', 'Column 4'],
-  tableData: [
-    ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
-    ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
-  ],
-  teacherName: 'John Doe',
-)
-                )
-                );
+              if(BlocProvider.of<CircleBloc>(context)
+                  .circlesList?.isNotEmpty??false) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Report(
+                              reportTitle: 'School Report',
+                              startDateMiladi: '2023-10-01',
+                              endDateMiladi: '2023-10-31',
+                              startDateHijri: '1445-03-15',
+                              endDateHijri: '1445-04-15',
+                              headerTitles: [
+                                'الاسم',
+                                'الوصف',
+                                'وقت الحلقة',
+                                'نوع الحلقة'
+                              ],
+                              tableData: BlocProvider
+                                  .of<CircleBloc>(context)
+                                  .circlesList!
+                                  .map((school) =>
+                              [
+                                school.name,
+                                school.description ?? 'N/A',
+                                '${school.circleTime ?? 0}',
+                                school.circleType ?? 'N/A'
+                              ])
+                                  .toList(),
+                              // tableData: [
+                              //   ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
+                              //   ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
+                              // ],
+                              teacherName: 'John Doe',
+                            )));
+              }
             },
           ),
         ],
       ),
-      
       drawer: widget.schoolId == null ? const AppDrawer() : null,
       body: BlocBuilder<CircleBloc, CircleState>(
         builder: (context, state) {
@@ -94,6 +125,7 @@ void initState() {
                 const ScreenHeader(),
                 Expanded(
                   child: ListView.builder(
+                    shrinkWrap: true,
                     itemCount: state.circles.length,
                     itemBuilder: (context, index) {
                       return _buildCircleListItem(state.circles[index]);
@@ -131,8 +163,8 @@ void initState() {
       shadowColor: Colors.black,
       surfaceTintColor: Colors.white,
       child: ListTile(
-    contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
-          title: Row(
+        contentPadding: const EdgeInsets.symmetric(vertical: 2, horizontal: 10),
+        title: Row(
           children: [
             Text(
               circle.name,
@@ -152,7 +184,7 @@ void initState() {
           children: [
             if (circle.categoryName != null)
               Text(
-                'circle_category'.tr(context) + "/" +circle.categoryName!.tr(context),
+                "${'circle_category'.tr(context)}/${circle.categoryName!.tr(context)}",
                 style: Theme.of(context).textTheme.titleSmall,
               ),
             const SizedBox(height: 8),
@@ -171,7 +203,7 @@ void initState() {
                         orElse: () => CircleTime.morning,
                       )
                       .toLocalizeTimedString(context),
-                      style: Theme.of(context).textTheme.displaySmall,
+                  style: Theme.of(context).textTheme.displaySmall,
                 ),
                 const Spacer(),
                 const Icon(

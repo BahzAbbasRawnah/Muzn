@@ -1,6 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:muzn/app/core/check_if_login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../app/core/get_user_id.dart';
+import '../../app/core/secure_storage.dart';
 import '../../services/database_service.dart';
 import '../../models/user.dart';
 import 'package:crypto/crypto.dart';
@@ -67,6 +70,7 @@ class AuthLoading extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
   final User user;
+
   AuthAuthenticated(this.user);
 
   @override
@@ -75,6 +79,7 @@ class AuthAuthenticated extends AuthState {
 
 class AuthError extends AuthState {
   final String message;
+
   AuthError(this.message);
 
   @override
@@ -86,12 +91,51 @@ class AuthUnauthenticated extends AuthState {}
 // BLoC
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final DatabaseManager _databaseManager = DatabaseManager();
+  bool isLogin = false;
+  int userId = 0;
+  User? userModel;
 
   AuthBloc() : super(AuthInitial()) {
     on<LoginEvent>(_onLogin);
     on<RegisterEvent>(_onRegister);
     on<UpdateProfileEvent>(_onUpdateProfile);
     on<LogoutEvent>(_onLogout);
+    _getIsLogin();
+    _getUserId();
+    _getUserData();
+    // isLogin=await checkIfLogin();
+  }
+
+  _getIsLogin() async {
+    isLogin = await checkIfLogin();
+  }
+
+  _getUserId() async {
+    userId = await getUserId();
+  }
+
+  _getUserData() async {
+    final db = await _databaseManager.database;
+    // final hashedPassword = _hashPassword(event.password);
+    // final bool isEmail = event.emailOrPhone.contains('@');
+userId=await getUserId();
+// print("userId");
+// print(userId);
+    final List<Map<String, dynamic>> result = await db.query(
+      'User',
+      where: 'id= ? AND  deleted_at IS NULL',
+      whereArgs: [userId],
+    );
+    print('on get user data ');
+    print(result.toString());
+    print('user id is ');
+    print(userId);
+    if (result.isNotEmpty) {
+      final user = User.fromMap(result.first);
+      userModel = user;
+      // final prefs = await SharedPreferences.getInstance();
+      // prefs.setBool('authToken', true);
+    }
   }
 
   String _hashPassword(String password) {
@@ -120,6 +164,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         prefs.setBool('authToken', true);
 
         if (user.status == 'active') {
+          final storage = SecureStorage();
+          storage.write(key: 'isLogin', value: 'true');
+          storage.write(key: 'user_id', value: user.id.toString());
+          storage.write(key: 'user_name', value: user.fullName.toString());
           emit(AuthAuthenticated(user));
         } else {
           emit(AuthError('User is inactive'));

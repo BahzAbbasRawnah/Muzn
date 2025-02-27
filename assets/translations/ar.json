@@ -9,6 +9,9 @@
 "inserted_failed": "فشل في إدخال البيانات",
 "updated_failed": "فشل في تحديث البيانات",
 "deleted_failed": "فشل في حذف البيانات",
+"added_successfully": "تم الإضافة بنجاح",
+"edit_successfully": "تم التعديل بنجاح",
+"edit_student": " تعديل طالب",
 
 
 "about_description": "عزز تجربة تعلمك للقرآن الكريم باستخدام تطبيق إدارة الحلقات. قم بإدارة الحلقات، واقرأ، واستمع إلى القرآن الكريم بسهولة.",
@@ -122,6 +125,7 @@
   "circle_category": "تصنيف الحلقة",
   "circle_type": "طريقة التعليم",
   "circle_time": "توقيت الحلقة",
+  "edit_circle": "تعديل الحلقة",
   "online": "عن بعد",
   "offline": "حضوري",
   "morning": "الصباح",
@@ -228,6 +232,7 @@
   "invalid_old_password": "كلمة المرور القديمة غير صحيحة",
   "profile_update_failed": "فشل تحديث الملف الشخصي",
   "new_school": "إضافة مدرسة/جامع جديد",
+  "edit_school": "تعديل مدرسة/جامع ",
   "school_name": "اسم المدرسة/الجامع",
   "school_name_label": "اسم المدرسة/الجامع",
   "school_name_hint": "أدخل اسم المدرسة أو الجامع",

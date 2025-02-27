@@ -133,14 +133,30 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
                 circleId: widget.circleId,
               ),
             );
-        SuccessSnackbar.show(
-          context: context,
-          successText: 'updated_successfully'.tr(context),
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('edit_successfully'.tr(context)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.green,
+            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
+          ),
         );
+        // SuccessSnackbar.show(
+        //   context: context,
+        //   successText: 'updated_successfully'.tr(context),
+        // );
       }
     } catch (e) {
       if (mounted) {
-        ErrorSnackbar.show(context: context, errorText: e.toString());
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString()),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
+          ),
+        );
+        // ErrorSnackbar.show(context: context, errorText: e.toString());
       }
     } finally {
       if (mounted) {
@@ -152,165 +168,171 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final deviceHeight = MediaQuery.of(context).size.height;
-
     return SafeArea(
-      child: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-            left: 16,
-            right: 16,
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'edit_student'.tr(context),
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-
-                // Full Name field
-                CustomTextField(
-                  controller: nameController,
-                  hintText: 'full_name_hint'.tr(context),
-                  labelText: 'full_name'.tr(context),
-                  prefixIcon: Icons.person,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-
-                // Email field
-                CustomTextField(
-                  controller: emailController,
-                  hintText: 'email_hint'.tr(context),
-                  labelText: 'email'.tr(context),
-                  prefixIcon: Icons.email,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
-                    }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                        .hasMatch(value)) {
-                      return 'invalid_email'.tr(context);
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-
-                // Country field
-                IntlPhoneField(
-                  controller: countryController,
-                  decoration: InputDecoration(
-                    labelText: 'country'.tr(context),
-                    hintText: 'country'.tr(context),
-                    labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
-                    hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  showCountryFlag: false,
-                  initialValue: country,
-                  initialCountryCode: 'SA',
-                  languageCode: 'ar',
-                  textAlign: TextAlign.start,
-                  disableLengthCheck: true,
-                  onCountryChanged: (selectedCountry) {
-                    String translatedCountryName =
-                        selectedCountry.nameTranslations['ar'] ??
-                            selectedCountry.name;
-                    setState(() {
-                      country = translatedCountryName;
-                      countryController.text = country!;
-                    });
-                  },
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-
-                // Phone field
-                IntlPhoneField(
-                  controller: phoneController,
-                  searchText: 'search_country'.tr(context),
-                  languageCode: 'ar',
-                  invalidNumberMessage: 'phone_min_length'.tr(context),
-                  decoration: InputDecoration(
-                    labelText: 'phone'.tr(context),
-                    hintText: 'phone_hint'.tr(context),
-                    prefixIcon: const Icon(Icons.phone),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  onCountryChanged: (country) {
-                    phoneController.text = '';
-                  },
-                  initialCountryCode: 'SA',
-                  textAlign: TextAlign.start,
-                  onChanged: (phone) {
-                    _phoneNumber = phone.completeNumber;
-                  },
-                  validator: (value) {
-                    if (value == null || value.number.isEmpty) {
-                      return 'required_field'.tr(context);
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-
-                // Gender selection
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: Container(
+            // height: 300,
+            width: double.infinity,
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              left: 16,
+              right: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('gender'.tr(context)),
-                    Radio<String>(
-                      value: 'male',
-                      groupValue: gender,
-                      activeColor: Theme.of(context).primaryColor,
-                      onChanged: (value) {
+                    Text(
+                      'edit_student'.tr(context),
+                      style: Theme.of(context).textTheme.headlineSmall,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+              
+                    // Full Name field
+                    CustomTextField(
+                      controller: nameController,
+                      hintText: 'full_name_hint'.tr(context),
+                      labelText: 'full_name'.tr(context),
+                      prefixIcon: Icons.person,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'required_field'.tr(context);
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+              
+                    // Email field
+                    CustomTextField(
+                      controller: emailController,
+                      hintText: 'email_hint'.tr(context),
+                      labelText: 'email'.tr(context),
+                      prefixIcon: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'required_field'.tr(context);
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value)) {
+                          return 'invalid_email'.tr(context);
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+              
+                    // Country field
+                    IntlPhoneField(
+                      controller: countryController,
+                      decoration: InputDecoration(
+                        labelText: 'country'.tr(context),
+                        hintText: 'country'.tr(context),
+                        labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
+                        hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      showCountryFlag: false,
+                      initialValue: country,
+                      initialCountryCode: 'SA',
+                      languageCode: 'ar',
+                      textAlign: TextAlign.start,
+                      disableLengthCheck: true,
+                      onCountryChanged: (selectedCountry) {
+                        String translatedCountryName =
+                            selectedCountry.nameTranslations['ar'] ??
+                                selectedCountry.name;
                         setState(() {
-                          gender = value;
+                          country = translatedCountryName;
+                          countryController.text = country!;
                         });
                       },
                     ),
-                    Text('male'.tr(context)),
-                    Radio<String>(
-                      value: 'female',
-                      groupValue: gender,
-                      activeColor: Theme.of(context).primaryColor,
-                      onChanged: (value) {
-                        setState(() {
-                          gender = value;
-                        });
+                    SizedBox(height: deviceHeight * 0.02),
+              
+                    // Phone field
+                    IntlPhoneField(
+                      controller: phoneController,
+                      searchText: 'search_country'.tr(context),
+                      languageCode: 'ar',
+                      invalidNumberMessage: 'phone_min_length'.tr(context),
+                      decoration: InputDecoration(
+                        labelText: 'phone'.tr(context),
+                        hintText: 'phone_hint'.tr(context),
+                        prefixIcon: const Icon(Icons.phone),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                      ),
+                      onCountryChanged: (country) {
+                        phoneController.text = '';
+                      },
+                      initialCountryCode: 'SA',
+                      textAlign: TextAlign.start,
+                      onChanged: (phone) {
+                        _phoneNumber = phone.completeNumber;
+                      },
+                      validator: (value) {
+                        if (value == null || value.number.isEmpty) {
+                          return 'required_field'.tr(context);
+                        }
+                        return null;
                       },
                     ),
-                    Text('female'.tr(context)),
+                    SizedBox(height: deviceHeight * 0.02),
+              
+                    // Gender selection
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('gender'.tr(context)),
+                        Radio<String>(
+                          value: 'male',
+                          groupValue: gender,
+                          activeColor: Theme.of(context).primaryColor,
+                          onChanged: (value) {
+                            setState(() {
+                              gender = value;
+                            });
+                          },
+                        ),
+                        Text('male'.tr(context)),
+                        Radio<String>(
+                          value: 'female',
+                          groupValue: gender,
+                          activeColor: Theme.of(context).primaryColor,
+                          onChanged: (value) {
+                            setState(() {
+                              gender = value;
+                            });
+                          },
+                        ),
+                        Text('female'.tr(context)),
+                      ],
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+              
+                    // Save button
+                    if (_isLoading)
+                      const Center(child: CircularProgressIndicator())
+                    else
+                      CustomButton(
+                        text: 'update'.tr(context),
+                        onPressed: _updateStudent,
+                        icon: Icons.save,
+                      ),
                   ],
                 ),
-                SizedBox(height: deviceHeight * 0.02),
-
-                // Save button
-                if (_isLoading)
-                  const Center(child: CircularProgressIndicator())
-                else
-                  CustomButton(
-                    text: 'update'.tr(context),
-                    onPressed: _updateStudent,
-                    icon: Icons.save,
-                  ),
-              ],
+              ),
             ),
           ),
         ),

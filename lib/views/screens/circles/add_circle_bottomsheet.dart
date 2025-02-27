@@ -10,6 +10,8 @@ import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_dropdown.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 
+import '../../../app/core/show_success_message.dart';
+
 class AddCircleBottomSheet extends StatefulWidget {
   final int schoolId;
 
@@ -88,6 +90,9 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
             SnackBar(content: Text(state.message.tr(context))),
           );
         } else if (state is CirclesLoaded) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showSuccessMessage(context, 'added_successfully'.tr(context));
+          });
           Navigator.of(context).pop();
         }
       },
