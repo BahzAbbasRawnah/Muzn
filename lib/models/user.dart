@@ -53,14 +53,14 @@ class User {
       'full_name': fullName,
       'email': email,
       'phone': phone,
-      'password': password!,
+      'password': password??"",
       'country': country,
       'country_code':countryCode,
       'gender': gender,
       'role': role,
       'status': status,
-      'created_at': createdAt!.toIso8601String(),
-      'updated_at': updatedAt!.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
     };
   }

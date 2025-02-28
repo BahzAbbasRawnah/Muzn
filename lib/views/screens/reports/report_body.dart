@@ -127,6 +127,7 @@ class Report extends StatelessWidget {
   // Build the report table
   Widget _buildReportTable(BuildContext context) {
     return Table(
+      textDirection: TextDirection.rtl,
       border: TableBorder.all(color: Colors.black),
       columnWidths: _generateColumnWidths(headerTitles.length),
       children: [
@@ -236,26 +237,55 @@ class Report extends StatelessWidget {
           return pw.Column(
             children: [
               pw.Row(
+
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Left Titles
+
                   pw.Column(
-                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    crossAxisAlignment:pw.CrossAxisAlignment.center,
                     children: [
-                      pw.Text(AppStrings.appName,style: pw.TextStyle(
+                      pw.Text('جمعية مزن للإتقان',style: pw.TextStyle( fontSize: 20.0,
+                        fontWeight: pw.FontWeight.normal,
+                        color: pdfColor,
+                        font: arabicFont,)),
+                      pw.Text('مزن لتعليم القرآن الكريم',style: pw.TextStyle(
 
-                          fontSize: 18.0,
-                          fontWeight: pw.FontWeight.normal,
-                          color: pdfColor,
+                        fontSize: 18.0,
+                        fontWeight: pw.FontWeight.normal,
+                        color: pdfColor,
+                        font: arabicFont,
 
-                      ) ),
-                      // Text(AppStrings.appTitle.trans(context), style: Theme.of(context).textTheme.titleSmall),
+                      )),
 
                     ],
                   ),
+
                   pw.Image(pdfImage, width: 120, height: 120),
 // pw.Ima
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      // AppStrings.appName
+                      pw.Text('جمعية مزن للإتقان',style: pw.TextStyle(
+
+                        fontSize: 20.0,
+                        fontWeight: pw.FontWeight.normal,
+                        color: pdfColor,
+                        font: arabicFont,
+
+                      ) ),
+                      pw.Text('مزن لتعليم القرآن الكريم',style: pw.TextStyle(
+
+                        fontSize: 18.0,
+                        fontWeight: pw.FontWeight.normal,
+                        color: pdfColor,
+                        font: arabicFont,
+
+                      )),
+
+                    ],
+                  ),
                   // Center Logo
                   // pw.CircleAvatar(
                   //   radius: 30,
@@ -264,14 +294,7 @@ class Report extends StatelessWidget {
                   //
                   // ),
                   // Right Titles
-                  pw.Column(
-                    crossAxisAlignment:pw.CrossAxisAlignment.center,
-                    children: [
-                     pw.Text('جمعية مزن للإتقان',style: pw.TextStyle(font: arabicFont)),
-                      pw.Text(AppStrings.appTitle),
 
-                    ],
-                  ),
                 ],
               ),
               // ReportHeader(),
@@ -296,18 +319,20 @@ class Report extends StatelessWidget {
                   // Table Header
                   pw.TableRow(
                     children: [
-                      _buildPdfTableCell('No', isHeader: true,font: arabicFont),
+
                       for (var title in headerTitles)
                         _buildPdfTableCell(title, isHeader: true,font: arabicFont),
+                      _buildPdfTableCell('No', isHeader: true,font: arabicFont),
                     ],
                   ),
                   // Table Rows
                   for (var i = 0; i < tableData.length; i++)
                     pw.TableRow(
                       children: [
-                        _buildPdfTableCell((i + 1).toString(), font: arabicFont),
+
                         for (var cell in tableData[i])
                           _buildPdfTableCell(cell,font: arabicFont),
+                        _buildPdfTableCell((i + 1).toString(), font: arabicFont),
                       ],
                     ),
                 ],
