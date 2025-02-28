@@ -60,7 +60,7 @@ class _EditStudentHomeworkBottomSheetState extends State<EditStudentHomeworkBott
               children: [
                 Center(
                   child: Text(
-                    'edit_student_homework'.tr(context),
+                    'edit_student_homework'.trans(context),
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
@@ -69,7 +69,7 @@ Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'circle_category'.tr(context),
+                        'circle_category'.trans(context),
                         style: Theme.of(context).textTheme.labelMedium,
                       ),
                       const SizedBox(height: 8),
@@ -91,7 +91,7 @@ Column(
                   children: [
                     Expanded(
                       child: CustomSurahDropdown(
-                        label: 'from_surah'.tr(context),
+                        label: 'from_surah'.trans(context),
                         selectedSurah: selectedFromSurah,
                         surahList: surahList,
                         onChanged: (value) {
@@ -105,7 +105,7 @@ Column(
                     const SizedBox(width: 10),
                     Expanded(
                       child: CustomAyahDropdown(
-                        label: 'from_ayah'.tr(context),
+                        label: 'from_ayah'.trans(context),
                         selectedAyah: selectedFromAyah,
                         maxAyah: selectedFromSurah?.ayat_count,
                         onChanged: selectedFromSurah != null
@@ -126,7 +126,7 @@ Column(
                   children: [
                     Expanded(
                       child: CustomSurahDropdown(
-                        label: 'to_surah'.tr(context),
+                        label: 'to_surah'.trans(context),
                         selectedSurah: selectedToSurah,
                         surahList: surahList,
                         onChanged: (value) {
@@ -140,7 +140,7 @@ Column(
                     const SizedBox(width: 10),
                     Expanded(
                       child: CustomAyahDropdown(
-                        label: 'to_ayah'.tr(context),
+                        label: 'to_ayah'.trans(context),
                         selectedAyah: selectedToAyah,
                         maxAyah: selectedToSurah?.ayat_count,
                         onChanged: selectedToSurah != null
@@ -157,7 +157,7 @@ Column(
                 const SizedBox(height: 20),
 
                 CustomButton(
-                  text: 'save'.tr(context),
+                  text: 'save'.trans(context),
                   onPressed: () {
                     _saveHomework();
                   },
@@ -178,7 +178,7 @@ Column(
         selectedToSurah == null ||
         selectedToAyah == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('please_fill_all_fields'.tr(context))),
+        SnackBar(content: Text('please_fill_all_fields'.trans(context))),
       );
       return;
     }

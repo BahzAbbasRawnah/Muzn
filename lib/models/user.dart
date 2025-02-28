@@ -4,6 +4,7 @@ class User {
   final String email;
   final String phone;
   final String? country;
+  final String? countryCode;
   final String? password;
   final String gender;
   final String role;
@@ -18,6 +19,7 @@ class User {
     required this.email,
     required this.phone,
     this.country,
+    this.countryCode,
     this.password,
     required this.gender,
     required this.role,
@@ -34,6 +36,7 @@ class User {
       email: map['email'],
       phone: map['phone'],
       country: map['country'],
+      countryCode: map['country_code'],
       gender: map['gender'],
       role: map['role'],
       password: map['password'] as String?,
@@ -52,6 +55,7 @@ class User {
       'phone': phone,
       'password': password!,
       'country': country,
+      'country_code':countryCode,
       'gender': gender,
       'role': role,
       'status': status,

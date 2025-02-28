@@ -15,13 +15,18 @@ import 'package:muzn/views/widgets/custom_text_field.dart';
 import 'package:muzn/views/widgets/empty_data.dart';
 import 'package:muzn/views/widgets/screen_header.dart';
 
+import '../../../blocs/auth/auth_bloc.dart';
+import '../../../blocs/school/school_bloc.dart';
+import '../students/add_student_to_circle_bottomsheet2.dart';
+import '../students/edit_student_bottomsheet2.dart';
+
 class CircleScreen extends StatefulWidget {
   final Circle circle;
 
   const CircleScreen({
-    Key? key,
+    super.key,
     required this.circle,
-  }) : super(key: key);
+  });
 
   @override
   _CircleScreenState createState() => _CircleScreenState();
@@ -41,7 +46,7 @@ class _CircleScreenState extends State<CircleScreen> {
   void _loadStudents() {
     context.read<CircleStudentBloc>().add(
           LoadCircleStudents(
-            context,
+            // context,
             circleId: widget.circle.id!,
           ),
         );
@@ -78,12 +83,35 @@ class _CircleScreenState extends State<CircleScreen> {
   endDateMiladi: '2023-10-31',
   startDateHijri: '1445-03-15',
   endDateHijri: '1445-04-15',
-  headerTitles: ['Column 1', 'Column 2', 'Column 3', 'Column 4'],
-  tableData: [
-    ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
-    ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
-  ],
-  teacherName: 'John Doe',
+                  headerTitles: ['الجنس', 'الحضور', 'رقم الهاتف', 'الاسم'], // Update headers accordingly
+                  tableData: BlocProvider.of<CircleStudentBloc>(context)
+                      .studentsList!
+                      .map((school) => [
+                    school.student.user?.gender.trans(context) ?? 'N/A',
+                    '${school.todayAttendance?.name.toString().trans(context) ?? 0}',
+                    school.student.user?.phone ?? 'N/A',
+                    school.student.user?.fullName ?? "",
+                  ])
+                      .toList()
+                      .reversed // Reverse the entire list
+                      .toList(),
+                  teacherName: BlocProvider.of<AuthBloc>(context).userModel?.fullName ?? "",
+
+                  // headerTitles: ['الاسم ', 'رقم الهاتف', 'الحضور', 'الجنس'],
+  // // tableData: [
+  // //   ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
+  // //   ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
+  // // ],
+  //                 tableData: BlocProvider.of<CircleStudentBloc>(context)
+  //                     .studentsList!
+  //                     .map((school) => [
+  //                   school.student.user?.fullName??"",
+  //                   school.student.user?.phone ?? 'N/A',
+  //                   '${school.todayAttendance?.name.toString().trans(context) ?? 0}',
+  //                   school.student.user?.gender.trans(context) ?? 'N/A'
+  //                 ])
+  //                     .toList(),
+  // teacherName: BlocProvider.of<AuthBloc>(context).userModel?.fullName??"",
 )
                 )
                 );
@@ -118,7 +146,7 @@ class _CircleScreenState extends State<CircleScreen> {
                       children: [
                         Expanded(
                           child: _buildStatCard(
-                            'total_students'.tr(context),
+                            'total_students'.trans(context),
                             total.toString(),
                             Icons.people,
                           ),
@@ -126,7 +154,7 @@ class _CircleScreenState extends State<CircleScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: _buildStatCard(
-                            'attended'.tr(context),
+                            'attended'.trans(context),
                             attended.toString(),
                             Icons.check_circle,
                           ),
@@ -134,7 +162,7 @@ class _CircleScreenState extends State<CircleScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: _buildStatCard(
-                            'remaining'.tr(context),
+                            'remaining'.trans(context),
                             remaining.toString(),
                             Icons.pending,
                           ),
@@ -154,8 +182,8 @@ class _CircleScreenState extends State<CircleScreen> {
                 children: [
                   CustomTextField(
                     controller: _searchController,
-                    labelText: 'search_student'.tr(context),
-                    hintText: 'search_student_hint'.tr(context),
+                    labelText: 'search_student'.trans(context),
+                    hintText: 'search_student_hint'.trans(context),
                     onChanged: (value) {
                       final state = context.read<CircleStudentBloc>().state;
                       if (state is CircleStudentsLoaded) {
@@ -170,7 +198,7 @@ class _CircleScreenState extends State<CircleScreen> {
                     child: Row(
                       children: [
                         FilterChip(
-                          label: Text('all'.tr(context)),
+                          label: Text('all'.trans(context)),
                           selected: _selectedFilter == null,
                           backgroundColor:
                               Theme.of(context).primaryColor.withAlpha(100),
@@ -193,7 +221,7 @@ class _CircleScreenState extends State<CircleScreen> {
                           return Padding(
                             padding: const EdgeInsets.all(5),
                             child: FilterChip(
-                              label: Text(status.name.tr(context)),
+                              label: Text(status.name.trans(context)),
                               backgroundColor: Colors.grey[200],
                               selected: _selectedFilter == status,
                               onSelected: (bool selected) {
@@ -253,7 +281,7 @@ class _CircleScreenState extends State<CircleScreen> {
             useSafeArea: true,
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-            builder: (context) => AddStudentToCircleBottomSheet(
+            builder: (context) => AddStudentToCircleBottomSheet2(
               circleId: widget.circle.id!,
             ),
           );
@@ -315,7 +343,7 @@ class _CircleScreenState extends State<CircleScreen> {
               Navigator.push(
                 context, MaterialPageRoute(
                 builder: (context) => 
-                EditStudentBottomSheet(circleStudent: Circle_student,circleId: widget.circle.id!)
+                EditStudentBottomSheet2(circleStudent: Circle_student,circleId: widget.circle.id!)
                 )
                 );
               
@@ -329,7 +357,72 @@ class _CircleScreenState extends State<CircleScreen> {
                 
               ),
               onPressed: (){
-                
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    alignment: Alignment.center,
+                    title: Text('delete'.trans(context)),
+                    content: Text(
+                        'delete_confirm'.trans(context)),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text('cancel'.trans(context)),
+                      ),
+                      // TextButton(
+                      //   onPressed: () {
+                      //     BlocProvider.of<CircleStudentBloc>(context).add(DeleteStudentToCircleEvent(studentId: Circle_student.student.id, circleId: widget.circle.id!));
+                      //     Navigator.pop(context);
+                      //
+                      //   },
+                      //   child: Text(
+                      //     'delete'.tr(context),
+                      //     style: const TextStyle(
+                      //         color: Colors.red),
+                      //   ),
+                      // ),
+                      BlocListener<CircleStudentBloc, CircleStudentState>(
+                        listener: (context, state) {
+                          if (state is CircleStudentDeleted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(state.message),
+                                backgroundColor: Colors.green,
+                                behavior: SnackBarBehavior.floating,
+                                margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+                              ),
+                            );
+                          } else if (state is CircleStudentError) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(state.message),
+                                backgroundColor: Colors.red,
+                                behavior: SnackBarBehavior.floating,
+                                margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+                              ),
+                            );
+                          }
+                        },
+                        child: TextButton(
+                          onPressed: () {
+                            BlocProvider.of<CircleStudentBloc>(context).add(
+                              DeleteStudentToCircleEvent(
+                                studentId: Circle_student.student.id,
+                                circleId: widget.circle.id!,
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            'delete'.trans(context),
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      )
+
+                    ],
+                  ),
+                );
               },
             )
             ],
@@ -346,8 +439,8 @@ class _CircleScreenState extends State<CircleScreen> {
               child: Text(
                 (Circle_student.todayAttendance == null ||
                         Circle_student.todayAttendance!.name == 'none')
-                    ? 'attendance'.tr(context)
-                    : Circle_student.todayAttendance!.name.tr(context),
+                    ? 'attendance'.trans(context)
+                    : Circle_student.todayAttendance!.name.trans(context),
                 style: const TextStyle(color: Colors.white),
               ),
               onTap: () {

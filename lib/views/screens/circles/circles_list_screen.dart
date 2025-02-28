@@ -61,7 +61,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('circles'.tr(context)),
+        title: Text('circles'.trans(context)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -115,7 +115,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           if (state is CircleLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is CircleError) {
-            return Center(child: Text(state.message.tr(context)));
+            return Center(child: Text(state.message.trans(context)));
           } else if (state is CirclesLoaded) {
             if (state.circles.isEmpty) {
               return EmptyDataList();
@@ -176,7 +176,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
               size: 20,
             ),
             const SizedBox(width: 4),
-            Text('${circle.studentCount ?? 0} ${'student'.tr(context)}'),
+            Text('${circle.studentCount ?? 0} ${'student'.trans(context)}'),
           ],
         ),
         subtitle: Column(
@@ -184,7 +184,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           children: [
             if (circle.categoryName != null)
               Text(
-                "${'circle_category'.tr(context)}/${circle.categoryName!.tr(context)}",
+                "${'circle_category'.trans(context)}/${circle.categoryName!.trans(context)}",
                 style: Theme.of(context).textTheme.titleSmall,
               ),
             const SizedBox(height: 8),
@@ -228,12 +228,12 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 'edit',
-              child: Text('edit'.tr(context)),
+              child: Text('edit'.trans(context)),
             ),
             PopupMenuItem(
               value: 'delete',
               child: Text(
-                'delete'.tr(context),
+                'delete'.trans(context),
                 style: const TextStyle(color: Colors.red),
               ),
             ),
@@ -253,12 +253,12 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text('delete_circle_confirm'.tr(context)),
-                  content: Text('delete_circle_confirmation'.tr(context)),
+                  title: Text('delete_circle_confirm'.trans(context)),
+                  content: Text('delete_circle_confirmation'.trans(context)),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text('cancel'.tr(context)),
+                      child: Text('cancel'.trans(context)),
                     ),
                     TextButton(
                       onPressed: () {
@@ -268,7 +268,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        'delete'.tr(context),
+                        'delete'.trans(context),
                         style: const TextStyle(color: Colors.red),
                       ),
                     ),

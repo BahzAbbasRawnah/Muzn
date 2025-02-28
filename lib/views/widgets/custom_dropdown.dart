@@ -57,7 +57,7 @@ class CustomDropdown extends StatelessWidget {
             hint: Text(label, style: Theme.of(context).textTheme.labelMedium
 ),
             searchHint: label,
-            closeButton:"close".tr(context),
+            closeButton:"close".trans(context),
          
             isExpanded: true, 
             underline: Container( 

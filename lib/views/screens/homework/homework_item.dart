@@ -48,12 +48,12 @@ class HomeworksItem extends StatelessWidget {
                   children: [
                     _buildItem(
                         context,
-                        "from_surah".tr(context) +
+                        "from_surah".trans(context) +
                             quran
                                 .getSurahNameArabic(homework.startSurahNumber)),
                     _buildItem(
                         context,
-                        "to_surah".tr(context) +
+                        "to_surah".trans(context) +
                             quran.getSurahNameArabic(homework.endSurahNumber))
                   ],
                 ),
@@ -63,11 +63,11 @@ class HomeworksItem extends StatelessWidget {
                   children: [
                     _buildItem(
                         context,
-                        "from_ayah".tr(context) +
+                        "from_ayah".trans(context) +
                             homework.startAyahNumber.toString()),
                     _buildItem(
                         context,
-                        "to_ayah".tr(context) +
+                        "to_ayah".trans(context) +
                             homework.endAyahNumber.toString())
                   ],
                 ),
@@ -114,7 +114,7 @@ class HomeworksItem extends StatelessWidget {
 
                 Center(
                   child: CustomButton(
-                    text: 'rating_button'.tr(context),
+                    text: 'rating_button'.trans(context),
                     onPressed: () {
                       Navigator.push(
                         context,

@@ -16,7 +16,7 @@ import '../../widgets/custom_text_button.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
@@ -30,6 +30,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController countryController = TextEditingController();
+  final TextEditingController countryCodeController = TextEditingController();
 
   String? gender = 'male'; // Default gender
   String? country = 'السعودية';
@@ -45,14 +46,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message.tr(context)),
+              content: Text(state.message.trans(context)),
               backgroundColor: Colors.red,
             ),
           );
         } else if (state is AuthAuthenticated) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('registration_success'.tr(context)),
+              content: Text('registration_success'.trans(context)),
               backgroundColor: Colors.green,
             ),
           );
@@ -104,7 +105,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               );
             },
           ),
-          title: Text('register_title'.tr(context)),
+          title: Text('register_title'.trans(context)),
           centerTitle: true,
           actions: [
             Padding(
@@ -143,12 +144,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: deviceHeight * 0.02),
                 CustomTextField(
                   controller: nameController,
-                  hintText: 'full_name_hint'.tr(context),
-                  labelText: 'full_name'.tr(context),
+                  hintText: 'full_name_hint'.trans(context),
+                  labelText: 'full_name'.trans(context),
                   prefixIcon: Icons.person,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     return null;
                   },
@@ -156,17 +157,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: deviceHeight * 0.02),
                 CustomTextField(
                   controller: emailController,
-                  hintText: 'email_hint'.tr(context),
-                  labelText: 'email'.tr(context),
+                  hintText: 'email_hint'.trans(context),
+                  labelText: 'email'.trans(context),
                   prefixIcon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                         .hasMatch(value)) {
-                      return 'invalid_email'.tr(context);
+                      return 'invalid_email'.trans(context);
                     }
                     return null;
                   },
@@ -176,8 +177,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 IntlPhoneField(
                   controller: countryController,
                   decoration: InputDecoration(
-                    labelText: 'country'.tr(context),
-                    hintText: 'country'.tr(context),
+                    labelText: 'country'.trans(context),
+                    hintText: 'country'.trans(context),
                     labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
                     hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
                     border: OutlineInputBorder(
@@ -206,25 +207,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: phoneController,
                   showCountryFlag: false,
                   showDropdownIcon: false,
-                  searchText: 'search_country'.tr(context),
+                  searchText: 'search_country'.trans(context),
                   languageCode: 'ar',
-                  invalidNumberMessage: 'phone_min_length'.tr(context),
+                  invalidNumberMessage: 'phone_min_length'.trans(context),
                   decoration: InputDecoration(
-                    labelText: 'phone'.tr(context),
-                    hintText: 'phone_hint'.tr(context),
+                    labelText: 'phone'.trans(context),
+                    hintText: 'phone_hint'.trans(context),
                     prefixIcon: const Icon(Icons.phone),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
                   onCountryChanged: (country) {
+                    countryCodeController.text=country.dialCode;
                     phoneController.text = '';
                   },
                   initialCountryCode: 'SA',
                   textAlign: TextAlign.start,
                   validator: (value) {
                     if (value == null || value.number.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     return null;
                   },
@@ -232,17 +234,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: deviceHeight * 0.02),
                 CustomTextField(
                   controller: passwordController,
-                  hintText: 'password_hint'.tr(context),
-                  labelText: 'password'.tr(context),
+                  hintText: 'password_hint'.trans(context),
+                  labelText: 'password'.trans(context),
                   prefixIcon: Icons.lock,
                   obscureText: true,
                   suffixIcon: Icons.visibility,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     if (value.length < 6) {
-                      return 'invalid_password'.tr(context);
+                      return 'invalid_password'.trans(context);
                     }
                     return null;
                   },
@@ -250,17 +252,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: deviceHeight * 0.02),
                 CustomTextField(
                   controller: confirmPasswordController,
-                  hintText: 'confirm_password_hint'.tr(context),
-                  labelText: 'confirm_password_label'.tr(context),
+                  hintText: 'confirm_password_hint'.trans(context),
+                  labelText: 'confirm_password_label'.trans(context),
                   prefixIcon: Icons.lock,
                   obscureText: true,
                   suffixIcon: Icons.visibility,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     if (value != passwordController.text) {
-                      return 'passwords_not_match'.tr(context);
+                      return 'passwords_not_match'.trans(context);
                     }
                     return null;
                   },
@@ -268,7 +270,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('gender'.tr(context)),
+                    Text('gender'.trans(context)),
                     Radio<String>(
                       value: 'male',
                       groupValue: gender,
@@ -279,7 +281,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         });
                       },
                     ),
-                    Text('male'.tr(context)),
+                    Text('male'.trans(context)),
                     Radio<String>(
                       value: 'female',
                       groupValue: gender,
@@ -290,7 +292,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         });
                       },
                     ),
-                    Text('female'.tr(context)),
+                    Text('female'.trans(context)),
                   ],
                 ),
                 SizedBox(height: deviceHeight * 0.03),
@@ -300,13 +302,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return state is AuthLoading
                         ? const Center(child: CircularProgressIndicator())
                         : CustomButton(
-                            text: 'register_button'.tr(context),
+                            text: 'register_button'.trans(context),
                             onPressed: () async {
+                              print("phoneController.text");
+                              print(phoneController.text);
+                              print("countryCodeController.text");
+                              print(countryCodeController.text);
                               if (_formKey.currentState!.validate()) {
                                 // Check if email exists before registration
                                 final dbHelper = DatabaseManager();
                                 final db = await dbHelper.database;
-
+print("phoneController.text");
+print(phoneController.text);
                                 final List<Map<String, dynamic>> existingUser =
                                     await db.query(
                                   'User',
@@ -317,7 +324,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 if (existingUser.isNotEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('email_exists'.tr(context)),
+                                      content: Text('email_exists'.trans(context)),
                                       backgroundColor: Colors.red,
                                     ),
                                   );
@@ -332,6 +339,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     password: passwordController.text,
                                     phone: phoneController.text,
                                     country: countryController.text,
+                                    countryCode: countryCodeController.text,
                                     gender: gender ?? 'male',
                                   ),
                                 );
@@ -342,7 +350,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 SizedBox(height: deviceHeight * 0.02),
                 CustomTextButton(
-                  text: '${'have_account'.tr(context)} ${'login_button'.tr(context)}',
+                  text: '${'have_account'.trans(context)} ${'login_button'.trans(context)}',
                   onPressed: () => Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(builder: (context) => const LoginScreen()),

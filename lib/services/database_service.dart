@@ -42,12 +42,14 @@ class DatabaseManager {
         password TEXT NOT NULL,
         phone TEXT NOT NULL UNIQUE,
         country TEXT,
+        country_code TEXT,
         gender TEXT CHECK(gender IN ('male', 'female')) NOT NULL,
         role TEXT CHECK(role IN ('admin', 'student', 'teacher')) NOT NULL,
         status TEXT CHECK(status IN ('active', 'inactive')) NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        deleted_at DATETIME
+        deleted_at DATETIME,
+         is_sync INTEGER
       )
     ''');
 
@@ -64,7 +66,9 @@ await db.execute('''
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME,
+        is_sync INTEGER,
     FOREIGN KEY (teacher_id) REFERENCES User(id) ON DELETE CASCADE
+
   )
 ''');
 
@@ -80,7 +84,8 @@ await db.execute('''
     namevalue TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    deleted_at DATETIME
+    deleted_at DATETIME,
+    is_sync INTEGER
   )
 ''');
 
@@ -115,9 +120,11 @@ await db.execute('''
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME,
+        is_sync INTEGER,
     FOREIGN KEY (school_id) REFERENCES School(id),
     FOREIGN KEY (teacher_id) REFERENCES User(id),
     FOREIGN KEY (circle_category_id) REFERENCES CirclesCategory(id)
+
 )
     ''');
 
@@ -130,8 +137,10 @@ await db.execute('''
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         deleted_at DATETIME,
+         is_sync INTEGER,
         FOREIGN KEY (user_id) REFERENCES User(id),
         FOREIGN KEY (teacher_id) REFERENCES User(id)
+       
       )
     ''');
 
@@ -145,9 +154,11 @@ await db.execute('''
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         deleted_at DATETIME,
+         is_sync INTEGER,
         FOREIGN KEY (circle_id) REFERENCES Circle(id),
         FOREIGN KEY (student_id) REFERENCES User(id),
         FOREIGN KEY (teacher_id) REFERENCES User(id)
+       
       )
     ''');
 
@@ -162,8 +173,10 @@ await db.execute('''
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME,
+       is_sync INTEGER,
     FOREIGN KEY (circle_id) REFERENCES Circle(id),
     FOREIGN KEY (student_id) REFERENCES User(id)
+ 
   )
 ''');
 
@@ -185,9 +198,11 @@ await db.execute('''
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME,
+     is_sync INTEGER,
     FOREIGN KEY (student_id) REFERENCES Student(id),
-    FOREIGN KEY (circle_category_id) REFERENCES CirclesCategory(id)
+    FOREIGN KEY (circle_category_id) REFERENCES CirclesCategory(id),
     FOREIGN KEY (circle_id) REFERENCES Circle(id)
+   
 
   )
 ''');
@@ -207,12 +222,12 @@ await db.execute('''
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     deleted_at DATETIME,
+     is_sync INTEGER,
     FOREIGN KEY (homework_id) REFERENCES Homework(id),
     FOREIGN KEY (student_id) REFERENCES User(id)
+   
   )
 ''');
-
-
     // Create DigitalLibrary Table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS DigitalLibrary (
@@ -225,7 +240,9 @@ await db.execute('''
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         deleted_at DATETIME,
+          is_sync INTEGER,
         FOREIGN KEY (teacher_id) REFERENCES User(id)
+      
       )
     ''');
 
@@ -244,7 +261,8 @@ await db.execute('''
         social_media_links TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-        deleted_at DATETIME
+        deleted_at DATETIME,
+        is_sync INTEGER
       )
     ''');
   }

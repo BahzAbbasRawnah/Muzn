@@ -18,8 +18,8 @@ class OnboardingScreen extends StatelessWidget {
         child: IntroductionScreen(
           pages: [
             PageViewModel(
-              title: "onBoarding1_title".tr(context),
-              body: "onBoarding1_text".tr(context),
+              title: "onBoarding1_title".trans(context),
+              body: "onBoarding1_text".trans(context),
               image: Center(
                 child: Image.asset(
                   "assets/images/onboarding.png",
@@ -28,8 +28,8 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ),
             PageViewModel(
-              title: "onBoarding2_title".tr(context),
-              body: "onBoarding2_text".tr(context),
+              title: "onBoarding2_title".trans(context),
+              body: "onBoarding2_text".trans(context),
               image: Center(
                 child: Image.asset(
                   "assets/images/onboarding.png",
@@ -38,8 +38,8 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ),
             PageViewModel(
-              title: "onBoarding3_title".tr(context),
-              body: "onBoarding3_text".tr(context),
+              title: "onBoarding3_title".trans(context),
+              body: "onBoarding3_text".trans(context),
               image: Center(
                 child: Image.asset(
                   "assets/images/onboarding.png",
@@ -74,7 +74,7 @@ class OnboardingScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: Text(
-              "skip_button".tr(context),
+              "skip_button".trans(context),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class OnboardingScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "next".tr(context),
+                  "next".trans(context),
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -114,7 +114,7 @@ class OnboardingScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(20.0),
             ),
             child: Text(
-              "done_button".tr(context),
+              "done_button".trans(context),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,

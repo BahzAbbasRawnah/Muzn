@@ -40,7 +40,18 @@ void _handleSave(BuildContext context) {
           teacherId: authState.user.id,
         ),
       );
-    } 
+    } else{
+      if(BlocProvider.of<AuthBloc>(context).userModel!=null){
+        context.read<SchoolBloc>().add(
+          AddSchool(
+            name: _nameController.text,
+            type: _selectedType,
+            address: _addressController.text,
+            teacherId: BlocProvider.of<AuthBloc>(context).userModel!.id,
+          ),
+        );
+      }
+    }
   }
 }
 
@@ -61,7 +72,7 @@ return Container(
             if (state is SchoolLoading) {
               Navigator.of(context).pop(); // Close the bottom sheet
               WidgetsBinding.instance.addPostFrameCallback((_) {
-                showSuccessMessage(context, 'school_added_successfully'.tr(context));
+                showSuccessMessage(context, 'added_successfully'.trans(context));
               });
               // showSuccessMessage(context, 'school_added_successfully'.tr(context)); /
               return const Center(
@@ -77,7 +88,7 @@ return Container(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'new_school'.tr(context),
+                      'new_school'.trans(context),
                       style: Theme.of(context).textTheme.headlineSmall,
                       textAlign: TextAlign.center,
                     ),
@@ -85,15 +96,15 @@ return Container(
                     TextFormField(
                       controller: _nameController,
                       decoration: InputDecoration(
-                        labelText: 'school_name_label'.tr(context),
-                        hintText: 'school_name_hint'.tr(context),
+                        labelText: 'school_name_label'.trans(context),
+                        hintText: 'school_name_hint'.trans(context),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'required_field'.tr(context);
+                          return 'required_field'.trans(context);
                         }
                         return null;
                       },
@@ -102,7 +113,7 @@ return Container(
                     DropdownButtonFormField<String>(
                       value: _selectedType,
                       decoration: InputDecoration(
-                        labelText: 'school_type'.tr(context),
+                        labelText: 'school_type'.trans(context),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -115,7 +126,7 @@ return Container(
                       ].map((type) {
                         return DropdownMenuItem(
                           value: type,
-                          child: Text(type.tr(context),style: Theme.of(context).textTheme.displayMedium,),
+                          child: Text(type.trans(context),style: Theme.of(context).textTheme.displayMedium,),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -128,8 +139,8 @@ return Container(
                     TextFormField(
                       controller: _addressController,
                       decoration: InputDecoration(
-                        labelText: 'address_label'.tr(context),
-                        hintText: 'address_hint'.tr(context),
+                        labelText: 'address_label'.trans(context),
+                        hintText: 'address_hint'.trans(context),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
@@ -137,7 +148,7 @@ return Container(
                     ),
                     SizedBox(height: deviceHeight * 0.03),
                     CustomButton(
-                      text: 'save'.tr(context),
+                      text: 'save'.trans(context),
                       icon: Icons.save,
                       onPressed: () => _handleSave(context),
                     ),

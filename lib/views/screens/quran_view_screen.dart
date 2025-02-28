@@ -61,11 +61,11 @@ class _QuranViewScreenState extends State<QuranViewScreen> {
     });
   }
 
-  String getJuzName(int juzNumber) => 'juz_$juzNumber'.tr(context);
+  String getJuzName(int juzNumber) => 'juz_$juzNumber'.trans(context);
 
   String getHezbName(int pageNumber) {
     int hezbNumber = (pageNumber) ~/ 10 + 1;
-    return 'hezb_$hezbNumber'.tr(context);
+    return 'hezb_$hezbNumber'.trans(context);
   }
 
   @override
@@ -77,7 +77,7 @@ class _QuranViewScreenState extends State<QuranViewScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('surah'.tr(context) +
+        title: Text('surah'.trans(context) +
             ' ' +
             quran.getSurahNameArabic(widget.surahNumber),
            
@@ -170,7 +170,7 @@ class _QuranViewScreenState extends State<QuranViewScreen> {
       child: Row(
         children: [
           Text(
-            'scroll_speed'.tr(context),
+            'scroll_speed'.trans(context),
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           Expanded(

@@ -58,27 +58,27 @@ class _HomeScreenState extends State<HomeScreen> {
         items: [
           TabItem(
             icon: Icons.mosque_outlined,
-            title: 'schools'.tr(context),
+            title: 'schools'.trans(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
           TabItem(
             icon: Icons.group_outlined,
-            title: 'circles'.tr(context),
+            title: 'circles'.trans(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
           TabItem(
             icon: Icons.home_outlined,
-            title: 'home'.tr(context),
+            title: 'home'.trans(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
           TabItem(
             icon: Icons.query_stats_sharp,
-            title: 'statistics'.tr(context),
+            title: 'statistics'.trans(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
           TabItem(
             icon: Icons.person_outline,
-            title: 'profile'.tr(context),
+            title: 'profile'.trans(context),
             fontFamily: GoogleFonts.amiri().fontFamily,
           ),
         ],

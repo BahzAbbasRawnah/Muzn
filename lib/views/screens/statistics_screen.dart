@@ -45,7 +45,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('statistics'.tr(context)),
+        title: Text('statistics'.trans(context)),
         centerTitle: true,
       ),
       drawer: const AppDrawer(),
@@ -69,26 +69,26 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                           children: [
                             _buildStatisticCard(
                               context,
-                              title: 'schools_count'.tr(context),
+                              title: 'schools_count'.trans(context),
                               value: state.schoolCount.toString(),
                               color: Colors.blue,
                             ),
                             _buildStatisticCard(
                               context,
-                              title: 'circles_count'.tr(context),
+                              title: 'circles_count'.trans(context),
                               value: state.circleCount.toString(),
                               color: Colors.blue,
                             ),
                             _buildStatisticCard(
                               context,
-                              title: 'students_count'.tr(context),
+                              title: 'students_count'.trans(context),
                               value: state.studentCount.toString(),
                               color: Colors.green,
                             ),
                           ],
                         ),
                         const SizedBox(height: 16), // Added spacing
-                        Text("top_present_students".tr(context), style: Theme.of(context).textTheme.titleMedium),
+                        Text("top_present_students".trans(context), style: Theme.of(context).textTheme.titleMedium),
                         Divider(color: Colors.black,),
                         Expanded(
                           child: SingleChildScrollView(
@@ -113,7 +113,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                                   },
                                 ),
                                 const SizedBox(height: 16), // Added spacing
-                                Text("top_absent_students".tr(context), style: Theme.of(context).textTheme.titleMedium),
+                                Text("top_absent_students".trans(context), style: Theme.of(context).textTheme.titleMedium),
                                                         Divider(color: Colors.black,),
 
                                 ListView.builder(

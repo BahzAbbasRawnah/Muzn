@@ -1,7 +1,16 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/views/screens/reports/reports_footer.dart';
 import 'package:muzn/views/screens/reports/reports_header.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+
+import '../../../app/constant/app_strings.dart';
 
 class Report extends StatelessWidget {
   final String startDateMiladi;
@@ -13,7 +22,7 @@ class Report extends StatelessWidget {
   final List<List<String>> tableData; // Dynamic table data
   final String teacherName;
 
-  const Report({
+  const Report({super.key,
     required this.startDateMiladi,
     required this.startDateHijri,
     required this.endDateMiladi,
@@ -59,11 +68,10 @@ class Report extends StatelessWidget {
       // Floating Action Button for Printing
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add your print or export logic here
           _printReport(context);
         },
-        child: const Icon(Icons.print),
         tooltip: 'Print Report',
+        child: const Icon(Icons.print),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -126,7 +134,7 @@ class Report extends StatelessWidget {
         TableRow(
           decoration: BoxDecoration(color: Theme.of(context).primaryColor),
           children: [
-            _buildTableCell('No.', isHeader: true),
+            _buildTableCell('No.'.trans(context), isHeader: true),
             for (var title in headerTitles)
               _buildTableCell(title, isHeader: true),
           ],
@@ -157,26 +165,183 @@ class Report extends StatelessWidget {
 
   // Build a table cell with consistent styling
   Widget _buildTableCell(String text, {bool isHeader = false}) {
-    return  Container(
-     padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-       
-        child: Center(
-          child: Text(
-            text,
-            style: TextStyle(
-              fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-            ),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
           ),
         ),
-      
+      ),
     );
   }
 
   // Print or export the report
-  void _printReport(BuildContext context) {
-    // Add your print or export logic here
+  void _printReport(BuildContext context) async {
+    // final font = await PdfGoogleFonts.loadFont('assets/fonts/Amiri-Regular.ttf');
+    // final ByteData fontData = await rootBundle.load('assets/fonts/Amiri-Regular.ttf');
+    // final List<int> fontBytes = fontData.buffer.asUint8List();
+
+    // final pw.Font font = pw.Font.ttf(Uint8List.fromList(fontBytes));
+    final pdf = pw.Document();
+    // var arabicFont = pw.Font.ttf(await rootBundle.load("assets/fonts/HacenTunisia.ttf"));
+    var arabicFont =
+    pw.Font.ttf(await rootBundle.load("assets/fonts/HacenTunisia.ttf"));
+    // final image = MemoryImage(
+    //     (await rootBundle.load("assets/images/app_logo.png"))
+    //         .buffer
+    //         .asUint8List());
+
+    final Uint8List imageBytes =
+    (await rootBundle.load("assets/images/app_logo.png")).buffer.asUint8List();
+
+// Convert to pw.MemoryImage for PDF
+    final pw.MemoryImage pdfImage = pw.MemoryImage(imageBytes);
+
+    final PdfColor pdfColor = PdfColor.fromInt(0xFF1F1F1F);
+
+    pdf.theme?.copyWith(defaultTextStyle:
+    pw.TextStyle(font: arabicFont),
+
+    );
+    // =pw.TextStyle(font: arabicFont);
+    pdf.addPage(
+      // pw.MultiPage(
+        // theme: ThemeData.(base: arabicFont),
+        // pageFormat: const PdfPageFormat(
+        //   9 * PdfPageFormat.cm,
+        //   15 * PdfPageFormat.cm,
+        //   marginAll: 2.0 * PdfPageFormat.cm,
+        // ),
+        // margin: const EdgeInsets.all(20),
+        // textDirection: TextDirection.rtl,
+        // build: (context) =>
+        //     _reportDebtPdfView(image, order, qrCode, arabicFont),
+      // ),
+      pw.Page(
+        textDirection: pw.TextDirection.rtl,
+        // pageTheme: pw.PageTheme(
+        //   theme: pw.ThemeData(
+        //     defaultTextStyle: pw.TextStyle().copyWith(
+        //       font: arabicFont,
+        //     )
+        //   )
+        // ),
+        // theme: ThemeData(
+        //   base: arabicFont,
+        // ),
+        build: (pw.Context context) {
+          return pw.Column(
+            children: [
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Left Titles
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.center,
+                    children: [
+                      pw.Text(AppStrings.appName,style: pw.TextStyle(
+
+                          fontSize: 18.0,
+                          fontWeight: pw.FontWeight.normal,
+                          color: pdfColor,
+
+                      ) ),
+                      // Text(AppStrings.appTitle.trans(context), style: Theme.of(context).textTheme.titleSmall),
+
+                    ],
+                  ),
+                  pw.Image(pdfImage, width: 120, height: 120),
+// pw.Ima
+                  // Center Logo
+                  // pw.CircleAvatar(
+                  //   radius: 30,
+                  //   child: Image.asset(AppStrings.appLogo),
+                  //   backgroundColor: Colors.white,
+                  //
+                  // ),
+                  // Right Titles
+                  pw.Column(
+                    crossAxisAlignment:pw.CrossAxisAlignment.center,
+                    children: [
+                     pw.Text('جمعية مزن للإتقان',style: pw.TextStyle(font: arabicFont)),
+                      pw.Text(AppStrings.appTitle),
+
+                    ],
+                  ),
+                ],
+              ),
+              // ReportHeader(),
+              // const Divider(height: 20),
+              // Date and Title Row
+              // _buildDateAndTitleRow(context),
+              // const SizedBox(height: 20),
+              pw.Text(reportTitle, style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold,font: arabicFont)),
+              pw.SizedBox(height: 20),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('Start Date: $startDateMiladi ($startDateHijri)'),
+                  pw.Text('End Date: $endDateMiladi ($endDateHijri)'),
+                ],
+              ),
+              pw.SizedBox(height: 20),
+              // Create a table
+              pw.Table(
+                border: pw.TableBorder.all(color: PdfColors.black),
+                children: [
+                  // Table Header
+                  pw.TableRow(
+                    children: [
+                      _buildPdfTableCell('No', isHeader: true,font: arabicFont),
+                      for (var title in headerTitles)
+                        _buildPdfTableCell(title, isHeader: true,font: arabicFont),
+                    ],
+                  ),
+                  // Table Rows
+                  for (var i = 0; i < tableData.length; i++)
+                    pw.TableRow(
+                      children: [
+                        _buildPdfTableCell((i + 1).toString(), font: arabicFont),
+                        for (var cell in tableData[i])
+                          _buildPdfTableCell(cell,font: arabicFont),
+                      ],
+                    ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    // Print or share the PDF
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+
+    // Show confirmation message
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Printing report...')),
+    );
+  }
+
+  // Build a table cell for PDF with consistent styling
+  pw.Widget _buildPdfTableCell(String text, {bool isHeader = false,required pw.Font font}) {
+    return pw.Container(
+      padding: const pw.EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+      child: pw.Center(
+        child: pw.Text(
+          text,
+          style: pw.TextStyle(
+            font: font,
+            fontWeight: isHeader ? pw.FontWeight.bold : pw.FontWeight.normal,
+          ),
+        ),
+      ),
     );
   }
 }

@@ -9,23 +9,24 @@ import 'package:muzn/services/database_service.dart';
 
 // Events
 abstract class CircleStudentEvent extends Equatable {
-  final BuildContext context;
-  const CircleStudentEvent(this.context);
+  // final BuildContext? context;
 
-  @override
-  List<Object> get props => [context];
+  // const CircleStudentEvent(this.context);
+
+  // @override
+  // List<Object> get props => [context];
 }
 
 class LoadCircleStudents extends CircleStudentEvent {
   final int circleId;
 
-  const LoadCircleStudents(
-    BuildContext context, {
+   LoadCircleStudents(
+      {
     required this.circleId,
-  }) : super(context);
+  });
 
   @override
-  List<Object> get props => [context, circleId];
+  List<Object> get props => [ circleId];
 }
 
 class UpdateStudentAttendance extends CircleStudentEvent {
@@ -33,29 +34,46 @@ class UpdateStudentAttendance extends CircleStudentEvent {
   final int circleId;
   final AttendanceStatuse status;
 
-  const UpdateStudentAttendance(
-    BuildContext context, {
+   UpdateStudentAttendance(
+    // super.context,
+      {
     required this.studentId,
     required this.circleId,
     required this.status,
-  }) : super(context);
+  });
 
   @override
-  List<Object> get props => [context, studentId, circleId, status];
+  List<Object> get props => [ studentId, circleId, status];
 }
 
-class AddStudentToCircle extends CircleStudentEvent {
+class AddStudentToCircleEvent extends CircleStudentEvent {
   final int studentId;
   final int circleId;
 
-  const AddStudentToCircle(
-    BuildContext context, {
+   AddStudentToCircleEvent(
+    // super.context,
+       {
     required this.studentId,
     required this.circleId,
-  }) : super(context);
+  });
 
   @override
-  List<Object> get props => [context, studentId, circleId];
+  List<Object> get props => [ studentId, circleId];
+}
+
+class DeleteStudentToCircleEvent extends CircleStudentEvent {
+  final int studentId;
+  final int circleId;
+
+   DeleteStudentToCircleEvent(
+    // super.context,
+      {
+    required this.studentId,
+    required this.circleId,
+  });
+
+  @override
+  List<Object> get props => [ studentId, circleId];
 }
 
 // States
@@ -91,15 +109,23 @@ class CircleStudentError extends CircleStudentState {
   @override
   List<Object> get props => [message];
 }
+class CircleStudentDeleted extends CircleStudentState {
+  final String message;
+  const CircleStudentDeleted(this.message);
+}
+
 
 // Bloc
 class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
   final DatabaseManager _databaseManager = DatabaseManager();
+  List<CircleStudent>? studentsList;
+  int? circleId;
 
   CircleStudentBloc() : super(CircleStudentInitial()) {
     on<LoadCircleStudents>(_onLoadCircleStudents);
     on<UpdateStudentAttendance>(_onUpdateStudentAttendance);
-    on<AddStudentToCircle>(_onAddStudentToCircle);
+    on<AddStudentToCircleEvent>(_onAddStudentToCircle);
+    on<DeleteStudentToCircleEvent>(deleteStudentFromCircle);
   }
 
   Future<void> _onLoadCircleStudents(
@@ -160,7 +186,6 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
                       orElse: () => AttendanceStatuse.none,
                     )))
           .toList();
-    
 
       // Get attendance summary
       final summaryResults = await db.rawQuery('''
@@ -185,7 +210,8 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         );
         summary[status] = row['count'] as int;
       }
-
+      circleId = event.circleId;
+      studentsList=students;
       emit(CircleStudentsLoaded(
         students: students,
         attendanceSummary: summary,
@@ -201,9 +227,8 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
   ) async {
     try {
       final db = await _databaseManager.database;
-  print('----------------------------------------------------------');
+      print('----------------------------------------------------------');
 
-      
       // Check if attendance record exists for today
       final existing = await db.query(
         'StudentAttendance',
@@ -215,7 +240,7 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         ''',
         whereArgs: [event.studentId, event.circleId],
       );
-              print("check if attendance record exists for today" + existing.toString());
+      print("check if attendance record exists for today$existing");
 
       if (existing.isEmpty) {
         // Insert new record
@@ -227,8 +252,7 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
-          print(" attendance record not exists for today" );
-
+        print(" attendance record not exists for today");
       } else {
         // Update existing record
         await db.update(
@@ -246,18 +270,17 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
           whereArgs: [event.studentId, event.circleId],
         );
 
-                  print(" attendance record updated for today" );
-
+        print(" attendance record updated for today");
       }
 
-      add(LoadCircleStudents(event.context, circleId: event.circleId));
+      add(LoadCircleStudents( circleId: event.circleId));
     } catch (e) {
       emit(CircleStudentError(e.toString()));
     }
   }
 
   Future<void> _onAddStudentToCircle(
-    AddStudentToCircle event,
+    AddStudentToCircleEvent event,
     Emitter<CircleStudentState> emit,
   ) async {
     try {
@@ -281,7 +304,42 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
       }
 
       // Reload students
-      add(LoadCircleStudents(event.context, circleId: event.circleId));
+      add(LoadCircleStudents(circleId: event.circleId));
+    } catch (e) {
+      emit(CircleStudentError(e.toString()));
+    }
+  }
+
+  Future<void> deleteStudentFromCircle(DeleteStudentToCircleEvent event,
+      Emitter<CircleStudentState> emit) async {
+    try {
+      final db = await _databaseManager.database;
+
+      // Check if student is in circle before attempting to delete
+      final existing = await db.query(
+        'CircleStudent',
+        where: 'student_id = ? AND circle_id = ? AND deleted_at IS NULL',
+        whereArgs: [event.studentId, event.circleId],
+      );
+
+      if (existing.isNotEmpty) {
+        // Delete student from circle
+        await db.delete(
+          'CircleStudent',
+          where: 'student_id = ? AND circle_id = ?',
+          whereArgs: [event.studentId, event.circleId],
+        );
+
+        // Emit a success state
+        emit(CircleStudentDeleted('delete_success'));
+
+        // emit(CircleStudentDeleted());
+      } else {
+        emit(CircleStudentError('Student not found in the circle.'));
+      }
+add(LoadCircleStudents(circleId: circleId!));
+      // Reload students
+      // add(LoadCircleStudents(context, circleId: circleId));
     } catch (e) {
       emit(CircleStudentError(e.toString()));
     }

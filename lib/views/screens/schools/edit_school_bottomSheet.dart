@@ -51,7 +51,9 @@ class _EditSchoolBottomSheetState extends State<EditSchoolBottomSheet> {
 
   void _handleSave(BuildContext context) {
     if (_formKey.currentState!.validate()) {
-      final authState = context.read<AuthBloc>().state;
+      final authState = context
+          .read<AuthBloc>()
+          .state;
 
       if (authState is AuthAuthenticated) {
         final teacherId = authState.user.id;
@@ -69,9 +71,27 @@ class _EditSchoolBottomSheetState extends State<EditSchoolBottomSheet> {
         );
 
 
-   context.read<SchoolBloc>().add(UpdateSchool( updatedSchool));
-
+        context.read<SchoolBloc>().add(UpdateSchool(updatedSchool));
       } else {
+        if (BlocProvider
+            .of<AuthBloc>(context)
+            .userModel != null) {
+          final teacherId = BlocProvider
+              .of<AuthBloc>(context)
+              .userModel!
+              .id;
+
+          final updatedSchool = School(
+            id: widget.schoolId,
+            name: _nameController.text,
+            address: _addressController.text,
+            type: _selectedType,
+            teacherId: teacherId,
+          );
+
+
+          context.read<SchoolBloc>().add(UpdateSchool(updatedSchool));
+        }
         print("User not authenticated.");
       }
     }
@@ -79,132 +99,197 @@ class _EditSchoolBottomSheetState extends State<EditSchoolBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final deviceHeight = MediaQuery.of(context).size.height;
+    final deviceHeight = MediaQuery
+        .of(context)
+        .size
+        .height;
 
     return BlocListener<SchoolBloc, SchoolState>(
-      listener: (context, state) async {
-        print("EditSchoolBottomSheet listener triggered with state: $state");
-        if (state is SchoolError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message.tr(context))),
-          );
-        } else if (state is SchoolsLoaded && mounted) {
-          print("Closing EditSchoolBottomSheet"); // Debugging log
-          print("SchoolsLoaded state emitted"); // Added log
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            showSuccessMessage(context, 'edit_successfully'.tr(context));
-          });
+        listener: (context, state) async {
+          print("EditSchoolBottomSheet listener triggered with state: $state");
 
-          // Close the bottom sheet after showing the message
-          if (await checkIfLogin()) {
-            BlocProvider.of<SchoolBloc>(context).add(LoadSchools(await getUserId()));
-          }
-          Navigator.of(context).pop();
-          // if(await checkIfLogin()){
-          //   BlocProvider.of<SchoolBloc>(context).add(LoadSchools(await getUserId()));
-          //   WidgetsBinding.instance.addPostFrameCallback((_) {
-          //     showSuccessMessage(context,'edit_successfully'.tr(context));
-          //   });
+          // if (state is SchoolsLoaded && mounted) {
+          //   print("Closing EditSchoolBottomSheet"); // Debugging log
+          //   print("SchoolsLoaded state emitted"); // Added log
           //
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(content: Text('edit_successfully'.tr(context))),
+          //   );
+          //
+          //   final authState = context.read<AuthBloc>().state;
+          //   if (authState is AuthAuthenticated) {
+          //     BlocProvider.of<SchoolBloc>(context).add(LoadSchools(authState.user.id));
+          //     Navigator.of(context).pop();
+          //   } else {
+          //     if (BlocProvider.of<AuthBloc>(context).userModel != null) {
+          //       BlocProvider.of<SchoolBloc>(context).add(
+          //         LoadSchools(BlocProvider.of<AuthBloc>(context).userModel!.id),
+          //       );
+          //       // Navigator.of(context).pop();
+          //     }
+          //   }
+          //
+          //   // **Fix: Delay closing the bottom sheet**
+          //   // WidgetsBinding.instance.addPostFrameCallback((_) {
+          //   //   if (mounted) {
+          //   //     // Navigator.of(context).pop();
+          //   //   }
+          //   // });
           // }
-          // Navigator.of(context).pop(); // Close the bottom sheet
-        }
-      },
-      child: Container(
-        padding: EdgeInsets.only(
+
+
+
+          // if (state is SchoolError) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(content: Text(state.message.tr(context))),
+          //   );
+          // } else if (state is SchoolsLoaded && mounted) {
+          //   print("Closing EditSchoolBottomSheet"); // Debugging log
+          //   print("SchoolsLoaded state emitted"); // Added log
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(content: Text('edit_successfully'.tr(context))),
+          //   );
+          //   // WidgetsBinding.instance.addPostFrameCallback((_) {
+          //   //   showSuccessMessage(context, 'edit_successfully'.tr(context));
+          //   // });
+          //
+          //   // Close the bottom sheet after showing the message
+          //   // if (await checkIfLogin()) {
+          //
+          //   final authState = context
+          //       .read<AuthBloc>()
+          //       .state;
+          //   if (authState is AuthAuthenticated) {
+          //     BlocProvider.of<SchoolBloc>(context).add(
+          //         LoadSchools(authState.user.id));
+          //   } else {
+          //     if (BlocProvider
+          //         .of<AuthBloc>(context)
+          //         .userModel != null) {
+          //       BlocProvider.of<SchoolBloc>(context).add(
+          //           LoadSchools(BlocProvider
+          //               .of<AuthBloc>(context)
+          //               .userModel!
+          //               .id));
+          //     }}
+          //     Navigator.of(context).pop();
+          //     // if(await checkIfLogin()){
+          //     //   BlocProvider.of<SchoolBloc>(context).add(LoadSchools(await getUserId()));
+          //     //   WidgetsBinding.instance.addPostFrameCallback((_) {
+          //     //     showSuccessMessage(context,'edit_successfully'.tr(context));
+          //     //   });
+          //     //
+          //     // }
+          //     // Navigator.of(context).pop(); // Close the bottom sheet
+          //   }
+          },
+          // ,
+          child: BlocBuilder<SchoolBloc, SchoolState>(
+  builder: (context, state) {
+    if (state is SchoolLoading) {
+      Navigator.of(context).pop(); // Close the bottom sheet
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showSuccessMessage(context, 'added_successfully'.trans(context));
+      });
+    }
+    return Container(
+          padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
           top: 16,
           left: 16,
           right: 16,
-        ),
-        child: Form(
+          ),
+          child: Form(
           key: _formKey,
           child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'edit_school'.tr(context),
-                  style: Theme.of(context).textTheme.headlineSmall,
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'school_name_label'.tr(context),
-                    hintText: 'school_name_hint'.tr(context),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-                DropdownButtonFormField<String>(
-                  value: _selectedType,
-                  decoration: InputDecoration(
-                    labelText: 'school_type'.tr(context),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  items: ['mosque', 'school', 'center', 'virtual'].map((type) {
-                    return DropdownMenuItem(
-                      value: type,
-                      child: Text(
-                        type.tr(context),
-                        style: Theme.of(context).textTheme.displayMedium,
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedType = value;
-                    });
-                  },
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-                CustomTextField(
-                  controller: _addressController,
-                  labelText: 'address_label'.tr(context),
-                  hintText: 'address_hint'.tr(context),
-                ),
-                SizedBox(height: deviceHeight * 0.03),
-                BlocBuilder<SchoolBloc, SchoolState>(
-                  builder: (context, state) {
-                    if (state is SchoolLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    return CustomButton(
-                      text: 'save'.tr(context),
-                      icon: Icons.update,
-                      onPressed: () => _handleSave(context),
-                    );
-                  },
-                ),
-                SizedBox(height: deviceHeight * 0.02),
-              ],
-            ),
+          child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+          Text(
+          'edit_school'.trans(context),
+          style: Theme.of(context).textTheme.headlineSmall,
+          textAlign: TextAlign.center,
           ),
+          SizedBox(height: deviceHeight * 0.02),
+          TextFormField(
+          controller: _nameController,
+          decoration: InputDecoration(
+          labelText: 'school_name_label'.trans(context),
+          hintText: 'school_name_hint'.trans(context),
+          border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          ),
+          ),
+          validator: (value) {
+          if (value == null || value.isEmpty) {
+          return 'required_field'.trans(context);
+          }
+          return null;
+          },
+          ),
+          SizedBox(height: deviceHeight * 0.02),
+          DropdownButtonFormField<String>(
+          value: _selectedType,
+          decoration: InputDecoration(
+          labelText: 'school_type'.trans(context),
+          border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          ),
+          ),
+          items: ['mosque', 'school', 'center', 'virtual'].map((type) {
+          return DropdownMenuItem(
+          value: type,
+          child: Text(
+          type.trans(context),
+          style: Theme.of(context).textTheme.displayMedium,
+          ),
+          );
+          }).toList(),
+          onChanged: (value) {
+          setState(() {
+          _selectedType = value;
+          });
+          },
+          ),
+          SizedBox(height: deviceHeight * 0.02),
+          CustomTextField(
+          controller: _addressController,
+          labelText: 'address_label'.trans(context),
+          hintText: 'address_hint'.trans(context),
+          ),
+          SizedBox(height: deviceHeight * 0.03),
+          BlocBuilder<SchoolBloc, SchoolState>(
+          builder: (context, state) {
+          if (state is SchoolLoading) {
+          return const Center(child: CircularProgressIndicator());
+          }
+          return CustomButton(
+          text: 'save'.trans(context),
+          icon: Icons.update,
+          onPressed: () => _handleSave(context),
+          );
+          },
+          ),
+          SizedBox(height: deviceHeight * 0.02),
+          ],
+          ),
+          ),
+          ),
+          );
+  },
+)
+          ,
+          );
+        }
+        void showSuccessMessage(BuildContext context, String message)
+    {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.green, // Customize the color
+          behavior: SnackBarBehavior.floating, // Optional: Make it floating
         ),
-      ),
-    );
+      );
+    }
   }
-  void showSuccessMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green, // Customize the color
-        behavior: SnackBarBehavior.floating, // Optional: Make it floating
-      ),
-    );
-  }
-
-}

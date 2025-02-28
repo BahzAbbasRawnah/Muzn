@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
             );
           },
         ),
-        title: Text('login_title'.tr(context)),
+        title: Text('login_title'.trans(context)),
         centerTitle: true,
         actions: [
           Padding(
@@ -124,14 +124,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: deviceHeight * 0.05),
                       CustomTextField(
-                        hintText: 'email_hint'.tr(context),
-                        labelText: 'email_label'.tr(context),
+                        hintText: 'email_hint'.trans(context),
+                        labelText: 'email_label'.trans(context),
                         prefixIcon: Icons.email,
                         keyboardType: TextInputType.emailAddress,
                         controller: _emailController,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'email_required'.tr(context);
+                            return 'email_required'.trans(context);
                           }
                         
                           return null;
@@ -139,8 +139,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: deviceHeight * 0.03),
                       CustomTextField(
-                        hintText: 'password_hint'.tr(context),
-                        labelText: 'password_label'.tr(context),
+                        hintText: 'password_hint'.trans(context),
+                        labelText: 'password_label'.trans(context),
                         prefixIcon: Icons.lock,
                         suffixIcon: _isPasswordVisible
                             ? Icons.visibility
@@ -152,10 +152,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'password_required'.tr(context);
+                            return 'password_required'.trans(context);
                           }
                           if (value.length < 6) {
-                            return 'password_length'.tr(context);
+                            return 'password_length'.trans(context);
                           }
                           return null;
                         },
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const CircularProgressIndicator()
                       else
                         CustomButton(
-                          text: 'login_button'.tr(context),
+                          text: 'login_button'.trans(context),
                           onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               context.read<AuthBloc>().add(
@@ -180,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 16.0),
                       CustomTextButton(
                         text:
-                            '${'have_not_account'.tr(context)} ${'register_button'.tr(context)}',
+                            '${'have_not_account'.trans(context)} ${'register_button'.trans(context)}',
                         onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(

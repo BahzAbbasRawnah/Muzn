@@ -77,7 +77,7 @@ setState(() {
     return Scaffold(
       key: _scaffoldKey,
       appBar: CustomAppBar(
-        title: 'profile'.tr(context),
+        title: 'profile'.trans(context),
         scaffoldKey: _scaffoldKey,
       ),
       drawer: const AppDrawer(),
@@ -89,7 +89,7 @@ setState(() {
             );
           } else if (state is AuthAuthenticated) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('profile_updated'.tr(context))),
+              SnackBar(content: Text('profile_updated'.trans(context))),
             );
           }
         },
@@ -128,12 +128,12 @@ setState(() {
                     SizedBox(height: deviceHeight * 0.03),
                     CustomTextField(
                       controller: nameController,
-                      hintText: 'full_name_hint'.tr(context),
-                      labelText: 'full_name'.tr(context),
+                      hintText: 'full_name_hint'.trans(context),
+                      labelText: 'full_name'.trans(context),
                       prefixIcon: Icons.person,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'full_name_required'.tr(context);
+                          return 'full_name_required'.trans(context);
                         }
                         return null;
                       },
@@ -141,16 +141,16 @@ setState(() {
                     SizedBox(height: deviceHeight * 0.02),
                     CustomTextField(
                       controller: emailController,
-                      hintText: 'email_hint'.tr(context),
-                      labelText: 'email'.tr(context),
+                      hintText: 'email_hint'.trans(context),
+                      labelText: 'email'.trans(context),
                       prefixIcon: Icons.email,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'email_required'.tr(context);
+                          return 'email_required'.trans(context);
                         }
                         if (!value.contains('@')) {
-                          return 'email_invalid'.tr(context);
+                          return 'email_invalid'.trans(context);
                         }
                         return null;
                       },
@@ -158,11 +158,11 @@ setState(() {
                     SizedBox(height: deviceHeight * 0.02),
                     IntlPhoneField(
                       controller: phoneController,
-                      searchText: 'search_country'.tr(context),
+                      searchText: 'search_country'.trans(context),
                       languageCode: 'ar',
                       decoration: InputDecoration(
-                        labelText: 'phone'.tr(context),
-                        hintText: 'phone_hint'.tr(context),
+                        labelText: 'phone'.trans(context),
+                        hintText: 'phone_hint'.trans(context),
                         prefixIcon: const Icon(Icons.phone),
                         border: OutlineInputBorder(),
                       ),
@@ -176,7 +176,7 @@ setState(() {
                       },
                       validator: (value) {
                         if (value == null || value.number.isEmpty) {
-                          return 'phone_required'.tr(context);
+                          return 'phone_required'.trans(context);
                         }
                         return null;
                       },
@@ -184,23 +184,23 @@ setState(() {
                     SizedBox(height: deviceHeight * 0.02),
                     CustomTextField(
                       controller: countryController,
-                      hintText: 'country'.tr(context),
-                      labelText: 'country'.tr(context),
+                      hintText: 'country'.trans(context),
+                      labelText: 'country'.trans(context),
                       prefixIcon: Icons.map,
                     ),
                     SizedBox(height: deviceHeight * 0.02),
                     CustomTextField(
                       controller: oldPasswordController,
-                      hintText: 'old_password_hint'.tr(context),
-                      labelText: 'old_password_label'.tr(context),
+                      hintText: 'old_password_hint'.trans(context),
+                      labelText: 'old_password_label'.trans(context),
                       prefixIcon: Icons.lock,
                       obscureText: true,
                     ),
                     SizedBox(height: deviceHeight * 0.02),
                     CustomTextField(
                       controller: newPasswordController,
-                      hintText: 'new_password_hint'.tr(context),
-                      labelText: 'new_password_label'.tr(context),
+                      hintText: 'new_password_hint'.trans(context),
+                      labelText: 'new_password_label'.trans(context),
                       prefixIcon: Icons.lock,
                       obscureText: true,
                     ),
@@ -208,7 +208,7 @@ setState(() {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('gender'.tr(context)),
+                        Text('gender'.trans(context)),
                         Radio<String>(
                           value: 'male',
                           groupValue: gender,
@@ -219,7 +219,7 @@ setState(() {
                             });
                           },
                         ),
-                        Text('male'.tr(context)),
+                        Text('male'.trans(context)),
                         Radio<String>(
                           value: 'female',
                           groupValue: gender,
@@ -230,7 +230,7 @@ setState(() {
                             });
                           },
                         ),
-                        Text('female'.tr(context)),
+                        Text('female'.trans(context)),
                       ],
                     ),
                     SizedBox(height: deviceHeight * 0.03),
@@ -238,7 +238,7 @@ setState(() {
                       const Center(child: CircularProgressIndicator())
                     else
                       CustomButton(
-                        text: 'update_profile_button'.tr(context),
+                        text: 'update_profile_button'.trans(context),
                         icon: Icons.update,
                         onPressed: () {
                           // final updatedUser = User(
@@ -305,12 +305,12 @@ setState(() {
                   SizedBox(height: deviceHeight * 0.03),
                   CustomTextField(
                     controller: nameController,
-                    hintText: 'full_name_hint'.tr(context),
-                    labelText: 'full_name'.tr(context),
+                    hintText: 'full_name_hint'.trans(context),
+                    labelText: 'full_name'.trans(context),
                     prefixIcon: Icons.person,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'full_name_required'.tr(context);
+                        return 'full_name_required'.trans(context);
                       }
                       return null;
                     },
@@ -318,16 +318,16 @@ setState(() {
                   SizedBox(height: deviceHeight * 0.02),
                   CustomTextField(
                     controller: emailController,
-                    hintText: 'email_hint'.tr(context),
-                    labelText: 'email'.tr(context),
+                    hintText: 'email_hint'.trans(context),
+                    labelText: 'email'.trans(context),
                     prefixIcon: Icons.email,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'email_required'.tr(context);
+                        return 'email_required'.trans(context);
                       }
                       if (!value.contains('@')) {
-                        return 'email_invalid'.tr(context);
+                        return 'email_invalid'.trans(context);
                       }
                       return null;
                     },
@@ -335,11 +335,11 @@ setState(() {
                   SizedBox(height: deviceHeight * 0.02),
                   IntlPhoneField(
                     controller: phoneController,
-                    searchText: 'search_country'.tr(context),
+                    searchText: 'search_country'.trans(context),
                     languageCode: 'ar',
                     decoration: InputDecoration(
-                      labelText: 'phone'.tr(context),
-                      hintText: 'phone_hint'.tr(context),
+                      labelText: 'phone'.trans(context),
+                      hintText: 'phone_hint'.trans(context),
                       prefixIcon: const Icon(Icons.phone),
                       border: OutlineInputBorder(),
                     ),
@@ -353,7 +353,7 @@ setState(() {
                     },
                     validator: (value) {
                       if (value == null || value.number.isEmpty) {
-                        return 'phone_required'.tr(context);
+                        return 'phone_required'.trans(context);
                       }
                       return null;
                     },
@@ -361,23 +361,23 @@ setState(() {
                   SizedBox(height: deviceHeight * 0.02),
                   CustomTextField(
                     controller: countryController,
-                    hintText: 'country'.tr(context),
-                    labelText: 'country'.tr(context),
+                    hintText: 'country'.trans(context),
+                    labelText: 'country'.trans(context),
                     prefixIcon: Icons.map,
                   ),
                   SizedBox(height: deviceHeight * 0.02),
                   CustomTextField(
                     controller: oldPasswordController,
-                    hintText: 'old_password_hint'.tr(context),
-                    labelText: 'old_password_label'.tr(context),
+                    hintText: 'old_password_hint'.trans(context),
+                    labelText: 'old_password_label'.trans(context),
                     prefixIcon: Icons.lock,
                     obscureText: true,
                   ),
                   SizedBox(height: deviceHeight * 0.02),
                   CustomTextField(
                     controller: newPasswordController,
-                    hintText: 'new_password_hint'.tr(context),
-                    labelText: 'new_password_label'.tr(context),
+                    hintText: 'new_password_hint'.trans(context),
+                    labelText: 'new_password_label'.trans(context),
                     prefixIcon: Icons.lock,
                     obscureText: true,
                   ),
@@ -385,7 +385,7 @@ setState(() {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('gender'.tr(context)),
+                      Text('gender'.trans(context)),
                       Radio<String>(
                         value: 'male',
                         groupValue: gender,
@@ -396,7 +396,7 @@ setState(() {
                           });
                         },
                       ),
-                      Text('male'.tr(context)),
+                      Text('male'.trans(context)),
                       Radio<String>(
                         value: 'female',
                         groupValue: gender,
@@ -407,7 +407,7 @@ setState(() {
                           });
                         },
                       ),
-                      Text('female'.tr(context)),
+                      Text('female'.trans(context)),
                     ],
                   ),
                   SizedBox(height: deviceHeight * 0.03),
@@ -415,7 +415,7 @@ setState(() {
                     const Center(child: CircularProgressIndicator())
                   else
                     CustomButton(
-                      text: 'update_profile_button'.tr(context),
+                      text: 'update_profile_button'.trans(context),
                       icon: Icons.update,
                       onPressed: () {
                         final updatedUser = User(
@@ -476,12 +476,12 @@ setState(() {
                   SizedBox(height: deviceHeight * 0.03),
                   CustomTextField(
                     controller: nameController,
-                    hintText: 'full_name_hint'.tr(context),
-                    labelText: 'full_name'.tr(context),
+                    hintText: 'full_name_hint'.trans(context),
+                    labelText: 'full_name'.trans(context),
                     prefixIcon: Icons.person,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'full_name_required'.tr(context);
+                        return 'full_name_required'.trans(context);
                       }
                       return null;
                     },
@@ -489,16 +489,16 @@ setState(() {
                   SizedBox(height: deviceHeight * 0.02),
                   CustomTextField(
                     controller: emailController,
-                    hintText: 'email_hint'.tr(context),
-                    labelText: 'email'.tr(context),
+                    hintText: 'email_hint'.trans(context),
+                    labelText: 'email'.trans(context),
                     prefixIcon: Icons.email,
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'email_required'.tr(context);
+                        return 'email_required'.trans(context);
                       }
                       if (!value.contains('@')) {
-                        return 'email_invalid'.tr(context);
+                        return 'email_invalid'.trans(context);
                       }
                       return null;
                     },
@@ -506,11 +506,11 @@ setState(() {
                   SizedBox(height: deviceHeight * 0.02),
                   IntlPhoneField(
                     controller: phoneController,
-                    searchText: 'search_country'.tr(context),
+                    searchText: 'search_country'.trans(context),
                     languageCode: 'ar',
                     decoration: InputDecoration(
-                      labelText: 'phone'.tr(context),
-                      hintText: 'phone_hint'.tr(context),
+                      labelText: 'phone'.trans(context),
+                      hintText: 'phone_hint'.trans(context),
                       prefixIcon: const Icon(Icons.phone),
                       border: OutlineInputBorder(),
                     ),
@@ -524,7 +524,7 @@ setState(() {
                     },
                     validator: (value) {
                       if (value == null || value.number.isEmpty) {
-                        return 'phone_required'.tr(context);
+                        return 'phone_required'.trans(context);
                       }
                       return null;
                     },
@@ -532,23 +532,23 @@ setState(() {
                   SizedBox(height: deviceHeight * 0.02),
                   CustomTextField(
                     controller: countryController,
-                    hintText: 'country'.tr(context),
-                    labelText: 'country'.tr(context),
+                    hintText: 'country'.trans(context),
+                    labelText: 'country'.trans(context),
                     prefixIcon: Icons.map,
                   ),
                   SizedBox(height: deviceHeight * 0.02),
                   CustomTextField(
                     controller: oldPasswordController,
-                    hintText: 'old_password_hint'.tr(context),
-                    labelText: 'old_password_label'.tr(context),
+                    hintText: 'old_password_hint'.trans(context),
+                    labelText: 'old_password_label'.trans(context),
                     prefixIcon: Icons.lock,
                     obscureText: true,
                   ),
                   SizedBox(height: deviceHeight * 0.02),
                   CustomTextField(
                     controller: newPasswordController,
-                    hintText: 'new_password_hint'.tr(context),
-                    labelText: 'new_password_label'.tr(context),
+                    hintText: 'new_password_hint'.trans(context),
+                    labelText: 'new_password_label'.trans(context),
                     prefixIcon: Icons.lock,
                     obscureText: true,
                   ),
@@ -556,7 +556,7 @@ setState(() {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('gender'.tr(context)),
+                      Text('gender'.trans(context)),
                       Radio<String>(
                         value: 'male',
                         groupValue: gender,
@@ -567,7 +567,7 @@ setState(() {
                           });
                         },
                       ),
-                      Text('male'.tr(context)),
+                      Text('male'.trans(context)),
                       Radio<String>(
                         value: 'female',
                         groupValue: gender,
@@ -578,7 +578,7 @@ setState(() {
                           });
                         },
                       ),
-                      Text('female'.tr(context)),
+                      Text('female'.trans(context)),
                     ],
                   ),
                   SizedBox(height: deviceHeight * 0.03),
@@ -586,7 +586,7 @@ setState(() {
                     const Center(child: CircularProgressIndicator())
                   else
                     CustomButton(
-                      text: 'update_profile_button'.tr(context),
+                      text: 'update_profile_button'.trans(context),
                       icon: Icons.update,
                       onPressed: () {
                         final updatedUser = User(

@@ -48,7 +48,7 @@ class _CircleCategorySelectorState extends State<CircleCategorySelector> {
         if (state is CircleCategoriesLoaded) {
           if (state.categories.isEmpty) {
             return Center(
-              child: Text('no_categories'.tr(context)),
+              child: Text('no_categories'.trans(context)),
             );
           }
 

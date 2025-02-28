@@ -43,7 +43,7 @@ class _AttendanceStatusBottomSheetState
  
     context.read<CircleStudentBloc>().add(
           UpdateStudentAttendance(
-            context,
+            // context,
             studentId: widget.studentId,
             circleId: widget.circleId,
             status: _selectedStatus!,
@@ -69,7 +69,7 @@ class _AttendanceStatusBottomSheetState
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'student_attendance'.tr(context),
+            'student_attendance'.trans(context),
             style: Theme.of(context).textTheme.headlineSmall,
             textAlign: TextAlign.center,
           ),
@@ -86,7 +86,7 @@ class _AttendanceStatusBottomSheetState
               final isSelected = _selectedStatus == status;
               return ChoiceChip(
                 label: Text(
-                  status.name.tr(context),
+                  status.name.trans(context),
                   style: TextStyle(
                     color: isSelected ? Colors.white : Colors.black,
                   ),
@@ -112,7 +112,7 @@ class _AttendanceStatusBottomSheetState
             const Center(child: CircularProgressIndicator())
           else
             CustomButton(
-              text: 'save'.tr(context),
+              text: 'save'.trans(context),
               onPressed: _saveAttendance,
               icon: Icons.save,
             ),

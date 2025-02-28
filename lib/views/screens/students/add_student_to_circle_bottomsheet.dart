@@ -49,20 +49,23 @@ class _AddStudentToCircleBottomSheetState
   }
 
   Future<void> _saveStudent() async {
+    print('start save student');
     if (!_formKey.currentState!.validate()) return;
 
 
     setState(() => _isLoading = true);
 
-    try {
+    // try {
       // Get current authenticated user from AuthBloc
       final authState = context.read<AuthBloc>().state;
-      if (authState is! AuthAuthenticated) {
-        throw Exception('No authenticated user found');
-      }
+      print('authState');
+      print(authState.toString());
+      // if (authState is! AuthAuthenticated) {
+      //   throw Exception('No authenticated user found');
+      // }
 
-
-      final teacherId = authState.user.id;
+ var user=BlocProvider.of<AuthBloc>(context).userModel;
+      final teacherId =user!.id;
       final db = await DatabaseManager().database;
 
       // Check if email or phone exists
@@ -73,7 +76,18 @@ class _AddStudentToCircleBottomSheetState
       );
 
       if (existingUser.isNotEmpty) {
-        throw Exception('email_or_phone_exists'.tr(context));
+        print('inside exsist user');
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('email_or_phone_exists'.trans(context)),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
+          ),
+        );
+        return;
+        // throw Exception('email_or_phone_exists'.tr(context));
       }
 
       // Begin transaction
@@ -116,9 +130,10 @@ class _AddStudentToCircleBottomSheetState
         // WidgetsBinding.instance.addPostFrameCallback((_) {
         //   showSuccessMessage(context, 'added_successfully'.tr(context));
         // });
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('added_successfully'.tr(context)),
+            content: Text('added_successfully'.trans(context)),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.green,
             margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
@@ -129,9 +144,10 @@ class _AddStudentToCircleBottomSheetState
       }
 
       if (mounted) {
+        setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('added_successfully'.tr(context)),
+            content: Text('added_successfully'.trans(context)),
             behavior: SnackBarBehavior.floating,
             backgroundColor: Colors.green,
             margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
@@ -144,30 +160,31 @@ class _AddStudentToCircleBottomSheetState
         // });
         context.read<CircleStudentBloc>().add(
               LoadCircleStudents(
-                context,
+                // context,
                 circleId: widget.circleId,
               ),
             );
        // SuccessSnackbar.show(context: context, successText: 'inserted_successfully'.tr(context));
 
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.red,
-            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
-          ),
-        );
-        // ErrorSnackbar.show(context: context, errorText: e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
+    // }
+    // catch (e) {
+    //   if (mounted) {
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       SnackBar(
+    //         content: Text(e.toString()),
+    //         behavior: SnackBarBehavior.floating,
+    //         backgroundColor: Colors.red,
+    //         margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
+    //       ),
+    //     );
+    //     // ErrorSnackbar.show(context: context, errorText: e.toString());
+    //   }
+    // } finally {
+    //   if (mounted) {
+    //     setState(() => _isLoading = false);
+    //   }
+    // }
   }
 
   @override
@@ -189,7 +206,7 @@ class _AddStudentToCircleBottomSheetState
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'add_new_student'.tr(context),
+                  'add_new_student'.trans(context),
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
@@ -198,12 +215,12 @@ class _AddStudentToCircleBottomSheetState
                 // Full Name field
                 CustomTextField(
                   controller: nameController,
-                  hintText: 'full_name_hint'.tr(context),
-                  labelText: 'full_name'.tr(context),
+                  hintText: 'full_name_hint'.trans(context),
+                  labelText: 'full_name'.trans(context),
                   prefixIcon: Icons.person,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     return null;
                   },
@@ -213,17 +230,17 @@ class _AddStudentToCircleBottomSheetState
                 // Email field
                 CustomTextField(
                   controller: emailController,
-                  hintText: 'email_hint'.tr(context),
-                  labelText: 'email'.tr(context),
+                  hintText: 'email_hint'.trans(context),
+                  labelText: 'email'.trans(context),
                   prefixIcon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                         .hasMatch(value)) {
-                      return 'invalid_email'.tr(context);
+                      return 'invalid_email'.trans(context);
                     }
                     return null;
                   },
@@ -234,8 +251,8 @@ class _AddStudentToCircleBottomSheetState
                 IntlPhoneField(
                   controller: countryController,
                   decoration: InputDecoration(
-                    labelText: 'country'.tr(context),
-                    hintText: 'country'.tr(context),
+                    labelText: 'country'.trans(context),
+                    hintText: 'country'.trans(context),
                     labelStyle: Theme.of(context).inputDecorationTheme.labelStyle,
                     hintStyle: Theme.of(context).inputDecorationTheme.hintStyle,
                     border: OutlineInputBorder(
@@ -263,14 +280,14 @@ class _AddStudentToCircleBottomSheetState
                 // Phone field
                 IntlPhoneField(
                   controller: phoneController,
-                  searchText: 'search_country'.tr(context),
+                  searchText: 'search_country'.trans(context),
                   languageCode: 'ar',
                                     showCountryFlag: false,
 
-                  invalidNumberMessage: 'phone_min_length'.tr(context),
+                  invalidNumberMessage: 'phone_min_length'.trans(context),
                   decoration: InputDecoration(
-                    labelText: 'phone'.tr(context),
-                    hintText: 'phone_hint'.tr(context),
+                    labelText: 'phone'.trans(context),
+                    hintText: 'phone_hint'.trans(context),
                     prefixIcon: const Icon(Icons.phone),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -286,7 +303,7 @@ class _AddStudentToCircleBottomSheetState
                   },
                   validator: (value) {
                     if (value == null || value.number.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     return null;
                   },
@@ -296,17 +313,17 @@ class _AddStudentToCircleBottomSheetState
                 // Password field
                 CustomTextField(
                   controller: passwordController,
-                  hintText: 'password_hint'.tr(context),
-                  labelText: 'password'.tr(context),
+                  hintText: 'password_hint'.trans(context),
+                  labelText: 'password'.trans(context),
                   prefixIcon: Icons.lock,
                   obscureText: true,
                   suffixIcon: Icons.visibility,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     if (value.length < 6) {
-                      return 'invalid_password'.tr(context);
+                      return 'invalid_password'.trans(context);
                     }
                     return null;
                   },
@@ -317,7 +334,7 @@ class _AddStudentToCircleBottomSheetState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('gender'.tr(context)),
+                    Text('gender'.trans(context)),
                     Radio<String>(
                       value: 'male',
                       groupValue: gender,
@@ -328,7 +345,7 @@ class _AddStudentToCircleBottomSheetState
                         });
                       },
                     ),
-                    Text('male'.tr(context)),
+                    Text('male'.trans(context)),
                     Radio<String>(
                       value: 'female',
                       groupValue: gender,
@@ -339,7 +356,7 @@ class _AddStudentToCircleBottomSheetState
                         });
                       },
                     ),
-                    Text('female'.tr(context)),
+                    Text('female'.trans(context)),
                   ],
                 ),
                 SizedBox(height: deviceHeight * 0.02),
@@ -349,7 +366,7 @@ class _AddStudentToCircleBottomSheetState
                   const Center(child: CircularProgressIndicator())
                 else
                   CustomButton(
-                    text: 'save'.tr(context),
+                    text: 'save'.trans(context),
                     onPressed: _saveStudent,
                     icon: Icons.save,
                   ),
@@ -361,3 +378,184 @@ class _AddStudentToCircleBottomSheetState
     );
   }
 }
+
+//
+// import 'package:flutter/material.dart';
+// import 'package:flutter_bloc/flutter_bloc.dart';
+// import 'package:intl_phone_field/intl_phone_field.dart';
+// import 'package:intl_phone_field/phone_number.dart';
+// import 'package:muzn/app_localization.dart';
+// import 'package:muzn/blocs/auth/auth_bloc.dart';
+// import 'package:muzn/blocs/circle_student/circle_student_bloc.dart';
+// import 'package:muzn/services/database_service.dart';
+// import 'package:muzn/views/widgets/custom_button.dart';
+// import 'package:muzn/views/widgets/custom_text_field.dart';
+//
+// class AddStudentToCircleBottomSheet extends StatefulWidget {
+//   final int circleId;
+//
+//   const AddStudentToCircleBottomSheet({Key? key, required this.circleId}) : super(key: key);
+//
+//   @override
+//   _AddStudentToCircleBottomSheetState createState() => _AddStudentToCircleBottomSheetState();
+// }
+//
+// class _AddStudentToCircleBottomSheetState extends State<AddStudentToCircleBottomSheet> {
+//   final _formKey = GlobalKey<FormState>();
+//   final _nameController = TextEditingController();
+//   final _emailController = TextEditingController();
+//   final _passwordController = TextEditingController();
+//   final _phoneController = TextEditingController();
+//   String? _gender = 'male';
+//   String? _phoneNumber = '';
+//   bool _isLoading = false;
+//
+//   @override
+//   void dispose() {
+//     _nameController.dispose();
+//     _emailController.dispose();
+//     _passwordController.dispose();
+//     _phoneController.dispose();
+//     super.dispose();
+//   }
+//
+//   Future<void> _saveStudent() async {
+//     if (!_formKey.currentState!.validate()) return;
+//     setState(() => _isLoading = true);
+//
+//     try {
+//       final user = context.read<AuthBloc>().userModel;
+//       if (user == null) throw Exception('No authenticated user found');
+//
+//       final db = await DatabaseManager().database;
+//       final existingUser = await db.query(
+//         'User',
+//         where: '(email = ? OR phone = ?) AND deleted_at IS NULL',
+//         whereArgs: [_emailController.text, _phoneNumber],
+//       );
+//
+//       if (existingUser.isNotEmpty) throw Exception('email_or_phone_exists'.tr(context));
+//
+//       await db.transaction((txn) async {
+//         final userId = await txn.insert('User', {
+//           'full_name': _nameController.text,
+//           'email': _emailController.text,
+//           'password': _passwordController.text,
+//           'phone': _phoneNumber,
+//           'gender': _gender,
+//           'role': 'student',
+//           'status': 'active',
+//           'created_at': DateTime.now().toIso8601String(),
+//         });
+//
+//         final studentId = await txn.insert('Student', {
+//           'user_id': userId,
+//           'teacher_id': user.id,
+//           'created_at': DateTime.now().toIso8601String(),
+//         });
+//
+//         await txn.insert('CircleStudent', {
+//           'circle_id': widget.circleId,
+//           'student_id': studentId,
+//           'teacher_id': user.id,
+//           'created_at': DateTime.now().toIso8601String(),
+//         });
+//       });
+//
+//       if (mounted) {
+//         ScaffoldMessenger.of(context).showSnackBar(_snackBar('added_successfully'.tr(context), Colors.green));
+//         Navigator.pop(context);
+//         context.read<CircleStudentBloc>().add(LoadCircleStudents(context, circleId: widget.circleId));
+//       }
+//     } catch (e) {
+//       if (mounted) {
+//         ScaffoldMessenger.of(context).showSnackBar(_snackBar(e.toString(), Colors.red));
+//       }
+//     } finally {
+//       if (mounted) setState(() => _isLoading = false);
+//     }
+//   }
+//
+//   String? _requiredValidator(String? value) => (value == null || value.isEmpty) ? 'required_field'.tr(context) : null;
+//
+//   String? _phoneValidator(PhoneNumber? phone) => (phone == null || phone.number.isEmpty) ? 'required_field'.tr(context) : null;
+//
+//   InputDecoration _inputDecoration(String label) => InputDecoration(
+//     labelText: label,
+//     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+//   );
+//
+//   Widget _buildGenderSelection() {
+//     return Row(
+//       mainAxisAlignment: MainAxisAlignment.center,
+//       children: ['male', 'female'].map((type) {
+//         return Row(
+//           children: [
+//             Radio<String>(
+//               value: type,
+//               groupValue: _gender,
+//               activeColor: Theme.of(context).primaryColor,
+//               onChanged: (value) => setState(() => _gender = value),
+//             ),
+//             Text(type.tr(context)),
+//           ],
+//         );
+//       }).toList(),
+//     );
+//   }
+//
+//   SnackBar _snackBar(String message, Color color) {
+//     return SnackBar(
+//       content: Text(message),
+//       behavior: SnackBarBehavior.floating,
+//       backgroundColor: color,
+//       margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
+//     );
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return SafeArea(
+//       child: SingleChildScrollView(
+//         padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 16, left: 16, right: 16),
+//         child: Form(
+//           key: _formKey,
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             crossAxisAlignment: CrossAxisAlignment.stretch,
+//             children: [
+//               Text('add_new_student'.tr(context), style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
+//               const SizedBox(height: 16),
+//
+//               CustomTextField(controller: _nameController, labelText: 'full_name'.tr(context), prefixIcon: Icons.person, validator: _requiredValidator, hintText: '',),
+//               const SizedBox(height: 16),
+//
+//               CustomTextField(controller: _emailController, labelText: 'email'.tr(context), prefixIcon: Icons.email, keyboardType: TextInputType.emailAddress, validator: _requiredValidator, hintText: '',),
+//               const SizedBox(height: 16),
+//
+//               IntlPhoneField(
+//                 controller: _phoneController,
+//                 initialCountryCode: 'SA',
+//                 searchText: 'search_country'.tr(context),
+// //                   languageCode: 'ar',
+//                 showCountryFlag: false,
+//                 decoration: _inputDecoration('phone'.tr(context)),
+//                 onChanged: (phone) => _phoneNumber = phone.completeNumber,
+//                 validator: _phoneValidator,
+//               ),
+//               const SizedBox(height: 16),
+//
+//               CustomTextField(controller: _passwordController, labelText: 'password'.tr(context), prefixIcon: Icons.lock, obscureText: true, validator: _requiredValidator, hintText: '',),
+//               const SizedBox(height: 16),
+//
+//               _buildGenderSelection(),
+//               const SizedBox(height: 16),
+//
+//               _isLoading ? const Center(child: CircularProgressIndicator()) : CustomButton(text: 'save'.tr(context), onPressed: _saveStudent, icon: Icons.save),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

@@ -40,12 +40,12 @@ class HistoryItem extends StatelessWidget {
                   children: [
                     _buildItem(
                       context,
-                      "from_surah".tr(context) +
+                      "from_surah".trans(context) +
                           quran.getSurahNameArabic(progressHistory.homework.startSurahNumber),
                     ),
                     _buildItem(
                       context,
-                      "to_surah".tr(context) +
+                      "to_surah".trans(context) +
                           quran.getSurahNameArabic(progressHistory.homework.endSurahNumber),
                     ),
                   ],
@@ -55,12 +55,12 @@ class HistoryItem extends StatelessWidget {
                   children: [
                     _buildItem(
                       context,
-                      "from_ayah".tr(context) +
+                      "from_ayah".trans(context) +
                           progressHistory.homework.startAyahNumber.toString(),
                     ),
                     _buildItem(
                       context,
-                      "to_ayah".tr(context) +
+                      "to_ayah".trans(context) +
                           progressHistory.homework.endAyahNumber.toString(),
                     ),
                   ],
@@ -103,7 +103,7 @@ class HistoryItem extends StatelessWidget {
                   const SizedBox(height: 10),
                   Divider(),
                 Text(
-                    'student_score'.tr(context),
+                    'student_score'.trans(context),
                     style: Theme.of(context).textTheme.displayLarge,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -114,7 +114,7 @@ class HistoryItem extends StatelessWidget {
                       children: [
                         Column(
                           children: [
-                        Text('reading_wrongs'.tr(context),
+                        Text('reading_wrongs'.trans(context),
                         style: Theme.of(context).textTheme.displaySmall,
                         
                         ),
@@ -125,7 +125,7 @@ class HistoryItem extends StatelessWidget {
                         ),
                          Column(
                           children: [
-                        Text('tajweed_wrongs'.tr(context),
+                        Text('tajweed_wrongs'.trans(context),
                         style: Theme.of(context).textTheme.displaySmall,
                         
                         ),
@@ -136,7 +136,7 @@ class HistoryItem extends StatelessWidget {
                         ),
                          Column(
                           children: [
-                        Text('tashkeel_wrongs'.tr(context),
+                        Text('tashkeel_wrongs'.trans(context),
                         style: Theme.of(context).textTheme.displaySmall,
                         
                         ),
@@ -151,7 +151,7 @@ class HistoryItem extends StatelessWidget {
       const SizedBox(height: 10),
                   Divider(),
                 Text(
-                    'student_rating'.tr(context),
+                    'student_rating'.trans(context),
                     style: Theme.of(context).textTheme.displayLarge,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -162,7 +162,7 @@ class HistoryItem extends StatelessWidget {
                       children: [
                         Column(
                           children: [
-                        Text('reading_rating'.tr(context),
+                        Text('reading_rating'.trans(context),
                         style: Theme.of(context).textTheme.displaySmall,
                         
                         ),
@@ -173,7 +173,7 @@ class HistoryItem extends StatelessWidget {
                         ),
                          Column(
                           children: [
-                        Text('review_rating'.tr(context),
+                        Text('review_rating'.trans(context),
                         style: Theme.of(context).textTheme.displaySmall,
                         
                         ),
@@ -184,7 +184,7 @@ class HistoryItem extends StatelessWidget {
                         ),
                          Column(
                           children: [
-                        Text('telawah_rating'.tr(context),
+                        Text('telawah_rating'.trans(context),
                         style: Theme.of(context).textTheme.displaySmall,
                         
                         ),

@@ -26,7 +26,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("students_list".tr(context)),
+        title: Text("students_list".trans(context)),
         centerTitle: true,
       ),
       body: Column(
@@ -49,7 +49,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: TextField(
         decoration: InputDecoration(
-          hintText: 'search_students'.tr(context),
+          hintText: 'search_students'.trans(context),
           prefixIcon: Icon(Icons.search),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -100,15 +100,15 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Center(
-                    child: Text('new_student'.tr(context),
+                    child: Text('new_student'.trans(context),
                         style: Theme.of(context).textTheme.titleMedium)),
                 SizedBox(height: 16),
 
                 // Full Name Field
                 CustomTextField(
                   controller: nameController,
-                  hintText: 'full_name_hint'.tr(context),
-                  labelText: 'full_name'.tr(context),
+                  hintText: 'full_name_hint'.trans(context),
+                  labelText: 'full_name'.trans(context),
                   prefixIcon: Icons.person,
                 ),
                 SizedBox(height: 10),
@@ -116,8 +116,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                 // Email Field
                 CustomTextField(
                   controller: emailController,
-                  hintText: 'email_hint'.tr(context),
-                  labelText: 'email'.tr(context),
+                  hintText: 'email_hint'.trans(context),
+                  labelText: 'email'.trans(context),
                   prefixIcon: Icons.email,
                   keyboardType: TextInputType.emailAddress,
                 ),
@@ -127,8 +127,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                 IntlPhoneField(
                   controller: phoneController,
                   decoration: InputDecoration(
-                    labelText: 'phone'.tr(context),
-                    hintText: 'phone_hint'.tr(context),
+                    labelText: 'phone'.trans(context),
+                    hintText: 'phone_hint'.trans(context),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -143,8 +143,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                 // Password Field
                 CustomTextField(
                   controller: passwordController,
-                  hintText: 'password_hint'.tr(context),
-                  labelText: 'password'.tr(context),
+                  hintText: 'password_hint'.trans(context),
+                  labelText: 'password'.trans(context),
                   prefixIcon: Icons.lock,
                   obscureText: true,
                 ),
@@ -153,7 +153,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                 // Gender Selection
                 Row(
                   children: [
-                    Text('gender'.tr(context),
+                    Text('gender'.trans(context),
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                     SizedBox(width: 20),
@@ -165,7 +165,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                           groupValue: gender,
                           onChanged: (value) => setState(() => gender = value),
                         ),
-                        Text('male'.tr(context)),
+                        Text('male'.trans(context)),
                       ],
                     ),
                     Row(
@@ -176,7 +176,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                           groupValue: gender,
                           onChanged: (value) => setState(() => gender = value),
                         ),
-                        Text('female'.tr(context)),
+                        Text('female'.trans(context)),
                       ],
                     ),
                   ],
@@ -185,7 +185,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
 
                 // Save Button
                 CustomButton(
-                  text: 'save'.tr(context),
+                  text: 'save'.trans(context),
                   onPressed: _saveStudent,
                   icon: Icons.save,
                 ),
@@ -203,7 +203,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
         passwordController.text.isEmpty ||
         phoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('fill_all_fields'.tr(context))),
+        SnackBar(content: Text('fill_all_fields'.trans(context))),
       );
       return;
     }
@@ -226,7 +226,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
     confirmPasswordController.clear();
     phoneController.clear();
     Navigator.pop(context);
-    SuccessSnackbar.show(context: context, successText: 'inserted_successfully'.tr(context));
+    SuccessSnackbar.show(context: context, successText: 'inserted_successfully'.trans(context));
     
   }
 }

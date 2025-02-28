@@ -40,7 +40,7 @@ class ScreenHeader extends StatelessWidget {
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('welcome'.tr(context)),
+                Text('welcome'.trans(context)),
                 Text(userName),
                 
 
