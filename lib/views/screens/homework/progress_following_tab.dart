@@ -18,14 +18,26 @@ class ProgressFollowingTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Load homework when this tab is built
-    BlocProvider.of<HomeworkBloc>(context)
-        .add(LoadHomeworkEvent(context, student.id));
+    // BlocProvider.of<HomeworkBloc>(context)
+    //     .add(LoadHomeworkEvent(student.id));
 
     return BlocBuilder<HomeworkBloc, HomeworkState>(
       builder: (context, state) {
+        print('home work state');
+        print(state.toString());
         if (state is HomeworkLoading) {
           return Center(child: CircularProgressIndicator());
-        } else if (state is HomeworkLoaded) {
+        }
+        if(BlocProvider.of<HomeworkBloc>(context).listHomeWork?.isNotEmpty??false){
+          return ListView.builder(
+            itemCount: BlocProvider.of<HomeworkBloc>(context).listHomeWork?.length,
+            itemBuilder: (context, index) {
+              final homework = BlocProvider.of<HomeworkBloc>(context).listHomeWork![index];
+              return HomeworksItem(homework: homework, student: student);
+            },
+          );
+        }
+        else if (state is HomeworkLoaded) {
           final homeworkItems = state.homeworkList;
           if (homeworkItems.isEmpty) {
             return EmptyDataList();
@@ -37,7 +49,8 @@ class ProgressFollowingTab extends StatelessWidget {
               return HomeworksItem(homework: homework, student: student);
             },
           );
-        } else if (state is HomeworkError) {
+        }
+        else if (state is HomeworkError) {
           return Center(child: Text(state.message));
         }
         return Container(); // Default case

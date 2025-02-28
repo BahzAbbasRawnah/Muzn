@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/homework/homework_bloc.dart';
 import 'package:muzn/models/homework.dart';
@@ -170,7 +171,9 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                           // Dispatch AddHomeworkEvent
                           BlocProvider.of<HomeworkBloc>(context)
                               .add(AddHomeworkEvent(context, homework));
-
+                          BlocProvider.of<HomeworkBloc>(context)
+                              .add(LoadHomeworkEvent(widget.studentId));
+                          // Get.off(StudentProgressScreen(widget.studentId))
                           // Close the bottom sheet after successful insertion
                           Navigator.pop(context);
                         },

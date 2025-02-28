@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/models/circle_student.dart';
@@ -116,15 +117,24 @@ class HomeworksItem extends StatelessWidget {
                   child: CustomButton(
                     text: 'rating_button'.trans(context),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RatingStudentScreen(
-                            homework: homework,
-                            student: student,
-                          ),
-                        ),
-                      );
+                      print("homework.toString()");
+                      print(homework.toMap().toString());
+                      print('student.toString()');
+                      print(student.toMap().toString());
+                      Get.off(RatingStudentScreen(
+                                homework: homework,
+                                student: student,
+                              ));
+
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => RatingStudentScreen(
+                      //       homework: homework,
+                      //       student: student,
+                      //     ),
+                      //   ),
+                      // );
                     },
                     icon: Icons.rate_review,
                   ),

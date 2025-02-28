@@ -236,6 +236,14 @@ userId=await getUserId();
       );
 
       if (newUser.isNotEmpty) {
+        final storage = SecureStorage();
+        var user=User.fromMap(newUser.first);
+        storage.write(key: 'isLogin', value: 'true');
+        storage.write(key: 'user_id', value: user.id.toString());
+        storage.write(key: 'user_name', value: user.fullName.toString());
+        _getIsLogin();
+        _getUserId();
+        _getUserData();
         emit(AuthAuthenticated(User.fromMap(newUser.first)));
       } else {
         emit(AuthError('registration_failed'));

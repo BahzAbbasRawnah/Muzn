@@ -12,7 +12,7 @@ import 'package:muzn/views/widgets/custom_ayah_dropdown.dart';
 class EditStudentHomeworkBottomSheet extends StatefulWidget {
   final Homework homework;
 
-  const EditStudentHomeworkBottomSheet({Key? key, required this.homework}) : super(key: key);
+  const EditStudentHomeworkBottomSheet({super.key, required this.homework});
 
   @override
   _EditStudentHomeworkBottomSheetState createState() => _EditStudentHomeworkBottomSheetState();
@@ -204,7 +204,7 @@ Column(
 
     // Call the BLoC event to save the homework
     context.read<HomeworkBloc>().add(UpdateHomeworkEvent(
-            context,
+            // context,
             updatedHomework,
           ),
         );

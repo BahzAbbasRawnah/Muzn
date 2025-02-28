@@ -17,8 +17,8 @@ class ProgressHistoryTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Load history when this tab is built
-    BlocProvider.of<HomeworkBloc>(context)
-        .add(LoadHistoryEvent(context, studentId));
+    // BlocProvider.of<HomeworkBloc>(context)
+    //     .add(LoadHistoryEvent(context, studentId));
 
     return BlocBuilder<HomeworkBloc, HomeworkState>(
       builder: (context, state) {
@@ -39,6 +39,15 @@ class ProgressHistoryTab extends StatelessWidget {
           }
         } else if (state is HomeworkError) {
           return Center(child: Text(state.message));
+        }
+        if(BlocProvider.of<HomeworkBloc>(context).listStudentProgressHistory?.isNotEmpty??false){
+          return ListView.builder(
+            itemCount: BlocProvider.of<HomeworkBloc>(context).listStudentProgressHistory?.length,
+            itemBuilder: (context, index) {
+              final ProgressHistory = BlocProvider.of<HomeworkBloc>(context).listStudentProgressHistory![index];
+              return HistoryItem(progressHistory: ProgressHistory);
+            },
+          );
         }
         return Container(); // Default case
       },

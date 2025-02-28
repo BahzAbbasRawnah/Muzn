@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:jhijri/_src/_jHijri.dart';
 import 'package:muzn/app_localization.dart';
@@ -16,14 +17,14 @@ import 'package:quran/quran.dart' as quran;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RatingStudentScreen extends StatefulWidget {
-  final Homework homework;
-  final Student student;
+   Homework homework;
+   Student student;
 
-  const RatingStudentScreen({
-    Key? key,
+   RatingStudentScreen({
+    super.key,
     required this.homework,
     required this.student,
-  }) : super(key: key);
+  });
 
   @override
   State<RatingStudentScreen> createState() => _RatingStudentScreenState();
@@ -61,7 +62,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                 children: [
                   Center(
                     child: Text(
-                      widget.homework.categoryName!,
+                      widget.homework.categoryName??"",
                       style: Theme.of(context).textTheme.titleMedium,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -112,9 +113,8 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                                 size: 20, color: Colors.grey),
                             const SizedBox(width: 8),
                             Text(
-                              DateFormat('yyyy-MM-dd')
-                                      .format(widget.homework.homeworkDate) +
-                                  ' مــ',
+                              '${DateFormat('yyyy-MM-dd')
+                                      .format(widget.homework.homeworkDate)} مــ',
                               style: Theme.of(context).textTheme.bodyMedium,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -131,9 +131,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                                 size: 20, color: Colors.grey),
                             const SizedBox(width: 8),
                             Text(
-                              JHijri(fDate: widget.homework.homeworkDate)
-                                      .toString() +
-                                  ' هــ ',
+                              '${JHijri(fDate: widget.homework.homeworkDate)} هــ ',
                               style: Theme.of(context).textTheme.bodyMedium,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -238,7 +236,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                       text: 'save'.trans(context),
                       icon: Icons.save,
                       onPressed: () {
-                        StudentProgress progress = new StudentProgress(
+                        StudentProgress progress =  StudentProgress(
                             id: 0,
                             circleId: widget.homework.circleId,
                             studentId: widget.homework.studentId,
@@ -269,27 +267,33 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
     // Create an instance of StudentProgress
 
 
-    context.read<StudentProgressBloc>().setStudentProgress(studentProgress);
+   BlocProvider.of<StudentProgressBloc>(context).setStudentProgress(studentProgress);
 
     // Dispatch the event
-    context.read<StudentProgressBloc>().add(AddStudentProgress(
+   BlocProvider.of<StudentProgressBloc>(context).add(AddStudentProgress(
           studentProgress: studentProgress,
         ));
-    context.read<StudentProgressBloc>().stream.listen((state) {
-      if (state is StudentProgressAdded) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => StudentProgressScreen(
-              student: widget.student,
-              circleId: studentProgress.circleId,
-            ),
-          ),
-        );
-      } 
-      else if (state is StudentProgressError) {
-      }
-    });
+    print('widget.student.toMap().toString()');
+    print(widget.student.user?.toMap().toString());
+    Get.off(StudentProgressScreen(
+      student: widget.student,
+      circleId: studentProgress.circleId,
+    ),);
+    // context.read<StudentProgressBloc>().stream.listen((state) {
+    //   if (state is StudentProgressAdded) {
+    //     Navigator.pushReplacement(
+    //       context,
+    //       MaterialPageRoute(
+    //         builder: (context) => StudentProgressScreen(
+    //           student: widget.student,
+    //           circleId: studentProgress.circleId,
+    //         ),
+    //       ),
+    //     );
+    //   }
+    //   else if (state is StudentProgressError) {
+    //   }
+    // });
   }
 }
 

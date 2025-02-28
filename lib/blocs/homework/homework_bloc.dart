@@ -7,58 +7,61 @@ import 'package:muzn/models/homework.dart';
 
 // Events
 abstract class HomeworkEvent extends Equatable {
-  final BuildContext context;
+  // final BuildContext context;
 
-  const HomeworkEvent(this.context);
+  // const HomeworkEvent(this.context);
 
   @override
-  List<Object> get props => [context];
+  List<Object> get props => [];
 }
 
 class LoadHomeworkEvent extends HomeworkEvent {
-  final int studentId;
+  int studentId;
 
-  const LoadHomeworkEvent(BuildContext context, this.studentId) : super(context);
+  LoadHomeworkEvent(this.studentId);
 
   @override
-  List<Object> get props => [context, studentId];
+  List<Object> get props => [studentId];
 }
+
 class LoadHistoryEvent extends HomeworkEvent {
   final int studentId;
 
-  const LoadHistoryEvent(BuildContext context, this.studentId) : super(context);
+  LoadHistoryEvent(BuildContext context, this.studentId);
 
   @override
-  List<Object> get props => [context, studentId];
+  List<Object> get props => [studentId];
 }
 
 class AddHomeworkEvent extends HomeworkEvent {
   final Homework homework;
 
-  const AddHomeworkEvent(BuildContext context, this.homework) : super(context);
+  AddHomeworkEvent(BuildContext context, this.homework);
 
   @override
-  List<Object> get props => [context, homework];
+  List<Object> get props => [homework];
 }
 
 class UpdateHomeworkEvent extends HomeworkEvent {
   final Homework homework;
 
-  const UpdateHomeworkEvent(BuildContext context, this.homework)
-      : super(context);
+  UpdateHomeworkEvent(this.homework);
+
+  // : super(context);
 
   @override
-  List<Object> get props => [context, homework];
+  List<Object> get props => [homework];
 }
 
 class DeleteHomeworkEvent extends HomeworkEvent {
   final int homeworkId;
 
-  const DeleteHomeworkEvent(BuildContext context, this.homeworkId)
-      : super(context);
+  DeleteHomeworkEvent(this.homeworkId);
+
+  // : super(context);
 
   @override
-  List<Object> get props => [context, homeworkId];
+  List<Object> get props => [homeworkId];
 }
 
 // States
@@ -109,6 +112,8 @@ class HomeworkError extends HomeworkState {
 // Bloc
 class HomeworkBloc extends Bloc<HomeworkEvent, HomeworkState> {
   final DatabaseManager _databaseManager = DatabaseManager();
+  List<Homework>? listHomeWork;
+  List<StudentProgressHistory>? listStudentProgressHistory;
 
   HomeworkBloc() : super(HomeworkInitial()) {
     on<LoadHomeworkEvent>(_onLoadHomework);
@@ -119,42 +124,76 @@ class HomeworkBloc extends Bloc<HomeworkEvent, HomeworkState> {
     on<DeleteHomeworkEvent>(_onDeleteHomework);
   }
 
-Future<void> _onLoadHomework(
-    LoadHomeworkEvent event, Emitter<HomeworkState> emit) async {
-  emit(HomeworkLoading());
-  try {
-    final db = await _databaseManager.database;
+//
+// Future<void> _onLoadHomework(
+//     LoadHomeworkEvent event, Emitter<HomeworkState> emit) async {
+//   emit(HomeworkLoading());
+//   try {
+//     final db = await _databaseManager.database;
+//
+//     // Fetch homework with category name
+//     final List<Map<String, dynamic>> results = await db.rawQuery('''
+//       SELECT h.*, cat.name AS category_name
+//       FROM Homework h
+//       LEFT JOIN CirclesCategory cat ON h.circle_category_id = cat.id
+//       WHERE h.student_id = ? AND h.checked = ?
+//     ''', [event.studentId, 0]);
+//
+//     // Convert results to a list of Homework objects
+//     final homeworkList = results.map((map) {
+//       return Homework.fromMap({
+//         ...map,
+//         'category_name': map['category_name'] ?? '' // Ensure category name is handled properly
+//       });
+//     }).toList();
+// listHomeWork=homeworkList;
+//     emit(HomeworkLoaded(homeworkList));
+//   } catch (e, stackTrace) {
+//     debugPrint("Error loading homework: $e\n$stackTrace");
+//     emit(HomeworkError('Failed to load homework: $e')); // Include error details for debugging
+//   }
+// }
 
-    // Fetch homework with category name
-    final List<Map<String, dynamic>> results = await db.rawQuery('''
+  Future<void> _onLoadHomework(
+      LoadHomeworkEvent event, Emitter<HomeworkState> emit) async {
+    print("LoadHomeworkEvent received for student ID: ${event.studentId}");
+
+    emit(HomeworkLoading());
+
+    try {
+      final db = await _databaseManager.database;
+
+      final List<Map<String, dynamic>> results = await db.rawQuery('''
       SELECT h.*, cat.name AS category_name 
       FROM Homework h
       LEFT JOIN CirclesCategory cat ON h.circle_category_id = cat.id
       WHERE h.student_id = ? AND h.checked = ?
     ''', [event.studentId, 0]);
 
-    // Convert results to a list of Homework objects
-    final homeworkList = results.map((map) {
-      return Homework.fromMap({
-        ...map, 
-        'category_name': map['category_name'] ?? '' // Ensure category name is handled properly
-      });
-    }).toList();
+      final homeworkList = results.map((map) {
+        return Homework.fromMap({
+          ...map,
+          'category_name': map['category_name'] ?? ''
+          // Ensure category name is handled properly
+        });
+      }).toList();
+      listHomeWork = homeworkList;
 
-    emit(HomeworkLoaded(homeworkList));
-  } catch (e, stackTrace) {
-    debugPrint("Error loading homework: $e\n$stackTrace");
-    emit(HomeworkError('Failed to load homework: $e')); // Include error details for debugging
+      print("Loaded ${homeworkList.length} homework items.");
+
+      emit(HomeworkLoaded(homeworkList));
+    } catch (e, stackTrace) {
+      debugPrint("Error loading homework: $e\n$stackTrace");
+      emit(HomeworkError('Failed to load homework: $e'));
+    }
   }
-}
 
-
-Future<void> _onLoadHistory(
-    LoadHistoryEvent event, Emitter<HomeworkState> emit) async {
-  emit(HomeworkLoading());
-  try {
-    final db = await _databaseManager.database;
- final List<Map<String, dynamic>> results = await db.rawQuery('''
+  Future<void> _onLoadHistory(
+      LoadHistoryEvent event, Emitter<HomeworkState> emit) async {
+    emit(HomeworkLoading());
+    try {
+      final db = await _databaseManager.database;
+      final List<Map<String, dynamic>> results = await db.rawQuery('''
   SELECT h.*, sp.*, cat.name AS category_name
   FROM Homework h
   LEFT JOIN CirclesCategory cat ON h.circle_category_id = cat.id
@@ -162,26 +201,37 @@ Future<void> _onLoadHistory(
   WHERE h.student_id = ? AND h.checked = ?
 ''', [event.studentId, 1]);
 
-
-    final progressHistoryList = results.map((map) {
-      return StudentProgressHistory.fromMap(map);
-    }).toList();
-
-    emit(ProgressHistoryLoaded(progressHistoryList));
-  } catch (e) {
-    emit(HomeworkError('Failed to load history \n'+e.toString()));
+      final progressHistoryList = results.map((map) {
+        return StudentProgressHistory.fromMap(map);
+      }).toList();
+      listStudentProgressHistory = progressHistoryList;
+      emit(ProgressHistoryLoaded(progressHistoryList));
+    } catch (e) {
+      emit(HomeworkError('Failed to load history \n' + e.toString()));
+    }
   }
-}
+
+  // Future<void> _onAddHomework(
+  //     AddHomeworkEvent event, Emitter<HomeworkState> emit) async {
+  //   emit(HomeworkLoading());
+  //   // try {
+  //     await insertHomework(event.homework);
+  //     emit(HomeworkAdded());
+  //     add(LoadHomeworkEvent(event.homework.studentId));
+  //   emit(HomeworkAdded());
+  //   // } catch (e) {
+  //   //   emit(HomeworkError(e.toString()));
+  //   // }
+  // }
   Future<void> _onAddHomework(
       AddHomeworkEvent event, Emitter<HomeworkState> emit) async {
     emit(HomeworkLoading());
-    try {
-      await insertHomework(event.homework);
-      emit(HomeworkAdded());
-      add(LoadHomeworkEvent(event.context, event.homework.studentId));
-    } catch (e) {
-      emit(HomeworkError(e.toString()));
-    }
+    print("Inserting homework...");
+    await insertHomework(event.homework);
+    print("Homework inserted. Triggering reload...");
+    add(LoadHomeworkEvent(event.homework.studentId));
+    emit(HomeworkAdded());
+    print("HomeworkAdded state emitted.");
   }
 
   Future<void> _onUpdateHomework(
@@ -197,7 +247,7 @@ Future<void> _onLoadHistory(
       );
       emit(HomeworkUpdated());
       // Refresh homework list after updating
-      add(LoadHomeworkEvent(event.context, event.homework.studentId));
+      add(LoadHomeworkEvent(event.homework.studentId));
     } catch (e) {
       emit(HomeworkError(e.toString()));
     }
@@ -214,7 +264,7 @@ Future<void> _onLoadHistory(
         whereArgs: [event.homeworkId],
       );
       emit(HomeworkDeleted());
-      add(LoadHomeworkEvent(event.context, event.homeworkId));
+      add(LoadHomeworkEvent(event.homeworkId));
     } catch (e) {
       emit(HomeworkError(e.toString()));
     }
@@ -222,15 +272,12 @@ Future<void> _onLoadHistory(
 
   Future<void> insertHomework(Homework homework) async {
     try {
-
-    final db = await _databaseManager.database;
-    final homeworkMap = homework.toMap();
-    homeworkMap.remove('id');
-    await db.insert('Homework', homeworkMap);
+      final db = await _databaseManager.database;
+      final homeworkMap = homework.toMap();
+      homeworkMap.remove('id');
+      await db.insert('Homework', homeworkMap);
     } catch (e) {
       throw Exception('Failed to insert homework: $e');
     }
-
-
   }
 }

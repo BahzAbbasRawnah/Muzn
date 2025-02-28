@@ -8,7 +8,7 @@ class Student {
    DateTime? createdAt;
    DateTime? updatedAt;
    DateTime? deletedAt;
-  final User? user; // Optional User object
+   User? user; // Optional User object
 
   Student({
     required this.id,
@@ -39,8 +39,8 @@ class Student {
       'id': id,
       'teacher_id': teacherId,
       'user_id': userId,
-      'created_at': createdAt!.toIso8601String(),
-      'updated_at': updatedAt!.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
       'deleted_at': deletedAt?.toIso8601String(),
       'user': user?.toMap(), // Optional User object
     };
