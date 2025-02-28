@@ -54,7 +54,7 @@ class _QuranPdfScreenState extends State<QuranPdfScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'surah'.tr(context) + ' ' + quran.getSurahNameArabic(widget.surahNumber),
+          'surah'.trans(context) + ' ' + quran.getSurahNameArabic(widget.surahNumber),
         ),
       ),
       body: Column(
@@ -72,7 +72,7 @@ class _QuranPdfScreenState extends State<QuranPdfScreen> {
             child: Row(
               children: [
                 Text(
-                  'scroll_speed'.tr(context),
+                  'scroll_speed'.trans(context),
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 Expanded(

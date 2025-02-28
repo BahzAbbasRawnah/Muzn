@@ -100,13 +100,13 @@ class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
       listener: (context, state) {
         if (state is CircleError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message.tr(context))),
+            SnackBar(content: Text(state.message.trans(context))),
           );
         } else if (state is CirclesLoaded) {
           // SnackBar(content: Text(state.message.tr(context))),
           Navigator.of(context).pop(); // Close the bottom sheet
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            showSuccessMessage(context, 'edit_successfully'.tr(context));
+            showSuccessMessage(context, 'edit_successfully'.trans(context));
           });
           // Navigator.of(context).pop();
         // SnackBar(content: Text('success_add'.tr(context)));
@@ -127,25 +127,25 @@ class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'edit_circle'.tr(context),
+                  'edit_circle'.trans(context),
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
                   controller: _nameController,
-                  labelText: 'circle_name_label'.tr(context),
-                  hintText: 'circle_name_hint'.tr(context),
+                  labelText: 'circle_name_label'.trans(context),
+                  hintText: 'circle_name_hint'.trans(context),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 CustomDropdown(
-                  label: 'circle_category'.tr(context),
+                  label: 'circle_category'.trans(context),
                   selectedValue: _selectedCategory?.name,
                   items: _categories.map((cat) => cat['name'].toString()).toList(),
                   onChanged: (value) {
@@ -158,7 +158,7 @@ class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
                 ),
                 const SizedBox(height: 16),
                 CustomDropdown(
-                  label: 'circle_type'.tr(context),
+                  label: 'circle_type'.trans(context),
                   selectedValue: _selectedType?.toLocalizedTypeString(context),
                   items: CircleType.values
                       .map((type) => type.toLocalizedTypeString(context))
@@ -173,7 +173,7 @@ class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
                 ),
                 const SizedBox(height: 16),
                 CustomDropdown(
-                  label: 'circle_time'.tr(context),
+                  label: 'circle_time'.trans(context),
                   selectedValue: _selectedTime?.toLocalizeTimedString(context),
                   items: CircleTime.values
                       .map((time) => time.toLocalizeTimedString(context))
@@ -189,8 +189,8 @@ class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
                 const SizedBox(height: 16),
                 CustomTextField(
                   controller: _descriptionController,
-                  labelText: 'circle_description_label'.tr(context),
-                  hintText: 'circle_description_hint'.tr(context),
+                  labelText: 'circle_description_label'.trans(context),
+                  hintText: 'circle_description_hint'.trans(context),
                   line: 3,
                 ),
                 const SizedBox(height: 24),
@@ -202,7 +202,7 @@ class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
                       );
                     }
                     return CustomButton(
-                      text: 'update'.tr(context),
+                      text: 'update'.trans(context),
                       icon: Icons.update,
                       onPressed: () => _handleSave(context),
                     );

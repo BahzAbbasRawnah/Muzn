@@ -11,7 +11,7 @@ class ContactScreen extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text('contact'.tr(context)),
+          title: Text('contact'.trans(context)),
           centerTitle: true,
         ),
         body: Padding(
@@ -32,7 +32,7 @@ class ContactScreen extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       Text(
-                        'contact_welcome'.tr(context),
+                        'contact_welcome'.trans(context),
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
@@ -70,14 +70,14 @@ class ContactScreen extends StatelessWidget {
 
                       // Contact Form
                       CustomTextField(
-                        labelText: 'type_message'.tr(context),
-                        hintText: 'type_message'.tr(context),
+                        labelText: 'type_message'.trans(context),
+                        hintText: 'type_message'.trans(context),
                         line: 10,
                       ),
 
                       const SizedBox(height: 20),
                       CustomButton(
-                          text: 'send_message'.tr(context),
+                          text: 'send_message'.trans(context),
                           icon: Icons.send,
                           onPressed: () {}),
                     ],

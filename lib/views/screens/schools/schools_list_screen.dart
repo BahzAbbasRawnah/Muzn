@@ -13,7 +13,7 @@ import '../../../app_localization.dart';
 import '../../../blocs/school/school_bloc.dart';
 
 class SchoolsListScreen extends StatefulWidget {
-  const SchoolsListScreen({Key? key}) : super(key: key);
+  const SchoolsListScreen({super.key});
 
   @override
   State<SchoolsListScreen> createState() => _SchoolsListScreenState();
@@ -43,7 +43,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('schools'.tr(context)),
+        title: Text('schools'.trans(context)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -93,7 +93,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
           }
 
           if (state is SchoolError) {
-            return Center(child: Text(state.message.tr(context)));
+            return Center(child: Text(state.message.trans(context)));
           }
 
           if (state is SchoolsLoaded) {
@@ -130,7 +130,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                     const Icon(Icons.group, size: 20),
                                     const SizedBox(width: 4),
                                     Text(
-                                      '${school.circleCount ?? 0} ${'circles'.tr(context)}',
+                                      '${school.circleCount ?? 0} ${'circles'.trans(context)}',
                                     ),
                                   ],
                                 ),
@@ -178,13 +178,13 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                   context: context,
                                   builder: (context) => AlertDialog(
                                     alignment: Alignment.center,
-                                    title: Text('delete_school'.tr(context)),
+                                    title: Text('delete_school'.trans(context)),
                                     content: Text(
-                                        'delete_school_confirm'.tr(context)),
+                                        'delete_school_confirm'.trans(context)),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.pop(context),
-                                        child: Text('cancel'.tr(context)),
+                                        child: Text('cancel'.trans(context)),
                                       ),
                                       TextButton(
                                         onPressed: () {
@@ -195,17 +195,27 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                                 .read<SchoolBloc>()
                                                 .add(DeleteSchool(school.id));
                                             Navigator.pop(context);
-
-                                            // Reload schools after deletion
                                             if (mounted) {
                                               context.read<SchoolBloc>().add(
                                                   LoadSchools(
                                                       authState.user.id));
                                             }
+                                          }else{
+                                            context
+                                                .read<SchoolBloc>()
+                                                .add(DeleteSchool(school.id));
+                                            Navigator.pop(context);
+
+                                            // Reload schools after deletion
+                                            if (mounted) {
+                                              context.read<SchoolBloc>().add(
+                                                  LoadSchools(
+                                                      BlocProvider.of<AuthBloc>(context).userModel!.id));
+                                            }
                                           }
                                         },
                                         child: Text(
-                                          'delete'.tr(context),
+                                          'delete'.trans(context),
                                           style: const TextStyle(
                                               color: Colors.red),
                                         ),
@@ -222,7 +232,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                   children: [
                                     const Icon(Icons.edit),
                                     const SizedBox(width: 8),
-                                    Text('edit'.tr(context)),
+                                    Text('edit'.trans(context)),
                                   ],
                                 ),
                               ),
@@ -233,7 +243,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                     const Icon(Icons.delete, color: Colors.red),
                                     const SizedBox(width: 8),
                                     Text(
-                                      'delete'.tr(context),
+                                      'delete'.trans(context),
                                       style: const TextStyle(color: Colors.red),
                                     ),
                                   ],
@@ -281,6 +291,15 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
               }
             });
           } else {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              useSafeArea: true,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (context) => const AddSchoolBottomSheet(),
+            );
             print("User is not authenticated! Redirecting to login?");
           }
         },

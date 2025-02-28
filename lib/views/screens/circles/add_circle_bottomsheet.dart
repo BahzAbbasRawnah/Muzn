@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/circle/circle_bloc.dart';
+import 'package:muzn/blocs/school/school_bloc.dart';
 import 'package:muzn/models/circle.dart';
 import 'package:muzn/models/enums.dart';
+import 'package:muzn/models/school.dart';
 import 'package:muzn/services/database_service.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:muzn/views/widgets/custom_dropdown.dart';
@@ -13,10 +15,9 @@ import 'package:muzn/views/widgets/custom_text_field.dart';
 import '../../../app/core/show_success_message.dart';
 
 class AddCircleBottomSheet extends StatefulWidget {
-  final int schoolId;
+   int schoolId;
 
-  const AddCircleBottomSheet({Key? key, required this.schoolId})
-      : super(key: key);
+   AddCircleBottomSheet({super.key, required this.schoolId});
 
   @override
   AddCircleBottomSheetState createState() => AddCircleBottomSheetState();
@@ -26,16 +27,20 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _schoolController = TextEditingController();
   String? _selectedCategory;
+  String? _selectedSchool;
   CircleType? _selectedType;
   CircleTime? _selectedTime;
   List<Map<String, dynamic>> _categories = [];
+  List<School>? _schools=[];
   Map<String, int> _categoryNameToId = {};
 
   @override
   void initState() {
     super.initState();
     _loadCategories();
+    _schools=BlocProvider.of<SchoolBloc>(context).schoolsList;
   }
 
   Future<void> _loadCategories() async {
@@ -77,6 +82,22 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
           circleTime: _selectedTime?.name,
         );
         context.read<CircleBloc>().add(AddCircle(circle: circle));
+      }else{
+        if(BlocProvider.of<AuthBloc>(context).userModel!=null){
+          Circle circle = Circle(
+            name: _nameController.text,
+            schoolId: widget.schoolId,
+            teacherId: BlocProvider.of<AuthBloc>(context).userModel!.id,
+            description: _descriptionController.text,
+            circleCategoryId: _selectedCategory != null
+                ? _categoryNameToId[_selectedCategory]
+                : null,
+            circleType: _selectedType?.name,
+            circleTime: _selectedTime?.name,
+          );
+          context.read<CircleBloc>().add(AddCircle(circle: circle));
+
+        }
       }
     }
   }
@@ -87,11 +108,11 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
       listener: (context, state) {
         if (state is CircleError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message.tr(context))),
+            SnackBar(content: Text(state.message.trans(context))),
           );
         } else if (state is CirclesLoaded) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            showSuccessMessage(context, 'added_successfully'.tr(context));
+            showSuccessMessage(context, 'added_successfully'.trans(context));
           });
           Navigator.of(context).pop();
         }
@@ -111,25 +132,58 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'new_circle'.tr(context),
+                  'new_circle'.trans(context),
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
                   controller: _nameController,
-                  labelText: 'circle_name_label'.tr(context),
-                  hintText: 'circle_name_hint'.tr(context),
+                  labelText: 'circle_name_label'.trans(context),
+                  hintText: 'circle_name_hint'.trans(context),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'required_field'.tr(context);
+                      return 'required_field'.trans(context);
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
+                if(widget.schoolId==-1)
+                  CustomDropdown(
+                    label: 'school'.trans(context),
+                    selectedValue: _selectedSchool, // Show the name in dropdown
+                    items: _schools!
+                        .map((cat) => cat.name.toString())
+                        .toList(),
+                    onChanged: (value) {
+                      final selectedSchool = _schools!.firstWhere((cat) => cat.name == value);
+                      print('Selected School ID: ${selectedSchool.id}');
+                      print('Selected School Name: ${selectedSchool.name}');
+                      setState(() {
+                        _selectedSchool = selectedSchool.name;
+
+                        widget.schoolId=selectedSchool.id;// Store the entire school object
+                      });
+                    },
+                  ),
+
+                // CustomDropdown(
+                  //   label: 'circle_school'.tr(context),
+                  //   selectedValue: _selectedSchool,
+                  //   items:
+                  //   _schools!.map((cat) => cat.name.toString()).toList(),
+                  //   onChanged: (value) {
+                  //     print('selected school');
+                  //     print(value);
+                  //     setState(() {
+                  //       _selectedSchool = value;
+                  //     });
+                  //   },
+                  // ),
+                const SizedBox(height: 16),
                 CustomDropdown(
-                  label: 'circle_category'.tr(context),
+                  label: 'circle_category'.trans(context),
                   selectedValue: _selectedCategory,
                   items:
                       _categories.map((cat) => cat['name'].toString()).toList(),
@@ -141,7 +195,7 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
                 ),
                 const SizedBox(height: 16),
                 CustomDropdown(
-                  label: 'circle_type'.tr(context),
+                  label: 'circle_type'.trans(context),
                   selectedValue: _selectedType?.toLocalizedTypeString(context),
                   items: CircleType.values
                       .map((type) => type.toLocalizedTypeString(context))
@@ -155,7 +209,7 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
                 ),
                 const SizedBox(height: 16),
                 CustomDropdown(
-                  label: 'circle_time'.tr(context),
+                  label: 'circle_time'.trans(context),
                   selectedValue: _selectedTime?.toLocalizeTimedString(context),
                   items: CircleTime.values
                       .map((time) => time.toLocalizeTimedString(context))
@@ -170,8 +224,8 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
                 const SizedBox(height: 16),
                 CustomTextField(
                   controller: _descriptionController,
-                  labelText: 'circle_description_label'.tr(context),
-                  hintText: 'circle_description_hint'.tr(context),
+                  labelText: 'circle_description_label'.trans(context),
+                  hintText: 'circle_description_hint'.trans(context),
                   line: 3,
                 ),
                 const SizedBox(height: 24),
@@ -183,7 +237,7 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
                       );
                     }
                     return CustomButton(
-                      text: 'save'.tr(context),
+                      text: 'save'.trans(context),
                       icon: Icons.save,
                       onPressed: () => _handleSave(context),
                     );

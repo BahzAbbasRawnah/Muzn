@@ -34,12 +34,12 @@ class AppDrawer extends StatelessWidget {
                     children: [
                        CircleAvatar(
                         radius: 40,
+                        backgroundColor: Colors.white,
                         child: Icon(
                           Icons.person,
                           size: 50,
                           color: Theme.of(context).iconTheme.color,
                           ),
-                        backgroundColor: Colors.white,
                       ),
                       const SizedBox(height: 5),
                       if (authState is AuthAuthenticated) ...[
@@ -52,6 +52,15 @@ class AppDrawer extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                       ],
+                      if(BlocProvider.of<AuthBloc>(context).userModel!=null)
+                        Text(
+                          BlocProvider.of<AuthBloc>(context).userModel?.fullName??"",
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                      Text(
+                        BlocProvider.of<AuthBloc>(context).userModel?.email??"",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
                     ],
                   ),
                 ),
@@ -65,7 +74,7 @@ class AppDrawer extends StatelessWidget {
                   width: 30,
                   height: 30,
                 ),
-                title: Text('quran'.tr(context)),
+                title: Text('quran'.trans(context)),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -79,7 +88,7 @@ class AppDrawer extends StatelessWidget {
               // Main Screen
               ListTile(
                 leading: const Icon(Icons.home),
-                title: Text('home'.tr(context)),
+                title: Text('home'.trans(context)),
                 onTap: () {
                   Navigator.pushReplacement(
                     context,
@@ -107,8 +116,8 @@ class AppDrawer extends StatelessWidget {
                     ),
                     title: Text(
                       themeState is ThemeDark
-                          ? 'dark_mode'.tr(context)
-                          : 'light_mode'.tr(context),
+                          ? 'dark_mode'.trans(context)
+                          : 'light_mode'.trans(context),
                     ),
                   );
                 },
@@ -147,7 +156,7 @@ class AppDrawer extends StatelessWidget {
                     leading: isEnglish
                         ? Image.asset('assets/flags/us_flag.png', width: 20)
                         : Image.asset('assets/flags/ar_flag.png', width: 20),
-                    title: Text('language'.tr(context)),
+                    title: Text('language'.trans(context)),
                     subtitle: Text(
                       isEnglish ? 'English' : 'العربية',
                       style: TextStyle(
@@ -170,7 +179,7 @@ class AppDrawer extends StatelessWidget {
               // Contact Screen
               ListTile(
                 leading: const Icon(Icons.contact_mail),
-                title: Text('contact'.tr(context)),
+                title: Text('contact'.trans(context)),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -182,7 +191,7 @@ class AppDrawer extends StatelessWidget {
               ),
                     ListTile(
                 leading: const Icon(Icons.info_outline),
-                title: Text('about'.tr(context)),
+                title: Text('about'.trans(context)),
                 onTap: () {
                   Navigator.push(
                     context,
@@ -198,7 +207,7 @@ class AppDrawer extends StatelessWidget {
               if (BlocProvider.of<AuthBloc>(context).isLogin)
                 ListTile(
                   leading: const Icon(Icons.exit_to_app),
-                  title: Text('logout'.tr(context)),
+                  title: Text('logout'.trans(context)),
                   onTap: () {
                     context.read<AuthBloc>().add(LogoutEvent());
                     Navigator.pushReplacement(

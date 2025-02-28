@@ -35,6 +35,8 @@ dependencies:
   bloc: ^9.0.0
   get:
   flutter_secure_storage:
+  pdf:
+  printing:
 
 
 
@@ -47,7 +49,13 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
+  fonts:
+    - family: Amiri
+      fonts:
+        - asset: assets/fonts/Amiri-Regular.ttf
+    - family: HacenTunisia
+      fonts:
+        - asset: assets/fonts/HacenTunisia.ttf
   assets:
     - assets/translations/ # Directory for translation files
     - assets/images/ # Directory for image 

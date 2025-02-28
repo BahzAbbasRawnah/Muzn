@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:get/get.dart';
 import 'package:muzn/app/core/check_if_login.dart';
 import 'package:muzn/app/theme/dark_theme.dart';
 import 'package:muzn/app/theme/light_theme.dart';
@@ -11,7 +12,9 @@ import 'package:muzn/blocs/auth/auth_bloc.dart';
 import 'package:muzn/blocs/bloc_observer.dart';
 import 'package:muzn/blocs/circle/circle_bloc.dart';
 import 'package:muzn/blocs/circle_category/circle_category_bloc.dart';
+import 'package:muzn/blocs/circle_student/add_student_cubit.dart';
 import 'package:muzn/blocs/circle_student/circle_student_bloc.dart';
+import 'package:muzn/blocs/circle_student/edit_student_cubit.dart';
 import 'package:muzn/blocs/homework/homework_bloc.dart';
 import 'package:muzn/blocs/school/school_bloc.dart';
 import 'package:muzn/blocs/statistics/statistics_bloc.dart';
@@ -89,6 +92,8 @@ class Muzn extends StatelessWidget {
         BlocProvider<StudentProgressBloc>(create: (_) => StudentProgressBloc()),
         BlocProvider<ThemeBloc>(create: (_) => ThemeBloc()),
         BlocProvider<StatisticsBloc>(create: (_) => StatisticsBloc()),
+        BlocProvider<AddStudentCubit>(create: (_) => AddStudentCubit()),
+        BlocProvider<EditStudentCubit>(create: (_) => EditStudentCubit()),
       ],
       child: BlocBuilder<LocaleBloc, LocaleState>(
         builder: (context, localeState) {
@@ -98,12 +103,11 @@ class Muzn extends StatelessWidget {
               print(themeState.toString());
               return BlocBuilder<AuthBloc, AuthState>(
                 builder: (context, authState) {
-                  // Get the current locale from state, default to Arabic
                   final currentLocale = localeState is LocaleLoadedState
                       ? localeState.locale
                       : const Locale('ar');
 
-                  return MaterialApp(
+                  return GetMaterialApp(
                     locale: currentLocale,
                     theme: themeState is ThemeLight ? lightTheme : darkTheme,
                     debugShowCheckedModeBanner: false,
@@ -130,38 +134,6 @@ class Muzn extends StatelessWidget {
                       }
                       return const Locale('ar'); // Default to Arabic
                     },
-                    // home: FutureBuilder<Widget>(
-                    //   future: _getInitialScreen(authState),
-                    //   // Call the async method
-                    //   builder: (context, snapshot) {
-                    //     if (snapshot.connectionState ==
-                    //         ConnectionState.waiting) {
-                    //       // Show a loading indicator while waiting for the result
-                    //       return const Scaffold(
-                    //         body: Center(
-                    //           child: CircularProgressIndicator(),
-                    //         ),
-                    //       );
-                    //     } else if (snapshot.hasError) {
-                    //       // Handle errors
-                    //       return Scaffold(
-                    //         body: Center(
-                    //           child: Text('Error: ${snapshot.error}'),
-                    //         ),
-                    //       );
-                    //     } else if (snapshot.hasData) {
-                    //       // Return the appropriate screen
-                    //       return snapshot.data!;
-                    //     } else {
-                    //       // Fallback in case of no data
-                    //       return const Scaffold(
-                    //         body: Center(
-                    //           child: Text('No screen to display'),
-                    //         ),
-                    //       );
-                    //     }
-                    //   },
-                    // ),
                     home:isAuthenticated?HomeScreen(): _getInitialScreen(authState),
                   );
                 },

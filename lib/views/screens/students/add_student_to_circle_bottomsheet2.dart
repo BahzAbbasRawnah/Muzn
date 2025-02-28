@@ -1,56 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
-import 'package:muzn/app_localization.dart';
-import 'package:muzn/blocs/auth/auth_bloc.dart';
-import 'package:muzn/blocs/circle_student/circle_student_bloc.dart';
-import 'package:muzn/models/circle_student.dart';
-import 'package:muzn/services/database_service.dart';
-import 'package:muzn/views/widgets/custom_button.dart';
-import 'package:muzn/views/widgets/custom_text_field.dart';
-import 'package:muzn/views/widgets/message.dart';
+import 'package:get/get.dart';
+// import 'package:get/get.dart' ;
+// import 'package:get/get.dart' as get; // Import with an alias
 
-class EditStudentBottomSheet extends StatefulWidget {
-  final CircleStudent circleStudent;
+import '../../../blocs/auth/auth_bloc.dart';
+import '../../../blocs/circle_student/add_student_cubit.dart';
+import '../../../blocs/circle_student/circle_student_bloc.dart';
+import '../../widgets/custom_button.dart';
+import 'package:muzn/app_localization.dart';
+
+import '../../widgets/custom_text_field.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+
+class AddStudentToCircleBottomSheet2 extends StatefulWidget {
   final int circleId;
 
-  const EditStudentBottomSheet({
-    Key? key,
-    required this.circleStudent,
-    required this.circleId,
-  }) : super(key: key);
+  const AddStudentToCircleBottomSheet2({super.key, required this.circleId});
 
   @override
-  _EditStudentBottomSheetState createState() => _EditStudentBottomSheetState();
+  _AddStudentToCircleBottomSheetState createState() =>
+      _AddStudentToCircleBottomSheetState();
 }
 
-class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
+class _AddStudentToCircleBottomSheetState
+    extends State<AddStudentToCircleBottomSheet2> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
-  final TextEditingController countryController = TextEditingController();
   final TextEditingController countryCodeController = TextEditingController();
-  String? gender;
-  String? country;
-  bool _isLoading = false;
+  final TextEditingController countryController = TextEditingController();
+  String? gender = 'male';
+  String? country = 'السعودية';
   String _phoneNumber = '';
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Pre-fill the form with the student's current data
-    nameController.text = widget.circleStudent.student.user!.fullName;
-    emailController.text = widget.circleStudent.student.user!.email;
-    phoneController.text = widget.circleStudent.student.user!.phone;
-    countryCodeController.text = widget.circleStudent.student.user!.countryCode??"";
-    countryController.text = widget.circleStudent.student.user!.country ?? 'السعودية';
-    gender = widget.circleStudent.student.user!.gender ?? 'male';
-    country = widget.circleStudent.student.user!.country ?? 'السعودية';
-    _phoneNumber = widget.circleStudent.student.user!.phone ?? '';
-  }
 
   @override
   void dispose() {
@@ -58,143 +42,78 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
     emailController.dispose();
     passwordController.dispose();
     phoneController.dispose();
-    countryController.dispose();
+    countryCodeController.dispose();
     super.dispose();
-  }
-
-  Future<void> _updateStudent() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _isLoading = true);
-
-    try {
-      final db = await DatabaseManager().database;
-
-      // Step 1: Fetch the user_id from the Student table using student_id
-      final List<Map<String, dynamic>> studentResult = await db.query(
-        'Student',
-        where: 'id = ?',
-        whereArgs: [widget.circleStudent.id],
-      );
-
-      if (studentResult.isEmpty) {
-        throw Exception('Student not found');
-      }
-
-      final int userId = studentResult.first['user_id'] as int;
-
-      // Step 2: Check if email or phone exists for another user
-      final List<Map<String, dynamic>> existingUser = await db.query(
-        'User',
-        where: '(email = ? OR phone = ?) AND id != ? AND deleted_at IS NULL',
-        whereArgs: [emailController.text, _phoneNumber, userId],
-      );
-
-      if (existingUser.isNotEmpty) {
-        throw Exception('email_or_phone_exists'.trans(context));
-      }
-
-      // Step 3: Update the User table using the fetched user_id
-      await db.transaction((txn) async {
-        // Update User table
-        await txn.update(
-          'User',
-          {
-            'full_name': nameController.text,
-            'email': emailController.text,
-            'phone': _phoneNumber,
-            'country': country,
-            'gender': gender,
-            'updated_at': DateTime.now().toIso8601String(),
-          },
-          where: 'id = ?',
-          whereArgs: [userId],
-        );
-
-        // Update Student table (if needed)
-        await txn.update(
-          'Student',
-          {
-            'updated_at': DateTime.now().toIso8601String(),
-          },
-          where: 'id = ?',
-          whereArgs: [widget.circleStudent.id],
-        );
-      });
-
-      // Close the bottom sheet
-      if (mounted) {
-        Navigator.pop(context);
-      }
-
-      // Reload the student list
-      if (mounted) {
-        context.read<CircleStudentBloc>().add(
-              LoadCircleStudents(
-                // context,
-                circleId: widget.circleId,
-              ),
-            );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('edit_successfully'.trans(context)),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.green,
-            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
-          ),
-        );
-        // SuccessSnackbar.show(
-        //   context: context,
-        //   successText: 'updated_successfully'.tr(context),
-        // );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.red,
-            margin: EdgeInsets.only(bottom: 80, left: 16, right: 16), // Adjust margin
-          ),
-        );
-        // ErrorSnackbar.show(context: context, errorText: e.toString());
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final deviceHeight = MediaQuery.of(context).size.height;
+
     return SafeArea(
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            // height: 300,
-            width: double.infinity,
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-              left: 16,
-              right: 16,
-            ),
-            child: SingleChildScrollView(
-              child: Form(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+            left: 16,
+            right: 16,
+          ),
+          child: BlocConsumer<AddStudentCubit, AddStudentState>(
+            listener: (context, state) async {
+              if (state is AddStudentSuccess) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('added_successfully'.trans(context)),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.pop(context);
+                // Load the circle students again
+                context.read<CircleStudentBloc>().add(
+                      LoadCircleStudents(
+                        // context,
+                        circleId: widget.circleId,
+                      ),
+                    );
+              } else if (state is AddStudentError) {
+                print("state.message: ${state.message}");
+                Get.snackbar(
+                  '', // Title of the snackbar
+                  state.message ?? 'An unknown error occurred', // Message of the snackbar
+                  backgroundColor: Colors.red, // Background color of the snackbar
+                  colorText: Colors.white, // Text color of the snackbar
+                  borderRadius: 8.0, // Border radius of the snackbar
+                  margin: EdgeInsets.all(16), // Margin around the snackbar
+                  snackPosition: SnackPosition.BOTTOM, // Position of the snackbar (TOP or BOTTOM)
+                  duration: Duration(seconds: 3), // Duration the snackbar is shown
+                  icon: Icon(Icons.error, color: Colors.white), // Optional icon
+                );
+                // ScaffoldMessenger.of(context).showSnackBar(
+                //   SnackBar(
+                //     content: Text(state.message ?? 'An unknown error occurred'),
+                //     backgroundColor: Colors.red,
+                //   ),
+                // );
+
+                // Optionally add a delay before navigating or performing another action
+                await Future.delayed(Duration(seconds: 2)); // Adjust duration as needed
+              }
+
+            },
+            builder: (context, state) {
+              return Form(
                 key: _formKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'edit_student'.trans(context),
-                      style: Theme.of(context).textTheme.headlineSmall,
+                      'add_new_student'.trans(context),
+                      style: Theme.of(context).textTheme.titleLarge,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
-              
+
                     // Full Name field
                     CustomTextField(
                       controller: nameController,
@@ -209,7 +128,7 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
                       },
                     ),
                     SizedBox(height: deviceHeight * 0.02),
-              
+
                     // Email field
                     CustomTextField(
                       controller: emailController,
@@ -229,8 +148,23 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
                       },
                     ),
                     SizedBox(height: deviceHeight * 0.02),
-              
+
                     // Country field
+                    // IntlPhoneField(
+                    //   decoration: InputDecoration(
+                    //     labelText: 'country'.tr(context),
+                    //     hintText: 'country'.tr(context),
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(8.0),
+                    //     ),
+                    //   ),
+                    //   initialCountryCode: 'SA',
+                    //   onCountryChanged: (country) {
+                    //     setState(() {
+                    //       this.country = country.name;
+                    //     });
+                    //   },
+                    // ),
                     IntlPhoneField(
                       controller: countryController,
                       decoration: InputDecoration(
@@ -242,7 +176,7 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
-                      showCountryFlag: false,
+                      showCountryFlag: true,
                       initialValue: country,
                       initialCountryCode: 'SA',
                       languageCode: 'ar',
@@ -258,13 +192,11 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
                         });
                       },
                     ),
+
                     SizedBox(height: deviceHeight * 0.02),
-              
+
                     // Phone field
                     IntlPhoneField(
-                      controller: phoneController,
-                      searchText: 'search_country'.trans(context),
-                      languageCode: 'ar',
                       invalidNumberMessage: 'phone_min_length'.trans(context),
                       decoration: InputDecoration(
                         labelText: 'phone'.trans(context),
@@ -274,14 +206,16 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                       ),
-                      onCountryChanged: (country) {
-                        phoneController.text = '';
-                      },
+                      searchText: 'search_country'.trans(context),
+                      languageCode: 'ar',
                       initialCountryCode: 'SA',
-                      textAlign: TextAlign.start,
                       onChanged: (phone) {
+                        print('phone.countryCode');
+                        print(phone.countryCode);
+                        print('phone.number');
+                        print(phone.number);
                         _phoneNumber = phone.number;
-
+                        countryCodeController.text=phone.countryCode;
                       },
                       validator: (value) {
                         if (value == null || value.number.isEmpty) {
@@ -291,11 +225,29 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
                       },
                     ),
                     SizedBox(height: deviceHeight * 0.02),
-              
+
+                    // Password field
+                    CustomTextField(
+                      controller: passwordController,
+                      hintText: 'password_hint'.trans(context),
+                      labelText: 'password'.trans(context),
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'required_field'.trans(context);
+                        }
+                        if (value.length < 6) {
+                          return 'invalid_password'.trans(context);
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: deviceHeight * 0.02),
+
                     // Gender selection
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text('gender'.trans(context)),
                         Radio<String>(
@@ -323,20 +275,37 @@ class _EditStudentBottomSheetState extends State<EditStudentBottomSheet> {
                       ],
                     ),
                     SizedBox(height: deviceHeight * 0.02),
-              
+
                     // Save button
-                    if (_isLoading)
+                    if (state is AddStudentLoading)
                       const Center(child: CircularProgressIndicator())
                     else
                       CustomButton(
-                        text: 'update'.trans(context),
-                        onPressed: _updateStudent,
+                        text: 'save'.trans(context),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            var user=BlocProvider.of<AuthBloc>(context).userModel;
+                            final teacherId =user!.id;
+                            final cubit = context.read<AddStudentCubit>();
+                            cubit.saveStudent(
+                              fullName: nameController.text,
+                              email: emailController.text,
+                              password: passwordController.text,
+                              phone: _phoneNumber,
+                              countryCode: countryCodeController.text,
+                              country: country!,
+                              gender: gender!,
+                              teacherId: teacherId,
+                              circleId: widget.circleId,
+                            );
+                          }
+                        },
                         icon: Icons.save,
                       ),
                   ],
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ),
       ),

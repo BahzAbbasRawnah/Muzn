@@ -60,7 +60,7 @@ class _AppLocalizationDelegate extends LocalizationsDelegate<AppLocalization> {
 }
 
 extension Translate on String {
-  String tr(BuildContext context) {
+  String trans(BuildContext context) {
     return AppLocalization.of(context)!.translate(this);
   }
 }
@@ -69,17 +69,17 @@ extension CircleTimeExtension on CircleTime {
   String toLocalizeTimedString(BuildContext context) {
     switch (this) {
       case CircleTime.morning:
-        return 'morning'.tr(context);
+        return 'morning'.trans(context);
       case CircleTime.noon:
-        return 'noon'.tr(context);
+        return 'noon'.trans(context);
       case CircleTime.afternoon:
-        return 'afternoon'.tr(context);
+        return 'afternoon'.trans(context);
       case CircleTime.maghrib:
-        return 'maghrib'.tr(context);
+        return 'maghrib'.trans(context);
       case CircleTime.evening:
-        return 'evening'.tr(context);
+        return 'evening'.trans(context);
       default:
-        return 'morning'.tr(context);
+        return 'morning'.trans(context);
     }
   }
 }
@@ -88,12 +88,12 @@ extension CircleTypeExtension on CircleType {
   String toLocalizedTypeString(BuildContext context) {
     switch (this) {
       case CircleType.offline:
-        return 'offline'.tr(context);
+        return 'offline'.trans(context);
       case CircleType.online:
-        return 'online'.tr(context);
+        return 'online'.trans(context);
 
       default:
-        return 'offline'.tr(context);
+        return 'offline'.trans(context);
     }
   }
 }
@@ -102,15 +102,15 @@ extension RatingTranslation on Rating {
   String translate(BuildContext context) {
     switch (this) {
       case Rating.excellent:
-        return "excellent".tr(context);
+        return "excellent".trans(context);
       case Rating.very_good:
-        return "very_good".tr(context);
+        return "very_good".trans(context);
       case Rating.good:
-        return "good".tr(context);
+        return "good".trans(context);
       case Rating.average:
-        return "average".tr(context);
+        return "average".trans(context);
       case Rating.weak:
-        return "weak".tr(context);
+        return "weak".trans(context);
       default:
         return this.name;
     }

@@ -41,7 +41,7 @@ class CustomAyahDropdown extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: Text(
-              label.tr(context),
+              label.trans(context),
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ),

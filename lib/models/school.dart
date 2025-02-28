@@ -1,4 +1,4 @@
-class School {
+  class School {
   final int id;
   final int? teacherId;
   final String name;

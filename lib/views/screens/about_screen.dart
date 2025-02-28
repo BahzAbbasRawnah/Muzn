@@ -6,7 +6,7 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("about".tr(context)),
+        title: Text("about".trans(context)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -24,7 +24,7 @@ class AboutScreen extends StatelessWidget {
 
             // App Name
             Text(
-              AppStrings.appName.tr(context),
+              AppStrings.appName.trans(context),
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.start,
             ),
@@ -32,19 +32,19 @@ class AboutScreen extends StatelessWidget {
 
             // Short Description
          Text(
-  "about_description".tr(context),
+  "about_description".trans(context),
   textAlign: TextAlign.center,
   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
 ),
 const SizedBox(height: 20),
 
 // Features Section
-_buildFeatureItem(Icons.groups, "manage_circles".tr(context)),
-_buildFeatureItem(Icons.book, "full_quran".tr(context)),
-_buildFeatureItem(Icons.headphones, "listen_quran".tr(context)),
-_buildFeatureItem(Icons.search, "search_quran".tr(context)),
-_buildFeatureItem(Icons.language, "arabic_and_english".tr(context)),
-_buildFeatureItem(Icons.adjust, "dark_light_mode".tr(context)),
+_buildFeatureItem(Icons.groups, "manage_circles".trans(context)),
+_buildFeatureItem(Icons.book, "full_quran".trans(context)),
+_buildFeatureItem(Icons.headphones, "listen_quran".trans(context)),
+_buildFeatureItem(Icons.search, "search_quran".trans(context)),
+_buildFeatureItem(Icons.language, "arabic_and_english".trans(context)),
+_buildFeatureItem(Icons.adjust, "dark_light_mode".trans(context)),
           ]         
         ),
       ),

@@ -79,7 +79,7 @@ class _MainScreenState extends State<MainScreen>
     return Scaffold(
         key: _scaffoldKey,
         appBar: CustomAppBar(
-          title: 'home'.tr(context),
+          title: 'home'.trans(context),
           scaffoldKey: _scaffoldKey,
         ),
         drawer: AppDrawer(), // Pass the userController here

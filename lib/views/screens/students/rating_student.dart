@@ -42,7 +42,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("student_rating".tr(context)),
+        title: Text("student_rating".trans(context)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -73,13 +73,13 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                     children: [
                       _buildItem(
                         context,
-                        "from_surah".tr(context) +
+                        "from_surah".trans(context) +
                             quran.getSurahNameArabic(
                                 widget.homework.startSurahNumber),
                       ),
                       _buildItem(
                         context,
-                        "to_surah".tr(context) +
+                        "to_surah".trans(context) +
                             quran.getSurahNameArabic(
                                 widget.homework.endSurahNumber),
                       ),
@@ -91,12 +91,12 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                     children: [
                       _buildItem(
                         context,
-                        "from_ayah".tr(context) +
+                        "from_ayah".trans(context) +
                             widget.homework.startAyahNumber.toString(),
                       ),
                       _buildItem(
                         context,
-                        "to_ayah".tr(context) +
+                        "to_ayah".trans(context) +
                             widget.homework.endAyahNumber.toString(),
                       ),
                     ],
@@ -145,7 +145,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                   const SizedBox(height: 20),
                   Center(
                     child: Text(
-                      'student_score'.tr(context),
+                      'student_score'.trans(context),
                       style: Theme.of(context).textTheme.displayLarge,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -153,19 +153,19 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                   Column(
                     children: [
                       QuantityInput(
-                        label: "reading_wrongs".tr(context),
+                        label: "reading_wrongs".trans(context),
                         onQuantityChanged: (value) {
                           setState(() => readingWrongs = value);
                         },
                       ),
                       QuantityInput(
-                        label: "tajweed_wrongs".tr(context),
+                        label: "tajweed_wrongs".trans(context),
                         onQuantityChanged: (value) {
                           setState(() => tajweedWrongs = value);
                         },
                       ),
                       QuantityInput(
-                        label: "tashkeel_wrongs".tr(context),
+                        label: "tashkeel_wrongs".trans(context),
                         onQuantityChanged: (value) {
                           setState(() => tashkeelWrongs = value);
                         },
@@ -175,7 +175,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                   const SizedBox(height: 20),
                   Center(
                     child: Text(
-                      'student_rating'.tr(context),
+                      'student_rating'.trans(context),
                       style: Theme.of(context).textTheme.displayLarge,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -184,7 +184,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
 
                   // Rating Selector
                   Text(
-                      'reading_rating'.tr(context),
+                      'reading_rating'.trans(context),
                       style: Theme.of(context).textTheme.displayMedium,
 
                  
@@ -202,7 +202,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
 
                   // Rating Selector
                   Text(
-                      'review_rating'.tr(context),
+                      'review_rating'.trans(context),
                       style: Theme.of(context).textTheme.displayMedium,
 
                  
@@ -219,7 +219,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
 
                   // Rating Selector
                   Text(
-                      'telawah_rating'.tr(context),
+                      'telawah_rating'.trans(context),
                       style: Theme.of(context).textTheme.displayMedium,
 
                  
@@ -235,7 +235,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                   const SizedBox(height: 20),
                   Center(
                     child: CustomButton(
-                      text: 'save'.tr(context),
+                      text: 'save'.trans(context),
                       icon: Icons.save,
                       onPressed: () {
                         StudentProgress progress = new StudentProgress(

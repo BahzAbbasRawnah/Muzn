@@ -52,7 +52,7 @@ class _QuranScreenState extends State<QuranScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("quran".tr(context)),
+        title: Text("quran".trans(context)),
       ),
       body: Column(
         children: [
@@ -61,7 +61,7 @@ class _QuranScreenState extends State<QuranScreen> {
             padding: EdgeInsets.symmetric(horizontal: 3,vertical: 5),
             child: CustomTextField(
               controller: _searchController,
-              hintText: 'surah_search'.tr(context),
+              hintText: 'surah_search'.trans(context),
               prefixIcon: Icons.search,
             ),
           ),
@@ -139,7 +139,7 @@ class _QuranScreenState extends State<QuranScreen> {
     String surahNameArabic = quran.getSurahNameArabic(surahNumber);
     int verseCount = quran.getVerseCount(surahNumber);
     String verseText =
-        verseCount > 10 ? "verse".tr(context) : "verses".tr(context);
+        verseCount > 10 ? "verse".trans(context) : "verses".trans(context);
     return "$surahNameArabic ( $verseCount $verseText )";
   }
 }

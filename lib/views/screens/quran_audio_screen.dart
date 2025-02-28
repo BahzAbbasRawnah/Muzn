@@ -99,7 +99,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'surah'.tr(context) + getSurahNameArabic(widget.surahNumber),
+          'surah'.trans(context) + getSurahNameArabic(widget.surahNumber),
         ),
       ),
       body: Column(
@@ -174,7 +174,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                     _buildPlaybackButton(
                       Icons.fast_rewind,
                       0.5,
-                      'decrease_playback_speed'.tr(context),
+                      'decrease_playback_speed'.trans(context),
                     ),
                     // Play/Pause Button
                     StreamBuilder<PlayerState>(
@@ -202,7 +202,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                     _buildPlaybackButton(
                       Icons.fast_forward,
                       1.5,
-                      'increase_playback_speed'.tr(context),
+                      'increase_playback_speed'.trans(context),
                     ),
                     // Stop Button
                     IconButton(

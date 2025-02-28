@@ -41,12 +41,12 @@ class _StudentScreenState extends State<StudentProgressScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("student_homework".tr(context)),
+          title: Text("student_homework".trans(context)),
           centerTitle: true,
           bottom: TabBar(
             tabs: [
-              Tab(child: Text("following_tab".tr(context))),
-              Tab(child: Text("progress_tab".tr(context))),
+              Tab(child: Text("following_tab".trans(context))),
+              Tab(child: Text("progress_tab".trans(context))),
             ],
           ),
         ),

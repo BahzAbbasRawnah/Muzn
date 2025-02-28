@@ -31,6 +31,7 @@ class RegisterEvent extends AuthEvent {
   final String password;
   final String phone;
   final String country;
+  final String countryCode;
   final String gender;
 
   RegisterEvent({
@@ -40,10 +41,11 @@ class RegisterEvent extends AuthEvent {
     required this.phone,
     required this.country,
     required this.gender,
+    required this.countryCode,
   });
 
   @override
-  List<Object> get props => [fullName, email, password, phone, country, gender];
+  List<Object> get props => [fullName, email, password, phone, country,countryCode, gender];
 }
 
 class UpdateProfileEvent extends AuthEvent {
@@ -219,6 +221,7 @@ userId=await getUserId();
         'password': hashedPassword,
         'phone': event.phone,
         'country': event.country,
+        'country_code': event.countryCode,
         'gender': event.gender,
         'role': 'student', // Default role
         'status': 'active',

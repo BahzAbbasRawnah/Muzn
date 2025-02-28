@@ -45,7 +45,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                 children: [
                   Center(
                     child: Text(
-                      'add_student_homework'.tr(context),
+                      'add_student_homework'.trans(context),
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -56,7 +56,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'circle_category'.tr(context),
+                        'circle_category'.trans(context),
                         style: Theme.of(context).textTheme.labelMedium,
                       ),
                       const SizedBox(height: 8),
@@ -76,7 +76,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                     children: [
                       Expanded(
                         child: CustomSurahDropdown(
-                          label: 'from_surah'.tr(context),
+                          label: 'from_surah'.trans(context),
                           selectedSurah: selectedFromSurah,
                           surahList: surahList,
                           onChanged: (value) {
@@ -91,7 +91,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: CustomAyahDropdown(
-                          label: 'from_ayah'.tr(context),
+                          label: 'from_ayah'.trans(context),
                           selectedAyah: selectedFromAyah,
                           maxAyah: selectedFromSurah?.ayat_count,
                           onChanged: selectedFromSurah != null
@@ -112,7 +112,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                     children: [
                       Expanded(
                         child: CustomSurahDropdown(
-                          label: 'to_surah'.tr(context),
+                          label: 'to_surah'.trans(context),
                           selectedSurah: selectedToSurah,
                           surahList: surahList,
                           onChanged: (value) {
@@ -127,7 +127,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: CustomAyahDropdown(
-                          label: 'to_ayah'.tr(context),
+                          label: 'to_ayah'.trans(context),
                           selectedAyah: selectedToAyah,
                           maxAyah: selectedToSurah?.ayat_count,
                           onChanged: selectedToSurah != null
@@ -147,7 +147,7 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                   BlocBuilder<HomeworkBloc, HomeworkState>(
                     builder: (context, state) {
                       return CustomButton(
-                        text: 'save'.tr(context),
+                        text: 'save'.trans(context),
                         icon: Icons.save,
                         onPressed: () {
                           // Create Homework object

@@ -17,7 +17,7 @@ class EmptyDataList extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'empty_data'.tr(context),
+                      'empty_data'.trans(context),
                       style: Theme.of(context).textTheme.displayMedium,
                     ),
                   ],
