@@ -11,11 +11,11 @@ class AttendanceStatusBottomSheet extends StatefulWidget {
   final AttendanceStatuse? currentStatus;
 
   const AttendanceStatusBottomSheet({
-    Key? key,
+    super.key,
     required this.studentId,
     required this.circleId,
     this.currentStatus,
-  }) : super(key: key);
+  });
 
   @override
   State<AttendanceStatusBottomSheet> createState() =>
@@ -43,7 +43,7 @@ class _AttendanceStatusBottomSheetState
  
     context.read<CircleStudentBloc>().add(
           UpdateStudentAttendance(
-            // context,
+            context,
             studentId: widget.studentId,
             circleId: widget.circleId,
             status: _selectedStatus!,

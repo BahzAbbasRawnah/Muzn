@@ -46,7 +46,7 @@ class _CircleScreenState extends State<CircleScreen> {
   void _loadStudents() {
     context.read<CircleStudentBloc>().add(
           LoadCircleStudents(
-            // context,
+            context,
             circleId: widget.circle.id!,
           ),
         );
@@ -248,6 +248,8 @@ class _CircleScreenState extends State<CircleScreen> {
             Expanded(
               child: BlocBuilder<CircleStudentBloc, CircleStudentState>(
                 builder: (context, state) {
+                  print('state is 88888888888888888888');
+                  print(state.toString());
                   if (state is CircleStudentLoading) {
                     return const Center(child: CircularProgressIndicator());
                   }
@@ -315,6 +317,8 @@ class _CircleScreenState extends State<CircleScreen> {
   }
 
   Widget _buildStudentListItem(CircleStudent Circle_student) {
+    print('Circle_student.todayAttendance');
+    print(Circle_student.todayAttendance?.name);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
       child: Card(
@@ -332,7 +336,7 @@ class _CircleScreenState extends State<CircleScreen> {
           ),
           title:Row(
             children: [
-            Expanded(child: Text(Circle_student.student.user!.fullName,)),
+            Expanded(child: Text(Circle_student.student.user?.fullName??"",)),
             // Spacer(),
             IconButton(
               icon:Icon(
@@ -407,6 +411,7 @@ class _CircleScreenState extends State<CircleScreen> {
                           onPressed: () {
                             BlocProvider.of<CircleStudentBloc>(context).add(
                               DeleteStudentToCircleEvent(
+                                context,
                                 studentId: Circle_student.student.id,
                                 circleId: widget.circle.id!,
                               ),

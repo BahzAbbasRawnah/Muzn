@@ -71,7 +71,7 @@ class _AddStudentToCircleBottomSheetState
                 // Load the circle students again
                 context.read<CircleStudentBloc>().add(
                       LoadCircleStudents(
-                        // context,
+                        context,
                         circleId: widget.circleId,
                       ),
                     );
