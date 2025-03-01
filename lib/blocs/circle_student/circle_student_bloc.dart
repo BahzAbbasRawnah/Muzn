@@ -9,9 +9,9 @@ import 'package:muzn/services/database_service.dart';
 
 // Events
 abstract class CircleStudentEvent extends Equatable {
-  // final BuildContext? context;
+  final BuildContext? context;
 
-  // const CircleStudentEvent(this.context);
+  const CircleStudentEvent(this.context);
 
   // @override
   // List<Object> get props => [context];
@@ -20,7 +20,8 @@ abstract class CircleStudentEvent extends Equatable {
 class LoadCircleStudents extends CircleStudentEvent {
   final int circleId;
 
-   LoadCircleStudents(
+   LoadCircleStudents(super.context,
+    // super.context,
       {
     required this.circleId,
   });
@@ -34,9 +35,8 @@ class UpdateStudentAttendance extends CircleStudentEvent {
   final int circleId;
   final AttendanceStatuse status;
 
-   UpdateStudentAttendance(
-    // super.context,
-      {
+  const UpdateStudentAttendance(
+    super.context, {
     required this.studentId,
     required this.circleId,
     required this.status,
@@ -50,9 +50,8 @@ class AddStudentToCircleEvent extends CircleStudentEvent {
   final int studentId;
   final int circleId;
 
-   AddStudentToCircleEvent(
-    // super.context,
-       {
+  const AddStudentToCircleEvent(
+    super.context, {
     required this.studentId,
     required this.circleId,
   });
@@ -65,9 +64,8 @@ class DeleteStudentToCircleEvent extends CircleStudentEvent {
   final int studentId;
   final int circleId;
 
-   DeleteStudentToCircleEvent(
-    // super.context,
-      {
+  const DeleteStudentToCircleEvent(
+    super.context, {
     required this.studentId,
     required this.circleId,
   });
@@ -132,6 +130,9 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
     LoadCircleStudents event,
     Emitter<CircleStudentState> emit,
   ) async {
+    print('start load circleStudents 00000000000000000000');
+    // final today = DateTime.now().toIso8601String().split('T')[0];  // Get current date in "YYYY-MM-DD"
+
     emit(CircleStudentLoading());
     try {
       final db = await _databaseManager.database;
@@ -150,7 +151,8 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         u.country,
         u.gender,
         u.role as role,
-        sa.status as today_attendance
+        sa.status as today_attendance,
+        sa.attendance_date as attendance_date
       FROM CircleStudent cs
       INNER JOIN Student s ON s.id = cs.student_id
       INNER JOIN User u ON u.id = s.user_id
@@ -161,7 +163,8 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
       WHERE cs.circle_id = ? 
         AND cs.deleted_at IS NULL
     ''', [event.circleId, event.circleId]);
-
+print("results.toString()");
+print(results.toString());
       final students = results
           .map((row) => CircleStudent(
               id: row['id'] as int,
@@ -211,7 +214,6 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         summary[status] = row['count'] as int;
       }
       circleId = event.circleId;
-      studentsList=students;
       emit(CircleStudentsLoaded(
         students: students,
         attendanceSummary: summary,
@@ -227,32 +229,43 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
   ) async {
     try {
       final db = await _databaseManager.database;
+      print('event.studentId');
+      print(event.studentId);
+      print('event.circleId');
+      print(event.circleId);
       print('----------------------------------------------------------');
 
       // Check if attendance record exists for today
+      final today = DateTime.now().toIso8601String().split('T')[0]; // YYYY-MM-DD
       final existing = await db.query(
         'StudentAttendance',
         where: '''
-          student_id = ? AND 
-          circle_id = ? AND 
-          DATE(attendance_date) = DATE('now') AND
-          deleted_at IS NULL
-        ''',
-        whereArgs: [event.studentId, event.circleId],
+    student_id = ? AND 
+    circle_id = ? AND
+    DATE(attendance_date) = ? AND
+      deleted_at IS NULL
+  ''',
+        whereArgs: [event.studentId, event.circleId, today],
       );
-      print("check if attendance record exists for today$existing");
-
+      //  deleted_at IS NULL
+      print("Query: student_id = ${event.studentId}, circle_id = ${event.circleId}, date = $today");
+      print("Existing Records: $existing");
       if (existing.isEmpty) {
         // Insert new record
-        await db.insert('StudentAttendance', {
+       int userid= await db.insert('StudentAttendance', {
           'student_id': event.studentId,
           'circle_id': event.circleId,
           'status': event.status.name,
-          'attendance_date': DateTime.now().toIso8601String(),
+
+          'attendance_date': DateTime.now().toIso8601String().split('T')[0], // Stores only "YYYY-MM-DD"
+
+          // 'attendance_date': DateTime.now().toIso8601String(),
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
-        print(" attendance record not exists for today");
+        print(" attendance record not exists for today 999999999");
+        print(" inserted id is ");
+        print(userid);
       } else {
         // Update existing record
         await db.update(
@@ -270,10 +283,10 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
           whereArgs: [event.studentId, event.circleId],
         );
 
-        print(" attendance record updated for today");
+        print(" attendance record updated for today998887787");
       }
 
-      add(LoadCircleStudents( circleId: event.circleId));
+      add(LoadCircleStudents(event.context, circleId: event.circleId));
     } catch (e) {
       emit(CircleStudentError(e.toString()));
     }
@@ -304,7 +317,7 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
       }
 
       // Reload students
-      add(LoadCircleStudents(circleId: event.circleId));
+      add(LoadCircleStudents(event.context, circleId: event.circleId));
     } catch (e) {
       emit(CircleStudentError(e.toString()));
     }
@@ -331,13 +344,11 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
         );
 
         // Emit a success state
-        emit(CircleStudentDeleted('delete_success'));
-
         // emit(CircleStudentDeleted());
       } else {
         emit(CircleStudentError('Student not found in the circle.'));
       }
-add(LoadCircleStudents(circleId: circleId!));
+add(LoadCircleStudents(event.context, circleId: circleId!));
       // Reload students
       // add(LoadCircleStudents(context, circleId: circleId));
     } catch (e) {

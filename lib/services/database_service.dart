@@ -168,7 +168,7 @@ await db.execute('''
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id INTEGER,
     circle_id INTEGER,
-    attendance_date DATETIME NOT NULL,
+    attendance_date DATE NOT NULL,
     status TEXT CHECK(status IN ('none', 'present', 'absent', 'absent_with_excuse', 'early_departure', 'not_listened', 'late')) DEFAULT 'none',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
