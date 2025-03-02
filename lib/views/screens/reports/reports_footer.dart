@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:muzn/app_localization.dart';
 
 class ReportFooter extends StatelessWidget {
   final int rowCount;
   final String teacherName;
 
-  const ReportFooter({
+  const ReportFooter({super.key,
     required this.rowCount,
     required this.teacherName,
   });
@@ -28,7 +29,7 @@ class ReportFooter extends StatelessWidget {
 
           ),
           Text(
-            'Teacher: $teacherName',
+            'Teacher:'.trans(context)+teacherName,
             style: Theme.of(context).textTheme.labelMedium,
           
           ),

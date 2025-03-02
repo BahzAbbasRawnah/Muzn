@@ -191,6 +191,7 @@ print(results.toString());
           .toList();
 
       // Get attendance summary
+      studentsList=students;
       final summaryResults = await db.rawQuery('''
       SELECT 
         COALESCE(sa.status, 'none') as status,
@@ -263,6 +264,7 @@ print(results.toString());
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
+
         print(" attendance record not exists for today 999999999");
         print(" inserted id is ");
         print(userid);
