@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/homework/homework_bloc.dart';
+import 'package:muzn/blocs/homework/student_history_cubit.dart';
 import 'package:muzn/models/student.dart';
+import 'package:muzn/views/screens/homework/present_history_tab.dart';
 import 'package:muzn/views/screens/homework/progress_following_tab.dart';
 import 'package:muzn/views/screens/homework/progress_history_tab.dart';
 import 'package:muzn/views/screens/homework/add_student_homework.dart';
@@ -47,7 +49,7 @@ class _StudentScreenState extends State<StudentProgressScreen> {
         // TODO: implement listener
       },
       child: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Scaffold(
           appBar: AppBar(
             title: Text("student_homework".trans(context)),
@@ -59,14 +61,17 @@ class _StudentScreenState extends State<StudentProgressScreen> {
                 if (val == 0) {
                   BlocProvider.of<HomeworkBloc>(context)
                       .add(LoadHomeworkEvent(widget.student.id));
-                } else {
+                } else if(val==1){
                   BlocProvider.of<HomeworkBloc>(context)
                       .add(LoadHistoryEvent(context, widget.student.id));
+                }else{
+                  BlocProvider.of<StudentHistoryCubit>(context).loadStudentHistory(widget.circleId, widget.student.id);
                 }
               },
               tabs: [
                 Tab(child: Text("following_tab".trans(context))),
                 Tab(child: Text("progress_tab".trans(context))),
+                Tab(child: Text("history_tab".trans(context))),
               ],
             ),
           ),
@@ -98,6 +103,7 @@ class _StudentScreenState extends State<StudentProgressScreen> {
                         ProgressFollowingTab(student: widget.student),
                         // Second Tab: Homework History
                         ProgressHistoryTab(studentId: widget.student.id),
+                        PresentHistoryTab(student: widget.student),
                       ],
                     ),
                   ),

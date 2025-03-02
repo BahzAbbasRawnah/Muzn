@@ -26,6 +26,8 @@ import 'package:muzn/views/screens/onBoarding_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'blocs/homework/student_history_cubit.dart';
+
 void main() async {
   Bloc.observer = MuznBlocObserver();
 
@@ -94,6 +96,7 @@ class Muzn extends StatelessWidget {
         BlocProvider<StatisticsBloc>(create: (_) => StatisticsBloc()),
         BlocProvider<AddStudentCubit>(create: (_) => AddStudentCubit()),
         BlocProvider<EditStudentCubit>(create: (_) => EditStudentCubit()),
+        BlocProvider<StudentHistoryCubit>(create: (_) => StudentHistoryCubit()),
       ],
       child: BlocBuilder<LocaleBloc, LocaleState>(
         builder: (context, localeState) {

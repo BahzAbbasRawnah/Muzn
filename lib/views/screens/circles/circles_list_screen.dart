@@ -76,7 +76,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
                     MaterialPageRoute(
                         builder: (context) =>
                             Report(
-                              reportTitle: 'School Report',
+                              reportTitle: 'circles_report'.trans(context),
                               startDateMiladi: '2023-10-01',
                               endDateMiladi: '2023-10-31',
                               startDateHijri: '1445-03-15',
@@ -85,7 +85,8 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
                                 'الاسم',
                                 'الوصف',
                                 'وقت الحلقة',
-                                'نوع الحلقة'
+                                'نوع الحلقة',
+                                'تاريخ الإضافة'
                               ],
                               tableData: BlocProvider
                                   .of<CircleBloc>(context)
@@ -94,15 +95,16 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
                               [
                                 school.name,
                                 school.description ?? 'N/A',
-                                '${school.circleTime ?? 0}',
-                                school.circleType ?? 'N/A'
+                                '${school.circleTime?.trans(context) }',
+                                school.circleType?.trans(context) ?? 'N/A',
+                                school.createdAt?.toIso8601String().split('T')[0] ?? 'N/A'
                               ])
                                   .toList(),
                               // tableData: [
                               //   ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
                               //   ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
                               // ],
-                              teacherName: 'John Doe',
+                              teacherName: BlocProvider.of<AuthBloc>(context).userModel?.fullName ?? "",
                             )));
               }
             },

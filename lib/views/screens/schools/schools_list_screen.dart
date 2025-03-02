@@ -55,7 +55,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => Report(
-                            reportTitle: 'School Report',
+                            reportTitle: 'school_report'.trans(context),
                             startDateMiladi: '2023-10-01',
                             endDateMiladi: '2023-10-31',
                             startDateHijri: '1445-03-15',
@@ -64,7 +64,8 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                               'الاسم',
                               'العنوان',
                               'عدد الحلقات',
-                              'النوع'
+                              'النوع',
+                              'تاريخ الإضافة'
                             ],
                             tableData: BlocProvider.of<SchoolBloc>(context)
                                 .schoolsList!
@@ -72,14 +73,15 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                       school.name,
                                       school.address ?? 'N/A',
                                       '${school.circleCount ?? 0}',
-                                      school.type ?? 'N/A'
+                                      school.type?.trans(context) ?? 'N/A',
+                                      school.createdAt?.toIso8601String().split('T')[0] ?? 'N/A'
                                     ])
                                 .toList(),
                             // [
                             //   ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
                             //   ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
                             // ],
-                            teacherName: 'John Doe',
+                            teacherName:BlocProvider.of<AuthBloc>(context).userModel?.fullName??"",
                           )));
             },
           ),

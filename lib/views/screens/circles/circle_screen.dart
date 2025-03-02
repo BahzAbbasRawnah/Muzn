@@ -71,50 +71,69 @@ class _CircleScreenState extends State<CircleScreen> {
       appBar: AppBar(
         title: Text(widget.circle.name),
         centerTitle: true,
-           actions: [
+        actions: [
           IconButton(
-            icon:  Icon(
+            icon: Icon(
               Icons.print,
             ),
             onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => Report(
-  reportTitle: 'School Report',
-  startDateMiladi: '2023-10-01',
-  endDateMiladi: '2023-10-31',
-  startDateHijri: '1445-03-15',
-  endDateHijri: '1445-04-15',
-                  headerTitles: ['الجنس', 'الحضور', 'رقم الهاتف', 'الاسم'], // Update headers accordingly
-                  tableData: BlocProvider.of<CircleStudentBloc>(context)
-                      .studentsList!
-                      .map((school) => [
-                    school.student.user?.gender.trans(context) ?? 'N/A',
-                    '${school.todayAttendance?.name.toString().trans(context) ?? 0}',
-                    school.student.user?.phone ?? 'N/A',
-                    school.student.user?.fullName ?? "",
-                  ])
-                      .toList()
-                      .reversed // Reverse the entire list
-                      .toList(),
-                  teacherName: BlocProvider.of<AuthBloc>(context).userModel?.fullName ?? "",
+              if (BlocProvider.of<CircleStudentBloc>(context).studentsList !=
+                  null) {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Report(
+                              reportTitle: 'students_report'.trans(context)+' '+widget.circle.name,
+                              startDateMiladi: '2023-10-01',
+                              endDateMiladi: '2023-10-31',
+                              startDateHijri: '1445-03-15',
+                              endDateHijri: '1445-04-15',
+                              headerTitles: [
+                                'الاسم',
+                                'رقم الهاتف',
+                                'الجنس',
+                                'الحضور',
 
-                  // headerTitles: ['الاسم ', 'رقم الهاتف', 'الحضور', 'الجنس'],
-  // // tableData: [
-  // //   ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
-  // //   ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
-  // // ],
-  //                 tableData: BlocProvider.of<CircleStudentBloc>(context)
-  //                     .studentsList!
-  //                     .map((school) => [
-  //                   school.student.user?.fullName??"",
-  //                   school.student.user?.phone ?? 'N/A',
-  //                   '${school.todayAttendance?.name.toString().trans(context) ?? 0}',
-  //                   school.student.user?.gender.trans(context) ?? 'N/A'
-  //                 ])
-  //                     .toList(),
-  // teacherName: BlocProvider.of<AuthBloc>(context).userModel?.fullName??"",
-)
-                )
-                );
+
+                              ],
+                              // Update headers accordingly
+                              tableData:
+                                  BlocProvider.of<CircleStudentBloc>(context)
+                                      .studentsList!
+                                      .map((school) => [
+                                    school.student.user?.fullName ?? "",
+                                    school.student.user?.phone ?? 'N/A',
+                                            school.student.user?.gender
+                                                    .trans(context) ??
+                                                'N/A',
+                                            '${school.todayAttendance?.name.toString().trans(context) ?? 0}',
+
+                                          ])
+                                      .toList(),
+                              // .reversed // Reverse the entire list
+                              // .toList(),
+                              teacherName: BlocProvider.of<AuthBloc>(context)
+                                      .userModel
+                                      ?.fullName ??
+                                  "",
+
+                              // headerTitles: ['الاسم ', 'رقم الهاتف', 'الحضور', 'الجنس'],
+                              // // tableData: [
+                              // //   ['Data 1', 'Data rrrrrrrrrrrrrrrrrrrrrrr2', 'Data 3', 'Data 4'],
+                              // //   ['Data 4', 'Data 5', 'Data 6', 'Data 7'],
+                              // // ],
+                              //                 tableData: BlocProvider.of<CircleStudentBloc>(context)
+                              //                     .studentsList!
+                              //                     .map((school) => [
+                              //                   school.student.user?.fullName??"",
+                              //                   school.student.user?.phone ?? 'N/A',
+                              //                   '${school.todayAttendance?.name.toString().trans(context) ?? 0}',
+                              //                   school.student.user?.gender.trans(context) ?? 'N/A'
+                              //                 ])
+                              //                     .toList(),
+                              // teacherName: BlocProvider.of<AuthBloc>(context).userModel?.fullName??"",
+                            )));
+              }
             },
           ),
         ],
@@ -334,106 +353,105 @@ class _CircleScreenState extends State<CircleScreen> {
               color: Theme.of(context).iconTheme.color,
             ),
           ),
-          title:Row(
+          title: Row(
             children: [
-            Expanded(child: Text(Circle_student.student.user?.fullName??"",)),
-            // Spacer(),
-            IconButton(
-              icon:Icon(
-                Icons.edit,
-                size: 30,
-              ),
-              onPressed: (){
-              Navigator.push(
-                context, MaterialPageRoute(
-                builder: (context) => 
-                EditStudentBottomSheet2(circleStudent: Circle_student,circleId: widget.circle.id!)
-                )
-                );
-              
-              },
-            ),
+              Expanded(
+                  child: Text(
+                Circle_student.student.user?.fullName ?? "",
+              )),
+              // Spacer(),
               IconButton(
-              icon:Icon(
-                Icons.delete,
-                color: Colors.red,
-                size: 30,
-                
+                icon: Icon(
+                  Icons.edit,
+                  size: 30,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EditStudentBottomSheet2(
+                              circleStudent: Circle_student,
+                              circleId: widget.circle.id!)));
+                },
               ),
-              onPressed: (){
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    alignment: Alignment.center,
-                    title: Text('delete'.trans(context)),
-                    content: Text(
-                        'delete_confirm'.trans(context)),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text('cancel'.trans(context)),
-                      ),
-                      // TextButton(
-                      //   onPressed: () {
-                      //     BlocProvider.of<CircleStudentBloc>(context).add(DeleteStudentToCircleEvent(studentId: Circle_student.student.id, circleId: widget.circle.id!));
-                      //     Navigator.pop(context);
-                      //
-                      //   },
-                      //   child: Text(
-                      //     'delete'.tr(context),
-                      //     style: const TextStyle(
-                      //         color: Colors.red),
-                      //   ),
-                      // ),
-                      BlocListener<CircleStudentBloc, CircleStudentState>(
-                        listener: (context, state) {
-                          if (state is CircleStudentDeleted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(state.message),
-                                backgroundColor: Colors.green,
-                                behavior: SnackBarBehavior.floating,
-                                margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
-                              ),
-                            );
-                          } else if (state is CircleStudentError) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(state.message),
-                                backgroundColor: Colors.red,
-                                behavior: SnackBarBehavior.floating,
-                                margin: const EdgeInsets.only(bottom: 80, left: 16, right: 16),
-                              ),
-                            );
-                          }
-                        },
-                        child: TextButton(
-                          onPressed: () {
-                            BlocProvider.of<CircleStudentBloc>(context).add(
-                              DeleteStudentToCircleEvent(
-                                context,
-                                studentId: Circle_student.student.id,
-                                circleId: widget.circle.id!,
-                              ),
-                            );
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            'delete'.trans(context),
-                            style: const TextStyle(color: Colors.red),
-                          ),
+              IconButton(
+                icon: Icon(
+                  Icons.delete,
+                  color: Colors.red,
+                  size: 30,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      alignment: Alignment.center,
+                      title: Text('delete'.trans(context)),
+                      content: Text('delete_confirm'.trans(context)),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text('cancel'.trans(context)),
                         ),
-                      )
-
-                    ],
-                  ),
-                );
-              },
-            )
+                        // TextButton(
+                        //   onPressed: () {
+                        //     BlocProvider.of<CircleStudentBloc>(context).add(DeleteStudentToCircleEvent(studentId: Circle_student.student.id, circleId: widget.circle.id!));
+                        //     Navigator.pop(context);
+                        //
+                        //   },
+                        //   child: Text(
+                        //     'delete'.tr(context),
+                        //     style: const TextStyle(
+                        //         color: Colors.red),
+                        //   ),
+                        // ),
+                        BlocListener<CircleStudentBloc, CircleStudentState>(
+                          listener: (context, state) {
+                            if (state is CircleStudentDeleted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(state.message),
+                                  backgroundColor: Colors.green,
+                                  behavior: SnackBarBehavior.floating,
+                                  margin: const EdgeInsets.only(
+                                      bottom: 80, left: 16, right: 16),
+                                ),
+                              );
+                            } else if (state is CircleStudentError) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(state.message),
+                                  backgroundColor: Colors.red,
+                                  behavior: SnackBarBehavior.floating,
+                                  margin: const EdgeInsets.only(
+                                      bottom: 80, left: 16, right: 16),
+                                ),
+                              );
+                            }
+                          },
+                          child: TextButton(
+                            onPressed: () {
+                              BlocProvider.of<CircleStudentBloc>(context).add(
+                                DeleteStudentToCircleEvent(
+                                  context,
+                                  studentId: Circle_student.student.id,
+                                  circleId: widget.circle.id!,
+                                ),
+                              );
+                              Navigator.pop(context);
+                            },
+                            child: Text(
+                              'delete'.trans(context),
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              )
             ],
           ),
-          
-          
           trailing: Container(
             decoration: BoxDecoration(
               color: _getStatusColor(Circle_student.todayAttendance),
@@ -475,7 +493,6 @@ class _CircleScreenState extends State<CircleScreen> {
               ),
             );
           },
-         
         ),
       ),
     );
