@@ -21,6 +21,11 @@ class ProgressFollowingTab extends StatelessWidget {
     // BlocProvider.of<HomeworkBloc>(context)
     //     .add(LoadHomeworkEvent(student.id));
 
+    return BlocConsumer<HomeworkBloc, HomeworkState>(
+  listener: (context, state) {
+    // TODO: implement listener
+  },
+  builder: (context, state) {
     return BlocBuilder<HomeworkBloc, HomeworkState>(
       builder: (context, state) {
         print('home work state');
@@ -56,5 +61,7 @@ class ProgressFollowingTab extends StatelessWidget {
         return Container(); // Default case
       },
     );
+  },
+);
   }
 }

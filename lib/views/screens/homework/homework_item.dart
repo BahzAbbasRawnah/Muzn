@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:muzn/app_localization.dart';
@@ -10,6 +11,8 @@ import 'package:muzn/views/screens/students/rating_student.dart';
 import 'package:muzn/views/widgets/custom_button.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:jhijri/jHijri.dart';
+
+import '../../../blocs/homework/homework_bloc.dart';
 
 class HomeworksItem extends StatelessWidget {
   final Homework homework;
@@ -84,9 +87,8 @@ class HomeworksItem extends StatelessWidget {
                               size: 20, color: Colors.grey),
                           SizedBox(width: 8),
                           Text(
-                            DateFormat('yyyy-MM-dd')
-                                    .format(homework.homeworkDate) +
-                                ' مــ',
+                            '${DateFormat('yyyy-MM-dd')
+                                    .format(homework.homeworkDate)} مــ',
                             style: Theme.of(context).textTheme.displayMedium,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -100,8 +102,7 @@ class HomeworksItem extends StatelessWidget {
                               size: 20, color: Colors.grey),
                           SizedBox(width: 8),
                           Text(
-                            JHijri(fDate: homework.homeworkDate).toString() +
-                                ' هــ ',
+                            '${JHijri(fDate: homework.homeworkDate)} هــ ',
                             style: Theme.of(context).textTheme.displayMedium,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -124,6 +125,10 @@ class HomeworksItem extends StatelessWidget {
                       Get.off(RatingStudentScreen(
                                 homework: homework,
                                 student: student,
+                        onHomeworkAdded: () {
+                          // Refresh the parent screen
+                          BlocProvider.of<HomeworkBloc>(context).add(LoadHomeworkEvent(student.id));
+                        },
                               ));
 
                       // Navigator.push(

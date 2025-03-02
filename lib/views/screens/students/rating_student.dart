@@ -19,11 +19,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class RatingStudentScreen extends StatefulWidget {
    Homework homework;
    Student student;
+   final VoidCallback onHomeworkAdded;
 
    RatingStudentScreen({
     super.key,
     required this.homework,
     required this.student,
+     required this.onHomeworkAdded,
   });
 
   @override
@@ -275,10 +277,14 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
         ));
     print('widget.student.toMap().toString()');
     print(widget.student.user?.toMap().toString());
+
+   // Navigator.pop(context);
+   // widget.onHomeworkAdded();
     Get.off(StudentProgressScreen(
       student: widget.student,
       circleId: studentProgress.circleId,
     ),);
+   widget.onHomeworkAdded();
     // context.read<StudentProgressBloc>().stream.listen((state) {
     //   if (state is StudentProgressAdded) {
     //     Navigator.pushReplacement(

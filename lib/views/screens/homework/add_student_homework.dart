@@ -13,9 +13,10 @@ import 'package:muzn/views/widgets/custom_ayah_dropdown.dart';
 class AddHomeworkBottomSheet extends StatefulWidget {
   final int studentId;
   final int circleId;
+  final VoidCallback onHomeworkAdded;
 
-  const AddHomeworkBottomSheet(
-      {super.key, required this.studentId, required this.circleId});
+   AddHomeworkBottomSheet(
+      {super.key, required this.studentId, required this.circleId,required this.onHomeworkAdded});
 
   @override
   _AddHomeworkBottomSheetState createState() => _AddHomeworkBottomSheetState();
@@ -171,11 +172,16 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                           // Dispatch AddHomeworkEvent
                           BlocProvider.of<HomeworkBloc>(context)
                               .add(AddHomeworkEvent(context, homework));
-                          BlocProvider.of<HomeworkBloc>(context)
-                              .add(LoadHomeworkEvent(widget.studentId));
+                          // BlocProvider.of<HomeworkBloc>(context)
+                          //     .add(LoadHomeworkEvent(widget.studentId));
                           // Get.off(StudentProgressScreen(widget.studentId))
                           // Close the bottom sheet after successful insertion
                           Navigator.pop(context);
+                          widget.onHomeworkAdded();
+                          // BlocProvider.of<HomeworkBloc>(context)
+                          //     .add(LoadHomeworkEvent(widget.studentId));
+                          // BlocProvider.of<HomeworkBloc>(context)
+                          //     .add(LoadHistoryEvent(context, widget.studentId));
                         },
                       );
                     },

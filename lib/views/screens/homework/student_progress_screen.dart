@@ -119,15 +119,35 @@ class _StudentScreenState extends State<StudentProgressScreen> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-                builder: (context) =>
-                    AddHomeworkBottomSheet(
-                      studentId: widget.student.id,
-                      circleId: widget.circleId,
-                    ),
+                builder: (context) => AddHomeworkBottomSheet(
+                  studentId: widget.student.id,
+                  circleId: widget.circleId,
+                  onHomeworkAdded: () {
+                    // Refresh the parent screen
+                    BlocProvider.of<HomeworkBloc>(context).add(LoadHomeworkEvent(widget.student.id));
+                  },
+                ),
               );
             },
             child: const Icon(Icons.add),
           ),
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () {
+          //     showModalBottomSheet(
+          //       context: context,
+          //       isScrollControlled: true,
+          //       shape: const RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          //       ),
+          //       builder: (context) =>
+          //           AddHomeworkBottomSheet(
+          //             studentId: widget.student.id,
+          //             circleId: widget.circleId,
+          //           ),
+          //     );
+          //   },
+          //   child: const Icon(Icons.add),
+          // ),
         ),
       ),
     );
