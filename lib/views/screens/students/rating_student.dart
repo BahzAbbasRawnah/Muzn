@@ -16,14 +16,20 @@ import 'package:muzn/views/widgets/rateing_selector.dart';
 import 'package:quran/quran.dart' as quran;
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../models/circle.dart';
+
 class RatingStudentScreen extends StatefulWidget {
    Homework homework;
    Student student;
+   Circle circle;
+   final VoidCallback onHomeworkAdded;
 
    RatingStudentScreen({
     super.key,
     required this.homework,
+     required this.circle,
     required this.student,
+     required this.onHomeworkAdded,
   });
 
   @override
@@ -239,8 +245,11 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                         StudentProgress progress =  StudentProgress(
                             id: 0,
                             circleId: widget.homework.circleId,
+                            circleUuid: widget.homework.circleUuid,
                             studentId: widget.homework.studentId,
+                            studentUuid: widget.student.uuid,
                             homeworkId: widget.homework.id,
+                            homeworkUuid: widget.homework.uuid,
                             readingRating:_readingRating,
                             reviewRating: _reviewRating,
                             telawahRating: _telawahRating,
@@ -250,7 +259,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
                             createdAt: DateTime.now(),
                             updatedAt: DateTime.now()
                             );
-                        _saveProgress(context,progress);
+                        _saveProgress(context,progress,widget.circle);
                       },
                     ),
                   ),
@@ -263,7 +272,7 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
     );
   }
 
-  void _saveProgress(BuildContext context,StudentProgress studentProgress) {
+  void _saveProgress(BuildContext context,StudentProgress studentProgress,Circle circle) {
     // Create an instance of StudentProgress
 
 
@@ -275,10 +284,14 @@ class _RatingStudentScreenState extends State<RatingStudentScreen> {
         ));
     print('widget.student.toMap().toString()');
     print(widget.student.user?.toMap().toString());
+
+   // Navigator.pop(context);
+   // widget.onHomeworkAdded();
     Get.off(StudentProgressScreen(
       student: widget.student,
-      circleId: studentProgress.circleId,
+      circle: circle,
     ),);
+   widget.onHomeworkAdded();
     // context.read<StudentProgressBloc>().stream.listen((state) {
     //   if (state is StudentProgressAdded) {
     //     Navigator.pushReplacement(

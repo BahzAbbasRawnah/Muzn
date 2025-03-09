@@ -18,6 +18,8 @@ class AddStudentCubit extends Cubit<AddStudentState> {
     required String gender,
     required int teacherId,
     required int circleId,
+    required String? circleUuid,
+    required String? teacherUuid,
     // required DatabaseManager db,
   }) async {
     emit(AddStudentLoading());
@@ -51,19 +53,40 @@ class AddStudentCubit extends Cubit<AddStudentState> {
           'updated_at': DateTime.now().toIso8601String(),
         });
 
+        final userResult = await txn.query(
+          'User',
+          columns: ['uuid'],
+          where: 'id = ?',
+          whereArgs: [userId],
+        );
+        final userUuid = userResult.first['uuid'] as String;
+
         // Insert into Student table
         final studentId = await txn.insert('Student', {
           'user_id': userId,
+          'user_uuid': userUuid,
           'teacher_id': teacherId,
+          'teacher_uuid': teacherUuid,
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });
 
+        final studentResult = await txn.query(
+          'Student',
+          columns: ['uuid'],
+          where: 'id = ?',
+          whereArgs: [studentId],
+        );
+        final studentUuid = studentResult.first['uuid'] as String;
+
         // Insert into CircleStudent table
         await txn.insert('CircleStudent', {
           'circle_id': circleId,
+          'circle_uuid': circleUuid,
           'student_id': studentId,
+          'student_uuid': studentUuid,
           'teacher_id': teacherId,
+          'teacher_uuid': teacherUuid,
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });

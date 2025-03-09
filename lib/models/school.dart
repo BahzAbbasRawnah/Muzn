@@ -1,17 +1,21 @@
   class School {
   final int id;
+   String? uuid;
   final int? teacherId;
+   String? teacherUuid;
   final String name;
   final String? type;
   final String? address;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final DateTime? deletedAt;
-  int? circleCount; // Count of circles associated with this school
+  int? circleCount;
 
   School({
     required this.id,
+     this.uuid,
     this.teacherId,
+    this.teacherUuid,
     required this.name,
     this.type,
     this.address,
@@ -24,7 +28,9 @@
 factory School.fromMap(Map<String, dynamic> map) {
   return School(
     id: map['id'] as int,
+    uuid: map['uuid'] as String,
     teacherId: map['teacher_id'] as int?,
+    teacherUuid: map['teacher_uuid'] as String?,
     name: map['name'] as String,
     type: map['type'] as String? ?? '', // Provide a default value if null
     address: map['address'] as String? ?? '', // Provide a default value if null
@@ -38,7 +44,9 @@ factory School.fromMap(Map<String, dynamic> map) {
 Map<String, dynamic> toMap() {
   return {
     'id': id,
+    'uuid': uuid,
     'teacher_id': teacherId,
+    'teacher_uuid': teacherUuid,
     'name': name,
     'type': type,
     'address': address,
@@ -61,6 +69,7 @@ Map<String, dynamic> toMap() {
   }) {
     return School(
       id: id ?? this.id,
+      uuid: uuid??uuid,
       teacherId: teacherId ?? this.teacherId,
       name: name ?? this.name,
       type: type ?? this.type,

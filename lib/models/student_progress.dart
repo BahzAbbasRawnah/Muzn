@@ -4,9 +4,13 @@ import 'package:muzn/models/enums.dart';
 
 class StudentProgress {
   final int id;
+   String? uuid;
   final int circleId;
+   String? circleUuid;
   final int studentId;
+   String? studentUuid;
   final int homeworkId;
+   String? homeworkUuid;
   final Rating readingRating;
   final Rating reviewRating;
   final Rating telawahRating;
@@ -21,9 +25,15 @@ class StudentProgress {
 
   StudentProgress({
     required this.id,
+    this.uuid,
+    // this.uuid,
     required this.circleId,
+    this.circleUuid,
     required this.studentId,
+    this.studentUuid,
+
     required this.homeworkId,
+    this.homeworkUuid,
     required this.readingRating,
     required this.reviewRating,
     required this.telawahRating,
@@ -38,9 +48,13 @@ class StudentProgress {
   factory StudentProgress.fromMap(Map<String, dynamic> map) {
     return StudentProgress(
       id: map['id'],
+      uuid: map['uuid'],
       circleId: map['circle_id'],
+      circleUuid: map['circle_uuid'],
       studentId: map['student_id'],
+      studentUuid: map['student_uuid'],
       homeworkId: map['homework_id'],
+      homeworkUuid: map['homework_uuid'],
     readingRating: Rating.values.firstWhere(
       (e) => e.name == map['reading_rating'].toString(),
       orElse: () => Rating.excellent, // Default if value is invalid
@@ -65,9 +79,13 @@ class StudentProgress {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      // 'uuid': uuid,
       'circle_id': circleId,
+      // 'circle_uuid': circleUuid,
       'student_id': studentId,
+      'student_uuid': studentUuid,
       'homework_id': homeworkId,
+      'homework_uuid': homeworkUuid,
       'reading_rating': readingRating.name,
       'review_rating': reviewRating.name,
       'telawah_rating': telawahRating.name,

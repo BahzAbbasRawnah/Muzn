@@ -1,9 +1,13 @@
 class Homework {
   final int id;
+   String? uuid;
   final int circleId;
+   String? circleUuid;
   final int circleCategoryId;
+   String? circleCategoryUuid;
   String? categoryName;
   final int studentId;
+   String? studentUuid;
   final int? checked;
   final int startSurahNumber;
   final int endSurahNumber;
@@ -17,9 +21,13 @@ class Homework {
 
   Homework({
     required this.id,
+    this.uuid,
     required this.circleId,
+    this.circleUuid,
     required this.circleCategoryId,
     required this.studentId,
+    this.studentUuid,
+    this.circleCategoryUuid,
     required this.startSurahNumber,
     required this.endSurahNumber,
     required this.startAyahNumber,
@@ -36,10 +44,14 @@ class Homework {
   factory Homework.fromMap(Map<String, dynamic> map) {
     return Homework(
       id: map['id'],
+      uuid: map['uuid'],
       circleId: map['circle_id'],
+      circleUuid: map['circle_uuid'],
       circleCategoryId: map['circle_category_id'],
+      circleCategoryUuid: map['circle_category_uuid'],
       categoryName: map['category_name'],
       studentId: map['student_id'],
+      studentUuid: map['student_uuid'],
       checked: map['checked'],
       startSurahNumber: map['start_surah_number'],
       endSurahNumber: map['end_surah_number'],
@@ -56,9 +68,13 @@ class Homework {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      // 'uuid': uuid,
       'circle_id': circleId,
+      'circle_uuid': circleUuid,
       'circle_category_id': circleCategoryId,
+      'circle_category_uuid': circleCategoryUuid,
       'student_id': studentId,
+      'student_uuid': studentUuid,
       'checked':checked,
       'start_surah_number': startSurahNumber,
       'end_surah_number': endSurahNumber,

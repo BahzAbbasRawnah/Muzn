@@ -33,12 +33,17 @@ class LoadCircleStudents extends CircleStudentEvent {
 class UpdateStudentAttendance extends CircleStudentEvent {
   final int studentId;
   final int circleId;
+  String? studentUuid;
+  String? circleUuid;
+
   final AttendanceStatuse status;
 
-  const UpdateStudentAttendance(
+   UpdateStudentAttendance(
     super.context, {
     required this.studentId,
     required this.circleId,
+         this.circleUuid,
+         this.studentUuid,
     required this.status,
   });
 
@@ -49,11 +54,15 @@ class UpdateStudentAttendance extends CircleStudentEvent {
 class AddStudentToCircleEvent extends CircleStudentEvent {
   final int studentId;
   final int circleId;
+  String? studentUuid;
+  String? circleUuid;
 
-  const AddStudentToCircleEvent(
+   AddStudentToCircleEvent(
     super.context, {
     required this.studentId,
     required this.circleId,
+         this.circleUuid,
+         this.studentUuid,
   });
 
   @override
@@ -134,21 +143,25 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
     // final today = DateTime.now().toIso8601String().split('T')[0];  // Get current date in "YYYY-MM-DD"
 
     emit(CircleStudentLoading());
-    try {
+    // try {
       final db = await _databaseManager.database;
-
+    final today = DateTime.now().toIso8601String().split('T')[0]; // YYY
       // Load all students from the database
       final results = await db.rawQuery('''
       SELECT 
         cs.id,
         s.id as student_id,
+        s.uuid as student_uuid,
         s.teacher_id,
+        s.teacher_uuid,
         s.user_id,
+        s.user_uuid,
         u.id as user_id,
         u.full_name,
         u.phone,
         u.email,
         u.country,
+        u.country_code,
         u.gender,
         u.role as role,
         sa.status as today_attendance,
@@ -158,26 +171,31 @@ class CircleStudentBloc extends Bloc<CircleStudentEvent, CircleStudentState> {
       INNER JOIN User u ON u.id = s.user_id
       LEFT JOIN StudentAttendance sa ON sa.student_id = cs.student_id 
         AND sa.circle_id = ? 
-        AND date(sa.attendance_date) = date('now')
+        AND date(sa.attendance_date) =? 
         AND sa.deleted_at IS NULL
       WHERE cs.circle_id = ? 
         AND cs.deleted_at IS NULL
-    ''', [event.circleId, event.circleId]);
+    ''', [event.circleId,today, event.circleId]);
 print("results.toString()");
 print(results.toString());
       final students = results
           .map((row) => CircleStudent(
               id: row['id'] as int,
               student: Student(
+                uuid: row['student_uuid'] as String,
                 id: row['student_id'] as int,
                 teacherId: row['teacher_id'] as int,
+                teacherUuid: row['teacher_uuid'] as String?,
                 userId: row['user_id'] as int,
+                userUuid: row['user_uuid'] as String?,
                 user: User(
+                  uuid: row['user_uuid'] as String?,
                   id: row['user_id'] as int,
                   fullName: row['full_name'] as String,
                   phone: row['phone'] as String,
                   email: row['email'] as String,
                   country: row['country'] as String?,
+                  countryCode: row['country_code'] as String?,
                   gender: row['gender'] as String,
                   role: row['role'] as String,
                 ),
@@ -219,9 +237,9 @@ print(results.toString());
         students: students,
         attendanceSummary: summary,
       ));
-    } catch (e) {
-      emit(CircleStudentError(e.toString()));
-    }
+    // } catch (e) {
+    //   emit(CircleStudentError(e.toString()));
+    // }
   }
 
   Future<void> _onUpdateStudentAttendance(
@@ -255,7 +273,10 @@ print(results.toString());
         // Insert new record
        int userid= await db.insert('StudentAttendance', {
           'student_id': event.studentId,
+          'student_uuid': event.studentUuid,
           'circle_id': event.circleId,
+          'circle_uuid': event.circleUuid,
+
           'status': event.status.name,
 
           'attendance_date': DateTime.now().toIso8601String().split('T')[0], // Stores only "YYYY-MM-DD"
@@ -312,7 +333,9 @@ print(results.toString());
         // Add student to circle
         await db.insert('CircleStudent', {
           'student_id': event.studentId,
+          'student_uuid': event.studentUuid,
           'circle_id': event.circleId,
+          'circle_uuid': event.circleUuid,
           'created_at': DateTime.now().toIso8601String(),
           'updated_at': DateTime.now().toIso8601String(),
         });

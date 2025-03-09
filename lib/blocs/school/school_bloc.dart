@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../api/database_sync.dart';
 import '../../models/school.dart';
 import '../../services/database_service.dart';
 
@@ -25,12 +26,14 @@ class AddSchool extends SchoolEvent {
   final String? type;
   final String? address;
   final int teacherId;
+  final String teacherUuid;
 
   const AddSchool({
     required this.name,
     this.type,
     this.address,
     required this.teacherId,
+    required this.teacherUuid,
   });
 
   @override
@@ -96,6 +99,9 @@ class SchoolBloc extends Bloc<SchoolEvent, SchoolState> {
 
   Future<void> _onLoadSchools(LoadSchools event, Emitter<SchoolState> emit) async {
     emit(SchoolLoading());
+    final DatabaseSync databaseSync = DatabaseSync(DatabaseManager());
+    databaseSync.syncDatabaseToAPI();
+
     try {
       final db = await _databaseManager.database;
       if (event.teacherId <= 0) {
@@ -133,6 +139,7 @@ class SchoolBloc extends Bloc<SchoolEvent, SchoolState> {
         'type': event.type,
         'address': event.address,
         'teacher_id': event.teacherId,
+        'teacher_uuid': event.teacherUuid,
         'created_at': now,
         'updated_at': now,
       });

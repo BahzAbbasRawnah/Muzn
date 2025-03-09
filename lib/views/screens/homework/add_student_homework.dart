@@ -12,10 +12,14 @@ import 'package:muzn/views/widgets/custom_ayah_dropdown.dart';
 
 class AddHomeworkBottomSheet extends StatefulWidget {
   final int studentId;
+  final String studentUuid;
+  final String circleUuid;
   final int circleId;
+  // final String circleUuid;
+  final VoidCallback onHomeworkAdded;
 
-  const AddHomeworkBottomSheet(
-      {super.key, required this.studentId, required this.circleId});
+   AddHomeworkBottomSheet(
+      {super.key, required this.studentId, required this.circleId,required this.studentUuid,required this.circleUuid,required this.onHomeworkAdded});
 
   @override
   _AddHomeworkBottomSheetState createState() => _AddHomeworkBottomSheetState();
@@ -156,7 +160,9 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                             id: 0,
                             circleCategoryId: selectedCategoryId!,
                             circleId: widget.circleId,
+                            circleUuid: widget.circleUuid,
                             studentId: widget.studentId,
+                            studentUuid: widget.studentUuid,
                             startSurahNumber: selectedFromSurah?.number ?? 0,
                             endSurahNumber: selectedToSurah?.number ?? 0,
                             startAyahNumber: selectedFromAyah ?? 1,
@@ -171,11 +177,16 @@ class _AddHomeworkBottomSheetState extends State<AddHomeworkBottomSheet> {
                           // Dispatch AddHomeworkEvent
                           BlocProvider.of<HomeworkBloc>(context)
                               .add(AddHomeworkEvent(context, homework));
-                          BlocProvider.of<HomeworkBloc>(context)
-                              .add(LoadHomeworkEvent(widget.studentId));
+                          // BlocProvider.of<HomeworkBloc>(context)
+                          //     .add(LoadHomeworkEvent(widget.studentId));
                           // Get.off(StudentProgressScreen(widget.studentId))
                           // Close the bottom sheet after successful insertion
                           Navigator.pop(context);
+                          widget.onHomeworkAdded();
+                          // BlocProvider.of<HomeworkBloc>(context)
+                          //     .add(LoadHomeworkEvent(widget.studentId));
+                          // BlocProvider.of<HomeworkBloc>(context)
+                          //     .add(LoadHistoryEvent(context, widget.studentId));
                         },
                       );
                     },

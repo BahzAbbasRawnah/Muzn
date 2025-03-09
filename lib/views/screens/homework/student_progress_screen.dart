@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/homework/homework_bloc.dart';
 import 'package:muzn/blocs/homework/student_history_cubit.dart';
+import 'package:muzn/models/circle.dart';
 import 'package:muzn/models/student.dart';
 import 'package:muzn/views/screens/homework/present_history_tab.dart';
 import 'package:muzn/views/screens/homework/progress_following_tab.dart';
@@ -11,11 +12,11 @@ import 'package:muzn/views/screens/homework/add_student_homework.dart';
 
 class StudentProgressScreen extends StatefulWidget {
   final Student student;
-  final int circleId;
+  final Circle circle;
 
   const StudentProgressScreen({super.key,
     required this.student,
-    required this.circleId,
+    required this.circle,
   });
 
   @override
@@ -44,6 +45,8 @@ class _StudentScreenState extends State<StudentProgressScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('widget.student.uuid');
+    print(widget.student.toMap().toString());
     return BlocListener<HomeworkBloc, HomeworkState>(
       listener: (context, state) {
         // TODO: implement listener
@@ -65,7 +68,7 @@ class _StudentScreenState extends State<StudentProgressScreen> {
                   BlocProvider.of<HomeworkBloc>(context)
                       .add(LoadHistoryEvent(context, widget.student.id));
                 }else{
-                  BlocProvider.of<StudentHistoryCubit>(context).loadStudentHistory(widget.circleId, widget.student.id);
+                  BlocProvider.of<StudentHistoryCubit>(context).loadStudentHistory(widget.circle.id!, widget.student.id);
                 }
               },
               tabs: [
@@ -100,7 +103,7 @@ class _StudentScreenState extends State<StudentProgressScreen> {
                     child: TabBarView(
                       children: [
                         // First Tab: Current Homework
-                        ProgressFollowingTab(student: widget.student),
+                        ProgressFollowingTab(student: widget.student, circle: widget.circle,),
                         // Second Tab: Homework History
                         ProgressHistoryTab(studentId: widget.student.id),
                         PresentHistoryTab(student: widget.student),
@@ -119,15 +122,37 @@ class _StudentScreenState extends State<StudentProgressScreen> {
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 ),
-                builder: (context) =>
-                    AddHomeworkBottomSheet(
-                      studentId: widget.student.id,
-                      circleId: widget.circleId,
-                    ),
+                builder: (context) => AddHomeworkBottomSheet(
+                  studentId: widget.student.id,
+                  circleId: widget.circle.id!,
+                  circleUuid: widget.circle.uuid!,
+                  studentUuid: widget.student.uuid!,
+                  onHomeworkAdded: () {
+                    // Refresh the parent screen
+                    BlocProvider.of<HomeworkBloc>(context).add(LoadHomeworkEvent(widget.student.id));
+                  },
+                ),
               );
             },
             child: const Icon(Icons.add),
           ),
+          // floatingActionButton: FloatingActionButton(
+          //   onPressed: () {
+          //     showModalBottomSheet(
+          //       context: context,
+          //       isScrollControlled: true,
+          //       shape: const RoundedRectangleBorder(
+          //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          //       ),
+          //       builder: (context) =>
+          //           AddHomeworkBottomSheet(
+          //             studentId: widget.student.id,
+          //             circleId: widget.circleId,
+          //           ),
+          //     );
+          //   },
+          //   child: const Icon(Icons.add),
+          // ),
         ),
       ),
     );

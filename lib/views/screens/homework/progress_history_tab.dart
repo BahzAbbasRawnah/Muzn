@@ -122,13 +122,15 @@ class ProgressHistoryTab extends StatelessWidget {
                     }
                   },
                 ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: ProgressHistoryItem.length,
-                  itemBuilder: (context, index) {
-                    final ProgressHistory = ProgressHistoryItem[index];
-                    return HistoryItem(progressHistory: ProgressHistory);
-                  },
+                Expanded(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: ProgressHistoryItem.length,
+                    itemBuilder: (context, index) {
+                      final ProgressHistory = ProgressHistoryItem[index];
+                      return HistoryItem(progressHistory: ProgressHistory);
+                    },
+                  ),
                 ),
               ],
             );

@@ -37,6 +37,8 @@ class DatabaseManager {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS User (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+              uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
         full_name TEXT NOT NULL,
         email TEXT UNIQUE,
         password TEXT NOT NULL,
@@ -59,7 +61,10 @@ await db.execute('PRAGMA foreign_keys = ON');
 await db.execute('''
   CREATE TABLE IF NOT EXISTS School (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+          uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
     teacher_id INTEGER,
+    teacher_uuid TEXT,
     name TEXT NOT NULL,
     type TEXT ,
     address TEXT,
@@ -80,6 +85,8 @@ await db.execute("INSERT INTO sqlite_sequence (name, seq) VALUES ('School', 1)")
 await db.execute('''
   CREATE TABLE IF NOT EXISTS CirclesCategory (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+          uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
     name TEXT NOT NULL,
     namevalue TEXT NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -108,8 +115,12 @@ await db.execute('''
     await db.execute('''
     CREATE TABLE IF NOT EXISTS Circle (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+          uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
     school_id INTEGER,
+    school_uuid TEXT,
     teacher_id INTEGER,
+    teacher_uuid TEXT,
     name TEXT NOT NULL,
     description TEXT,
     circle_category_id INTEGER,
@@ -132,8 +143,12 @@ await db.execute('''
     await db.execute('''
       CREATE TABLE IF NOT EXISTS Student (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+              uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
         teacher_id INTEGER,
+        teacher_uuid TEXT,
         user_id INTEGER,
+        user_uuid TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         deleted_at DATETIME,
@@ -148,9 +163,15 @@ await db.execute('''
     await db.execute('''
       CREATE TABLE IF NOT EXISTS CircleStudent (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        
+              uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
         circle_id INTEGER,
+        circle_uuid TEXT,
         student_id INTEGER,
+        student_uuid TEXT,
        teacher_id INTEGER,
+       teacher_uuid TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         deleted_at DATETIME,
@@ -167,7 +188,11 @@ await db.execute('''
   CREATE TABLE IF NOT EXISTS StudentAttendance (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     student_id INTEGER,
+    student_uuid TEXT,
+          uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
     circle_id INTEGER,
+    circle_uuid TEXT,
     attendance_date DATE NOT NULL,
     status TEXT CHECK(status IN ('none', 'present', 'absent', 'absent_with_excuse', 'early_departure', 'not_listened', 'late')) DEFAULT 'none',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -185,9 +210,14 @@ await db.execute('''
 await db.execute('''
   CREATE TABLE IF NOT EXISTS Homework (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+          uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
     circle_id INTEGER,
+    circle_uuid TEXT,
     circle_category_id INTEGER,
+    circle_category_uuid TEXT,
     student_id INTEGER,
+    student_uuid TEXT,
     start_surah_number INTEGER NOT NULL,
     end_surah_number INTEGER NOT NULL,
     start_ayah_number INTEGER NOT NULL,
@@ -211,8 +241,12 @@ await db.execute('''
 await db.execute('''
   CREATE TABLE IF NOT EXISTS StudentProgress (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+          uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
     homework_id INTEGER,
+    homework_uuid TEXT,
     student_id INTEGER,
+    student_uuid TEXT,
     reading_rating TEXT CHECK(reading_rating IN ('excellent', 'very_good', 'good', 'average', 'weak')) DEFAULT 'good',
     review_rating TEXT CHECK(review_rating IN ('excellent', 'very_good', 'good', 'average', 'weak')) DEFAULT 'good',
     telawah_rating TEXT CHECK(telawah_rating IN ('excellent', 'very_good', 'good', 'average', 'weak')) DEFAULT 'good',
@@ -232,11 +266,14 @@ await db.execute('''
     await db.execute('''
       CREATE TABLE IF NOT EXISTS DigitalLibrary (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+              uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
         title TEXT NOT NULL,
         author TEXT,
         category TEXT,
         file_url TEXT NOT NULL,
         teacher_id INTEGER,
+        teacher_uuid TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         deleted_at DATETIME,
@@ -250,6 +287,8 @@ await db.execute('''
     await db.execute('''
       CREATE TABLE IF NOT EXISTS Settings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+              uuid TEXT NOT NULL DEFAULT (lower(hex(randomblob(16)))),
+
         name TEXT NOT NULL,
         logo_url TEXT,
         address TEXT,
