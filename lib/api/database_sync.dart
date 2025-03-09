@@ -31,7 +31,7 @@ class DatabaseSync {
     print("jsonData -----------------------------------------------");
     log(jsonData);
     // Replace with your API endpoint
-    String apiUrl = "http://10.0.0.14:8000/api/sync";
+    String apiUrl = "http://192.168.50.118:8000/api/sync";
 
     try {
       var response = await http.post(

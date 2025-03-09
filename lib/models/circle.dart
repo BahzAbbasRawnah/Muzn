@@ -1,7 +1,10 @@
 class Circle {
   final int? id;
   final int? schoolId;
+   String? uuid;
+  String? schoolUuid;
   final int teacherId;
+  String? teacherUuid;
   final String name;
   final String? description;
   final int? circleCategoryId;
@@ -18,8 +21,11 @@ class Circle {
 
   Circle({
     this.id,
+    this.uuid,
     this.schoolId,
+    this.schoolUuid,
     required this.teacherId,
+    this.teacherUuid,
     required this.name,
     this.description,
     this.circleCategoryId,
@@ -38,8 +44,11 @@ class Circle {
   factory Circle.fromMap(Map<String, dynamic> map) {
     return Circle(
       id: map['id'] as int?,
+      uuid: map['uuid'] as String?,
       schoolId: map['school_id'] as int?,
+      schoolUuid: map['school_uuid'] as String?,
       teacherId: map['teacher_id'] as int,
+      teacherUuid: map['teacher_uuid'] as String?,
       name: map['name'] as String,
       description: map['description'] as String?,
       circleCategoryId: map['circle_category_id'] as int?,
@@ -65,8 +74,11 @@ class Circle {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'uuid': uuid,
       'school_id': schoolId,
+      'school_uuid': schoolUuid,
       'teacher_id': teacherId,
+      'teacher_uuid': teacherUuid,
       'name': name,
       'description': description,
       'circle_category_id': circleCategoryId,
@@ -82,6 +94,7 @@ class Circle {
 
   Circle copyWith({
     int? id,
+    String?  uuid,
     int? schoolId,
     int? teacherId,
     String? name,
@@ -100,6 +113,7 @@ class Circle {
   }) {
     return Circle(
       id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
       schoolId: schoolId ?? this.schoolId,
       teacherId: teacherId ?? this.teacherId,
       name: name ?? this.name,

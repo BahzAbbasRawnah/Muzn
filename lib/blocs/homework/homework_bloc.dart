@@ -36,6 +36,8 @@ class LoadHistoryEvent extends HomeworkEvent {
 class AddHomeworkEvent extends HomeworkEvent {
   final Homework homework;
 
+
+
   AddHomeworkEvent(BuildContext context, this.homework);
 
   @override
@@ -271,13 +273,13 @@ class HomeworkBloc extends Bloc<HomeworkEvent, HomeworkState> {
   }
 
   Future<void> insertHomework(Homework homework) async {
-    try {
+    // try {
       final db = await _databaseManager.database;
       final homeworkMap = homework.toMap();
       homeworkMap.remove('id');
       await db.insert('Homework', homeworkMap);
-    } catch (e) {
-      throw Exception('Failed to insert homework: $e');
-    }
+    // } catch (e) {
+    //   throw Exception('Failed to insert homework: $e');
+    // }
   }
 }

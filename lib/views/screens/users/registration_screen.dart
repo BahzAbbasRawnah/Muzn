@@ -34,12 +34,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String? gender = 'male'; // Default gender
   String? country = 'السعودية';
-
+  // countryCodeController
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     final deviceHeight = MediaQuery.of(context).size.height;
+    countryCodeController.text='+966';
 
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {

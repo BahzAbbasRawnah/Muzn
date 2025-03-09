@@ -16,6 +16,8 @@ class CircleStudent {
   });
 
   factory CircleStudent.fromMap(Map<String, dynamic> map) {
+    print('map iiiiiiiiiiii');
+    print(map);
     return CircleStudent(
       id: map['student_id'] as int? ?? 0, 
       student: Student.fromMap(map),

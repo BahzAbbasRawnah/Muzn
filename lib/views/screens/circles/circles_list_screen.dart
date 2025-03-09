@@ -17,8 +17,9 @@ import 'package:muzn/views/widgets/screen_header.dart';
 
 class CirclesListScreen extends StatefulWidget {
   final int? schoolId;
+  final String? schoolUuid;
 
-  const CirclesListScreen({Key? key, this.schoolId}) : super(key: key);
+  const CirclesListScreen({Key? key, this.schoolId, this.schoolUuid}) : super(key: key);
 
   @override
   _CirclesListScreenState createState() => _CirclesListScreenState();
@@ -150,7 +151,7 @@ class _CirclesListScreenState extends State<CirclesListScreen> {
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
             builder: (context) => AddCircleBottomSheet(
-              schoolId: widget.schoolId ?? -1,
+              schoolId: widget.schoolId ?? -1,schoolUuid: widget.schoolUuid??'',
             ),
           );
         },

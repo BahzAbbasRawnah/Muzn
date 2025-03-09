@@ -258,7 +258,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    CirclesListScreen(schoolId: school.id),
+                                    CirclesListScreen(schoolId: school.id,schoolUuid: school.uuid!,),
                               ),
                             );
                           },

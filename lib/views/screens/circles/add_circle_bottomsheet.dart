@@ -16,8 +16,9 @@ import '../../../app/core/show_success_message.dart';
 
 class AddCircleBottomSheet extends StatefulWidget {
    int schoolId;
+   String schoolUuid;
 
-   AddCircleBottomSheet({super.key, required this.schoolId});
+   AddCircleBottomSheet({super.key, required this.schoolId,required this.schoolUuid});
 
   @override
   AddCircleBottomSheetState createState() => AddCircleBottomSheetState();
@@ -73,7 +74,9 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
         Circle circle = Circle(
           name: _nameController.text,
           schoolId: widget.schoolId,
+          schoolUuid: widget.schoolUuid,
           teacherId: authState.user.id,
+          teacherUuid: authState.user.uuid,
           description: _descriptionController.text,
           circleCategoryId: _selectedCategory != null
               ? _categoryNameToId[_selectedCategory]
@@ -87,7 +90,9 @@ class AddCircleBottomSheetState extends State<AddCircleBottomSheet> {
           Circle circle = Circle(
             name: _nameController.text,
             schoolId: widget.schoolId,
+            schoolUuid: widget.schoolUuid,
             teacherId: BlocProvider.of<AuthBloc>(context).userModel!.id,
+            teacherUuid: BlocProvider.of<AuthBloc>(context).userModel!.uuid,
             description: _descriptionController.text,
             circleCategoryId: _selectedCategory != null
                 ? _categoryNameToId[_selectedCategory]

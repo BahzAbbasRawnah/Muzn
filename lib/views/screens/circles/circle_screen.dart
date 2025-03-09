@@ -303,7 +303,7 @@ class _CircleScreenState extends State<CircleScreen> {
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
             builder: (context) => AddStudentToCircleBottomSheet2(
-              circleId: widget.circle.id!,
+              circleId: widget.circle.id!,circleUuid: widget.circle.uuid,
             ),
           );
         },
@@ -337,7 +337,8 @@ class _CircleScreenState extends State<CircleScreen> {
 
   Widget _buildStudentListItem(CircleStudent Circle_student) {
     print('Circle_student.todayAttendance');
-    print(Circle_student.todayAttendance?.name);
+    print('Circle_student.todayAttendance');
+    print(Circle_student.student.toMap().toString());
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5),
       child: Card(
@@ -477,6 +478,8 @@ class _CircleScreenState extends State<CircleScreen> {
                   builder: (context) => AttendanceStatusBottomSheet(
                     studentId: Circle_student.student.id,
                     circleId: widget.circle.id!,
+                    circleUuid: widget.circle.uuid,
+                    studentUuid: Circle_student.student.uuid,
                     currentStatus: Circle_student.todayAttendance,
                   ),
                 );
@@ -488,7 +491,7 @@ class _CircleScreenState extends State<CircleScreen> {
               context,
               MaterialPageRoute(
                 builder: (context) => StudentProgressScreen(
-                    circleId: widget.circle.id!,
+                    circle: widget.circle,
                     student: Circle_student.student),
               ),
             );

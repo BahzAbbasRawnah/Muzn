@@ -15,8 +15,9 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 
 class AddStudentToCircleBottomSheet2 extends StatefulWidget {
   final int circleId;
+  String? circleUuid;
 
-  const AddStudentToCircleBottomSheet2({super.key, required this.circleId});
+   AddStudentToCircleBottomSheet2({super.key, required this.circleId,required this.circleUuid});
 
   @override
   _AddStudentToCircleBottomSheetState createState() =>
@@ -286,6 +287,7 @@ class _AddStudentToCircleBottomSheetState
                           if (_formKey.currentState!.validate()) {
                             var user=BlocProvider.of<AuthBloc>(context).userModel;
                             final teacherId =user!.id;
+                            final teacherUuid =user.uuid;
                             final cubit = context.read<AddStudentCubit>();
                             cubit.saveStudent(
                               fullName: nameController.text,
@@ -296,7 +298,9 @@ class _AddStudentToCircleBottomSheetState
                               country: country!,
                               gender: gender!,
                               teacherId: teacherId,
+                              teacherUuid: teacherUuid,
                               circleId: widget.circleId,
+                              circleUuid: widget.circleUuid,
                             );
                           }
                         },

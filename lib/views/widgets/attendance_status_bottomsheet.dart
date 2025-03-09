@@ -8,12 +8,16 @@ import 'package:muzn/views/widgets/custom_button.dart';
 class AttendanceStatusBottomSheet extends StatefulWidget {
   final int studentId;
   final int circleId;
+  String? studentUuid;
+  String? circleUuid;
   final AttendanceStatuse? currentStatus;
 
-  const AttendanceStatusBottomSheet({
+   AttendanceStatusBottomSheet({
     super.key,
     required this.studentId,
     required this.circleId,
+     required this.studentUuid,
+     required this.circleUuid,
     this.currentStatus,
   });
 

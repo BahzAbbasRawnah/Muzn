@@ -13,15 +13,18 @@ import 'package:quran/quran.dart' as quran;
 import 'package:jhijri/jHijri.dart';
 
 import '../../../blocs/homework/homework_bloc.dart';
+import '../../../models/circle.dart';
 
 class HomeworksItem extends StatelessWidget {
   final Homework homework;
   final Student student;
+  Circle circle;
 
-  const HomeworksItem({
+   HomeworksItem({
     super.key,
     required this.homework,
     required this.student,
+    required this.circle,
   });
 
   @override
@@ -122,9 +125,10 @@ class HomeworksItem extends StatelessWidget {
                       print(homework.toMap().toString());
                       print('student.toString()');
                       print(student.toMap().toString());
-                      Get.off(RatingStudentScreen(
+                      Get.off(()=>RatingStudentScreen(
                                 homework: homework,
                                 student: student,
+                        circle: circle,
                         onHomeworkAdded: () {
                           // Refresh the parent screen
                           BlocProvider.of<HomeworkBloc>(context).add(LoadHomeworkEvent(student.id));

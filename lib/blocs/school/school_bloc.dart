@@ -26,12 +26,14 @@ class AddSchool extends SchoolEvent {
   final String? type;
   final String? address;
   final int teacherId;
+  final String teacherUuid;
 
   const AddSchool({
     required this.name,
     this.type,
     this.address,
     required this.teacherId,
+    required this.teacherUuid,
   });
 
   @override
@@ -137,6 +139,7 @@ class SchoolBloc extends Bloc<SchoolEvent, SchoolState> {
         'type': event.type,
         'address': event.address,
         'teacher_id': event.teacherId,
+        'teacher_uuid': event.teacherUuid,
         'created_at': now,
         'updated_at': now,
       });

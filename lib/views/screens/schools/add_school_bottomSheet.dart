@@ -8,7 +8,7 @@ import 'package:muzn/views/widgets/message.dart';
 
 
 class AddSchoolBottomSheet extends StatefulWidget {
-  const AddSchoolBottomSheet({Key? key}) : super(key: key);
+   const AddSchoolBottomSheet({super.key});
 
   @override
   State<AddSchoolBottomSheet> createState() => _AddSchoolBottomSheetState();
@@ -38,6 +38,7 @@ void _handleSave(BuildContext context) {
           type: _selectedType,
           address: _addressController.text,
           teacherId: authState.user.id,
+          teacherUuid: authState.user.uuid!,
         ),
       );
     } else{
@@ -48,6 +49,7 @@ void _handleSave(BuildContext context) {
             type: _selectedType,
             address: _addressController.text,
             teacherId: BlocProvider.of<AuthBloc>(context).userModel!.id,
+            teacherUuid: BlocProvider.of<AuthBloc>(context).userModel!.uuid!,
           ),
         );
       }

@@ -7,12 +7,15 @@ import 'package:muzn/views/widgets/empty_data.dart';
 import 'package:muzn/views/screens/homework/homework_item.dart';
 import 'package:muzn/models/homework.dart';
 
+import '../../../models/circle.dart';
+
 class ProgressFollowingTab extends StatelessWidget {
   final Student student;
-
-  const ProgressFollowingTab({
+Circle circle;
+   ProgressFollowingTab({
     super.key,
     required this.student,
+    required this.circle,
   });
 
   @override
@@ -38,7 +41,7 @@ class ProgressFollowingTab extends StatelessWidget {
             itemCount: BlocProvider.of<HomeworkBloc>(context).listHomeWork?.length,
             itemBuilder: (context, index) {
               final homework = BlocProvider.of<HomeworkBloc>(context).listHomeWork![index];
-              return HomeworksItem(homework: homework, student: student);
+              return HomeworksItem(homework: homework, student: student, circle: circle,);
             },
           );
         }
@@ -51,7 +54,7 @@ class ProgressFollowingTab extends StatelessWidget {
             itemCount: homeworkItems.length,
             itemBuilder: (context, index) {
               final homework = homeworkItems[index];
-              return HomeworksItem(homework: homework, student: student);
+              return HomeworksItem(homework: homework, student: student, circle: circle,);
             },
           );
         }
