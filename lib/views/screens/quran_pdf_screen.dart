@@ -13,6 +13,7 @@ class QuranPdfScreen extends StatefulWidget {
   _QuranPdfScreenState createState() => _QuranPdfScreenState();
 }
 
+
 class _QuranPdfScreenState extends State<QuranPdfScreen> {
   final PdfViewerController _pdfController = PdfViewerController();
   double _scrollSpeed = 0.0; // Default scroll speed in pixels per second
