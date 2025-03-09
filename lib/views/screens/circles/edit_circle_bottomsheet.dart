@@ -81,12 +81,16 @@ class EditCircleBottomSheetState extends State<EditCircleBottomSheet> {
   void _handleSave(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       final updatedCircle = Circle(
+        uuid: widget.circle.uuid,
         id: widget.circle.id,
         name: _nameController.text,
         description: _descriptionController.text,
         schoolId: widget.circle.schoolId,
+        schoolUuid: widget.circle.schoolUuid,
         teacherId: widget.circle.teacherId,
+        teacherUuid: widget.circle.teacherUuid,
         circleCategoryId: _selectedCategory?.id,
+
         circleType: _selectedType?.name,
         circleTime: _selectedTime?.name,
       );

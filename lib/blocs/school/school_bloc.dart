@@ -51,8 +51,9 @@ class UpdateSchool extends SchoolEvent {
 
 class DeleteSchool extends SchoolEvent {
   final int schoolId;
+  int teacherId;
 
-  const DeleteSchool(this.schoolId);
+   DeleteSchool(this.schoolId,this.teacherId);
 
   @override
   List<Object> get props => [schoolId, ...super.props];
@@ -185,7 +186,7 @@ class SchoolBloc extends Bloc<SchoolEvent, SchoolState> {
         whereArgs: [event.schoolId],
       );
 
-      add(LoadSchools(event.schoolId));
+      add(LoadSchools(event.teacherId));
     } catch (e) {
       emit(SchoolError('Failed to delete school: $e'));
     }
