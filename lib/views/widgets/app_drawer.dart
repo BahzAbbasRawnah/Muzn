@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get/get.dart';
 import 'package:muzn/app/core/check_if_login.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/blocs/auth/auth_bloc.dart';
@@ -9,7 +8,6 @@ import 'package:muzn/blocs/ThemeBloc/theme_bloc.dart';
 import 'package:muzn/views/screens/about_screen.dart';
 import 'package:muzn/views/screens/contact_screen.dart';
 import 'package:muzn/views/screens/home_screen.dart';
-import 'package:muzn/views/screens/quran_pdf_screen.dart';
 import 'package:muzn/views/screens/users/login_screen.dart';
 import 'package:muzn/views/screens/quran_screen.dart';
 
@@ -78,14 +76,12 @@ class AppDrawer extends StatelessWidget {
                 ),
                 title: Text('quran'.trans(context)),
                 onTap: () {
-                  Get.to(()=>QuranScreen());
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => QuranPdfScreen()
-                  //         // QuranScreen(),
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuranScreen(),
+                    ),
+                  );
                 },
               ),
 

@@ -7,7 +7,8 @@ import 'dart:async';
 class QuranViewScreen extends StatefulWidget {
   final int surahNumber;
 
-  const QuranViewScreen({super.key, required this.surahNumber});
+  const QuranViewScreen({Key? key, required this.surahNumber})
+      : super(key: key);
 
   @override
   _QuranViewScreenState createState() => _QuranViewScreenState();

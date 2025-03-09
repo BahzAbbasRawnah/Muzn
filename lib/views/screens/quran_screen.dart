@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:muzn/app_localization.dart';
 import 'package:muzn/views/screens/quran_audio_screen.dart';
-import 'package:muzn/views/screens/quran_pdf_screen2.dart';
 import 'package:muzn/views/screens/quran_view_screen.dart';
 import 'package:muzn/views/widgets/custom_text_field.dart';
 import 'package:quran/quran.dart' as quran;
@@ -117,15 +115,14 @@ class _QuranScreenState extends State<QuranScreen> {
                         ],
                       ),
                       onTap: () {
-                        Get.to(()=>QuranPdfScreen2(surahNumber: surahNumber,));
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => QuranViewScreen(
-                        //       surahNumber: surahNumber,
-                        //     ),
-                        //   ),
-                        // );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuranViewScreen(
+                              surahNumber: surahNumber,
+                            ),
+                          ),
+                        );
                       },
                     ),
                   );

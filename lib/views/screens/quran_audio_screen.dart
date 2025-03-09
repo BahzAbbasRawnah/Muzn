@@ -8,10 +8,10 @@ class AudioPlayerScreen extends StatefulWidget {
   final int? ayahNumber;
 
   const AudioPlayerScreen({
-    super.key,
+    Key? key,
     required this.surahNumber,
     this.ayahNumber,
-  });
+  }) : super(key: key);
 
   @override
   _AudioPlayerScreenState createState() => _AudioPlayerScreenState();
@@ -32,8 +32,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
   Future<void> _initAudio() async {
     try {
       String surahAudioUrl = getAudioURLBySurah(widget.surahNumber);
-      print("surahAudioUrl");
-      print(surahAudioUrl);
+
       await _audioPlayer.setUrl(surahAudioUrl);
       setState(() {
         _isLoading = false;
@@ -70,11 +69,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: const Color.fromARGB(255, 204, 55, 44),
-        content: Text(
-          message + '  $speed',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          textAlign: TextAlign.center,
-        ),
+        content: Text(message + '  $speed',style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.only(
           bottom: MediaQuery.of(context).size.height * 0.3,
@@ -113,9 +108,9 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
             child: Center(
               child: _isLoading
                   ? CircularProgressIndicator(
-                      color: Theme.of(context).primaryColor,
-                      strokeWidth: 10,
-                    )
+                    color: Theme.of(context).primaryColor,
+                    strokeWidth: 10,
+                  )
                   : _errorMessage != null
                       ? Text(
                           _errorMessage!,
@@ -144,7 +139,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                   stream: _audioPlayer.positionStream,
                   builder: (context, snapshot) {
                     final position = snapshot.data ?? Duration.zero;
-                    return StreamBuilder<Duration?>(
+                    return StreamBuilder<Duration?>(  
                       stream: _audioPlayer.durationStream,
                       builder: (context, snapshot) {
                         final duration = snapshot.data ?? Duration.zero;
@@ -156,8 +151,7 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
                             _audioPlayer.seek(Duration(seconds: value.toInt()));
                           },
                           activeColor: Theme.of(context).primaryColor,
-                          inactiveColor:
-                              Theme.of(context).primaryColor.withAlpha(100),
+                          inactiveColor: Theme.of(context).primaryColor.withAlpha(100),
                           thumbColor: Theme.of(context).primaryColor,
                         );
                       },
