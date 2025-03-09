@@ -7,7 +7,7 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 class QuranPdfScreen extends StatefulWidget {
   final int surahNumber;
 
-  const QuranPdfScreen({super.key, this.surahNumber = 1});
+  const QuranPdfScreen({Key? key, this.surahNumber = 1}) : super(key: key);
 
   @override
   _QuranPdfScreenState createState() => _QuranPdfScreenState();
@@ -37,12 +37,12 @@ class _QuranPdfScreenState extends State<QuranPdfScreen> {
     _autoScrollTimer = Timer.periodic(Duration(milliseconds: 100), (timer) {
       if (_scrollSpeed > 0) {
         double newOffset = _currentPosition + (_scrollSpeed / 10); // Move gradually
-// _pdfController.
+
         // Prevent exceeding max scroll limit
         if (newOffset >= _pdfController.pageCount * 100) {
           newOffset = 0; // Restart from the top if end is reached
         }
-// _pdfController.jumpToPage(pageNumber)
+
         _pdfController.jumpTo(yOffset: newOffset);
         _currentPosition = newOffset;
       }
@@ -51,11 +51,10 @@ class _QuranPdfScreenState extends State<QuranPdfScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('quran pdf screen');
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${'surah'.trans(context)} ${quran.getSurahNameArabic(widget.surahNumber)}',
+          'surah'.trans(context) + ' ' + quran.getSurahNameArabic(widget.surahNumber),
         ),
       ),
       body: Column(
