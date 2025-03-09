@@ -31,7 +31,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
       }
     }else{
       if(BlocProvider.of<AuthBloc>(context).userModel!=null) {
-        context.read<SchoolBloc>().add(LoadSchools(BlocProvider
+       BlocProvider.of<SchoolBloc>(context).add(LoadSchools(BlocProvider
             .of<AuthBloc>(context)
             .userModel
             !.id));
@@ -161,6 +161,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                         top: Radius.circular(20)),
                                   ),
                                   builder: (context) => EditSchoolBottomSheet(
+                                    school: school,
                                     schoolId: school.id,
                                     initialName: school.name,
                                     initialAddress: school.address ?? '',
@@ -195,7 +196,7 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                           if (authState is AuthAuthenticated) {
                                             context
                                                 .read<SchoolBloc>()
-                                                .add(DeleteSchool(school.id));
+                                                .add(DeleteSchool(school.id,authState.user.id));
                                             Navigator.pop(context);
                                             if (mounted) {
                                               context.read<SchoolBloc>().add(
@@ -203,16 +204,15 @@ class _SchoolsListScreenState extends State<SchoolsListScreen> {
                                                       authState.user.id));
                                             }
                                           }else{
-                                            context
-                                                .read<SchoolBloc>()
-                                                .add(DeleteSchool(school.id));
+                                            BlocProvider.of<SchoolBloc>(context)
+                                                .add(DeleteSchool(school.id,BlocProvider.of<AuthBloc>(context).userModel!.id));
                                             Navigator.pop(context);
 
                                             // Reload schools after deletion
                                             if (mounted) {
-                                              context.read<SchoolBloc>().add(
-                                                  LoadSchools(
-                                                      BlocProvider.of<AuthBloc>(context).userModel!.id));
+                                              BlocProvider.of<SchoolBloc>(context).add(LoadSchools(BlocProvider.of<AuthBloc>(context).userModel!.id));
+                                              // context.read<SchoolBloc>().add(
+                                              //     LoadSchools(BlocProvider.of<AuthBloc>(context).userModel!.id));
                                             }
                                           }
                                         },

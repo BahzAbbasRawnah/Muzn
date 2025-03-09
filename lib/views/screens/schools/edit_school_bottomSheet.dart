@@ -12,12 +12,14 @@ import 'package:muzn/views/widgets/message.dart';
 import '../../../app/core/check_if_login.dart';
 
 class EditSchoolBottomSheet extends StatefulWidget {
+  School school;
   final int schoolId;
   final String initialName;
   final String initialAddress;
   final String? initialType;
 
-  EditSchoolBottomSheet({
+  EditSchoolBottomSheet({super.key,
+    required this.school,
     required this.schoolId,
     required this.initialName,
     required this.initialAddress,
@@ -63,6 +65,7 @@ class _EditSchoolBottomSheetState extends State<EditSchoolBottomSheet> {
         }
 
         final updatedSchool = School(
+          uuid: widget.school.uuid,
           id: widget.schoolId,
           name: _nameController.text,
           address: _addressController.text,
@@ -82,6 +85,7 @@ class _EditSchoolBottomSheetState extends State<EditSchoolBottomSheet> {
               .id;
 
           final updatedSchool = School(
+            uuid: widget.school.uuid,
             id: widget.schoolId,
             name: _nameController.text,
             address: _addressController.text,
