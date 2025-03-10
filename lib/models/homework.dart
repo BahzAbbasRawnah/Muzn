@@ -68,6 +68,28 @@ class Homework {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'uuid': uuid,
+      'circle_id': circleId,
+      'circle_uuid': circleUuid,
+      'circle_category_id': circleCategoryId,
+      'circle_category_uuid': circleCategoryUuid,
+      'student_id': studentId,
+      'student_uuid': studentUuid,
+      'checked':checked,
+      'start_surah_number': startSurahNumber,
+      'end_surah_number': endSurahNumber,
+      'start_ayah_number': startAyahNumber,
+      'end_ayah_number': endAyahNumber,
+      'homework_date': homeworkDate.toIso8601String(),
+      'notes': notes,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+      'deleted_at': deletedAt?.toIso8601String(),
+    };
+  }
+  Map<String, dynamic> toMapWithoutUuid() {
+    return {
+      'id': id,
       // 'uuid': uuid,
       'circle_id': circleId,
       'circle_uuid': circleUuid,
