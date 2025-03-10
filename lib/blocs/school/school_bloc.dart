@@ -100,8 +100,7 @@ class SchoolBloc extends Bloc<SchoolEvent, SchoolState> {
 
   Future<void> _onLoadSchools(LoadSchools event, Emitter<SchoolState> emit) async {
     emit(SchoolLoading());
-    final DatabaseSync databaseSync = DatabaseSync(DatabaseManager());
-    databaseSync.syncDatabaseToAPI();
+
 
     try {
       final db = await _databaseManager.database;

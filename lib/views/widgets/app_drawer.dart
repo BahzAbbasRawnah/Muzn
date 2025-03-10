@@ -13,6 +13,9 @@ import 'package:muzn/views/screens/quran_pdf_screen.dart';
 import 'package:muzn/views/screens/users/login_screen.dart';
 import 'package:muzn/views/screens/quran_screen.dart';
 
+import '../../api/database_sync.dart';
+import '../../services/database_service.dart';
+
 class AppDrawer extends StatelessWidget {
   const AppDrawer({Key? key}) : super(key: key);
 
@@ -203,6 +206,20 @@ class AppDrawer extends StatelessWidget {
                       builder: (context) => AboutScreen(),
                     ),
                   );
+                },
+              ),
+                    ListTile(
+                leading: const Icon(Icons.sync),
+                title: Text('sync_data'.trans(context)),
+                onTap: () {
+                  final DatabaseSync databaseSync = DatabaseSync(DatabaseManager());
+                  databaseSync.syncDatabaseToAPI();
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => AboutScreen(),
+                  //   ),
+                  // );
                 },
               ),
 

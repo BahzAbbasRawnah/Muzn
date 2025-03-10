@@ -8,6 +8,8 @@ import 'package:muzn/views/widgets/app_drawer.dart';
 import 'package:muzn/views/widgets/custom_app_bar.dart';
 import 'package:muzn/views/widgets/screen_header.dart';
 
+import '../../api/database_sync.dart';
+
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
@@ -33,6 +35,8 @@ class _MainScreenState extends State<MainScreen>
 
   Future<void> _initializeDependencies() async {
     _startAnimation();
+    final DatabaseSync databaseSync = DatabaseSync(DatabaseManager());
+    databaseSync.syncDatabaseToAPI();
   }
 
   void _startAnimation() {
