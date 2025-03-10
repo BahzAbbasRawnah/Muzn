@@ -10,9 +10,9 @@ import 'package:muzn/views/widgets/custom_surah_dropdown.dart';
 import 'package:muzn/views/widgets/custom_ayah_dropdown.dart';
 
 class EditStudentHomeworkBottomSheet extends StatefulWidget {
-  final Homework homework;
+   Homework homework;
 
-  const EditStudentHomeworkBottomSheet({super.key, required this.homework});
+   EditStudentHomeworkBottomSheet({super.key, required this.homework});
 
   @override
   _EditStudentHomeworkBottomSheetState createState() => _EditStudentHomeworkBottomSheetState();
@@ -74,6 +74,7 @@ Column(
                       ),
                       const SizedBox(height: 8),
                       CircleCategorySelector(
+initialSelectedCategoryId: selectedCategoryId,
                         onCategorySelected: (categoryId) {
                           setState(() {
                             selectedCategoryId = categoryId;
@@ -185,9 +186,12 @@ Column(
 
     // Create the updated Homework object
     Homework updatedHomework = Homework(
+      uuid: widget.homework.uuid,
       id: widget.homework.id,
       circleId: widget.homework.circleId,
+      circleUuid: widget.homework.circleUuid,
       circleCategoryId: selectedCategoryId ?? widget.homework.circleCategoryId,
+      studentUuid: widget.homework.studentUuid,
       studentId: widget.homework.studentId,
       startSurahNumber: selectedFromSurah!.number,
       endSurahNumber: selectedToSurah!.number,

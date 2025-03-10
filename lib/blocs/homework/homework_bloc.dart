@@ -275,7 +275,7 @@ class HomeworkBloc extends Bloc<HomeworkEvent, HomeworkState> {
   Future<void> insertHomework(Homework homework) async {
     // try {
       final db = await _databaseManager.database;
-      final homeworkMap = homework.toMap();
+      final homeworkMap = homework.toMapWithoutUuid();
       homeworkMap.remove('id');
       await db.insert('Homework', homeworkMap);
     // } catch (e) {
